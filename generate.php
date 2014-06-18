@@ -17,13 +17,7 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if ((CLICKHEAT_USER !== '' || CLICKHEAT_PASSWORD !== '') && (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || $_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD))
-{
-	header('WWW-Authenticate: Basic realm="Click Tracker"');
-	header('HTTP/1.0 401 Unauthorized');
-	echo LANG_AUTHORIZATION;
-	exit;
-}
+include './login.php';
 
 /** Screen size */
 $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;

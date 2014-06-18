@@ -17,14 +17,7 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
-$_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD)
-{
-	header('WWW-Authenticate: Basic realm="Click Tracker"');
-	header('HTTP/1.0 401 Unauthorized');
-	echo LANG_AUTHORIZATION;
-	exit;
-}
+include './login.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">

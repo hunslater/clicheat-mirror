@@ -8,7 +8,7 @@
 
 define('LANG_TITLE', 'ClickHeat : what\'s hot on your webpage ?');
 define('LANG_H1', 'ClickHeat : what\'s hot on your webpage ?');
-define('LANG_AUTHORIZATION', 'Sorry, this webpage is protected, please provide the good password.');
+define('LANG_AUTHORIZATION', 'Sorry, this webpage is protected, please provide the good password');
 define('LANG_DELETE_LOGS', 'Delete logs older than');
 define('LANG_DAYS', 'day(s)');
 define('LANG_SURE', 'Sure');

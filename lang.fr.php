@@ -8,7 +8,7 @@
 
 define('LANG_TITLE', 'ClickHeat : visualisation et analyse des clics');
 define('LANG_H1', 'ClickHeat : analyse des clics');
-define('LANG_AUTHORIZATION', 'Désolé, mais cette page est protégée, vous devez entrer le bon mot de passe.');
+define('LANG_AUTHORIZATION', 'Désolé, mais cette page est protégée, vous devez entrer le bon mot de passe');
 define('LANG_DELETE_LOGS', 'Supprimer les enregistrements de plus de');
 define('LANG_DAYS', 'jour(s)');
 define('LANG_SURE', 'Sûr');

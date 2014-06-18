@@ -20,11 +20,10 @@
 define('CLICKHEAT_LOGPATH', './logs/');
 
 /**
- * Utilisateur et mot de passe permettant d'accéder aux statistiques
+ * Mot de passe permettant d'accéder aux statistiques
  * 
- * User and password required for statistics
+ * Password required for statistics
 **/
-define('CLICKHEAT_USER', 'demo');
 define('CLICKHEAT_PASSWORD', 'demo');
 
 /**

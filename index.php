@@ -17,13 +17,7 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if ((CLICKHEAT_USER !== '' || CLICKHEAT_PASSWORD !== '') && (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || $_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD))
-{
-	header('WWW-Authenticate: Basic realm="Click Tracker"');
-	header('HTTP/1.0 401 Unauthorized');
-	echo LANG_AUTHORIZATION;
-	exit;
-}
+include './login.php';
 
 /** Input variables */
 $page = isset($_GET['page']) ? $_GET['page'] : '';
@@ -185,7 +179,7 @@ foreach ($browsersList as $label => $name)
 </head>
 <body>
 <?php
-if (CLICKHEAT_USER === '' && CLICKHEAT_PASSWORD === '' || CLICKHEAT_USER === 'demo' && CLICKHEAT_PASSWORD === 'demo')
+if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 {
 	echo '<small class="error" style="float:left;">'.LANG_ERROR_PASSWORD.'</small>';
 }
