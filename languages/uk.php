@@ -38,7 +38,7 @@ define('LANG_LAYOUT_RIGHT', 'Фіксована ширина правої час
 define('LANG_SCREENSIZE', 'Розмір екрану');
 define('LANG_HEATMAP', 'Карта (напівпрозора)');
 define('LANG_LATEST_CHECK', 'Поновити');
-define('LANG_LATEST_KO', 'Неможливо знайти останню доступну версію. Ви можете пошукати її на сайті:');
+define('LANG_LATEST_KO', 'Неможливо знайти останню доступну версію. Your release: %s, latest one is');
 define('LANG_LATEST_OK', 'У Вас сама остання версія (%s)');
 define('LANG_LATEST_NO', 'Ваша версія (%s) застаріла, нова: (%s). Ви можете завантажити нову версію на нашому сайті:');
 define('LANG_LOG_MY_CLICKS', 'Log my clicks?');

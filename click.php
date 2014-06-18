@@ -67,26 +67,26 @@ $final = ltrim($site.','.$group, ',');
 /** Limit file size */
 if ($clickheatConf['filesize'] !== 0)
 {
-	if (@filesize($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log') > $clickheatConf['filesize'])
+	if (file_exists($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log') && filesize($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log') > $clickheatConf['filesize'])
 	{
 		exit('Filesize reached limit');
 	}
 }
 /** Logging the click */
-$f = @fopen($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log', 'a');
+$f = fopen($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log', 'a');
 if ($f === false)
 {
 	/** Can't open the log, let's try to create the directory */
 	if (!is_dir(rtrim($clickheatConf['logPath'], '/')))
 	{
-		if (!@mkdir(rtrim($clickheatConf['logPath'], '/')))
+		if (!mkdir(rtrim($clickheatConf['logPath'], '/')))
 		{
 			exit('Cannot create log directory: '.$clickheatConf['logPath']);
 		}
 	}
 	if (!is_dir($clickheatConf['logPath'].$final))
 	{
-		if (!@mkdir($clickheatConf['logPath'].$final))
+		if (!mkdir($clickheatConf['logPath'].$final))
 		{
 			exit('Cannot create log directory: '.$clickheatConf['logPath'].$final);
 		}

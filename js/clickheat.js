@@ -7,6 +7,7 @@ ClickHeat : Suivi et analyse des clics / Tracking and clicks analysis
 @update 23/03/2007 - Yvan Taviaud : protection de 2 secondes entre chaque clic, et X clics maximum par page
 @update 18/05/2007 - Yvan Taviaud : suppression de clickHeatPage, ajout de clickHeatGroup et clickHeatSite
 @update 27/08/2007 - Yvan Taviaud : changement du système de débug
+@update 28/09/2007 - Yvan Taviaud : ajout de quelques messages de débug
 
 Tested under :
 Windows 2000 - IE 6.0
@@ -19,6 +20,7 @@ function catchClickHeat(e)
 	/** Use a try{} to avoid showing errors to users */
 	try
 	{
+		showClickHeatDebug('Gathering click data...');
 		if (clickHeatQuota == 0)
 		{
 			showClickHeatDebug('Click not logged: quota reached');
@@ -85,6 +87,7 @@ function catchClickHeat(e)
 			clickHeatQuota = clickHeatQuota - 1;
 		}
 		params = 's=' + clickHeatSite + '&g=' + clickHeatGroup + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + clickHeatBrowser + '&c=' + c + '&random=' + Date();
+		showClickHeatDebug('Ready to send click data...');
 		/** Local request? Try an ajax call */
 		var sent = false;
 		if (clickHeatServer.substring(0, 4) != 'http')
@@ -142,10 +145,7 @@ function catchClickHeat(e)
 	}
 	catch(e)
 	{
-		if (clickHeatDebug == true)
-		{
-			showClickHeatDebug('An error occurred while processing click (Javascript error): ' + e.message);
-		}
+		showClickHeatDebug('An error occurred while processing click (Javascript error): ' + e.message);
 	}
 	return true;
 }

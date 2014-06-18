@@ -30,6 +30,6 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 </table>
 <br />
 <?php echo LANG_JAVASCRIPT_PASTE ?><br />
-<pre id="clickheat-js"></pre>
+<div id="clickheat-js"></div>
 <img src="<?php echo CLICKHEAT_PATH ?>images/warning.png" width="16" height="16" alt="Warning" /> <?php echo LANG_JAVASCRIPT_DEBUG ?>
 </form>

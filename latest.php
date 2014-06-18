@@ -18,9 +18,9 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 <?php
 $f = @fsockopen('www.labsmedia.com', 80, $errno, $errstr, 5);
 include CLICKHEAT_ROOT.'version.php';
-if ($f === false)
+if ($f === false || is_null($f))
 {
-	echo LANG_LATEST_KO, ' <a href="http://www.labsmedia.com/clickheat/index.html">ClickHeat</a>';
+	echo sprintf(LANG_LATEST_KO, CLICKHEAT_VERSION), ': <iframe src="http://www.labsmedia.com/clickheat/version.txt" frameborder="0" width="50" height="20" scrolling="no"></iframe> - <a href="http://www.labsmedia.com/clickheat/index.html">ClickHeat</a>';
 }
 else
  {

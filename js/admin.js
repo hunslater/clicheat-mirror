@@ -214,7 +214,7 @@ function updateJs()
 {
 	var str = '';
 	var language = (navigator.language !== undefined && navigator.language == 'fr' ? 'fr' : 'com');
-	var addReturn = document.getElementById('jsShort').checked ? '' : '\n';
+	var addReturn = document.getElementById('jsShort').checked ? '' : '<br />';
 	str += '&lt;script type="text/javascript" src="';
 	str += scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;' + addReturn;
 	if (language == 'fr')
@@ -223,7 +223,7 @@ function updateJs()
 	}
 	else
 	{
-		linkList = ['&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Trafic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Click analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Surfer navigation analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Navigational analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Landing page optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Ergonomy optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Web design optimisation&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Heat map generator&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source heat map&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source trafic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Webmaster tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Free marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Seo tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Trafic optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Trafic monetization&lt;/a&gt;'];
+		linkList = ['&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Traffic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Click analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Surfer navigation analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Navigational analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Landing page optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Ergonomy optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Web design optimisation&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Heat map generator&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source heat map&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source traffic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Webmaster tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Free marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Seo tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Traffic optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Traffic monetization&lt;/a&gt;'];
 	}
 	if (document.getElementById('jsShowImage').checked)
 	{
@@ -234,7 +234,7 @@ function updateJs()
 		rand = Math.floor(Math.random() * linkList.length);
 		str += '&lt;noscript&gt;' + linkList[rand] + '&lt;/noscript&gt;' + addReturn;
 	}
-	str += '&lt;script type="text/javascript"&gt;&lt;!--\n';
+	str += '&lt;script type="text/javascript"&gt;&lt;!--<br />';
 	str += 'clickHeatSite = ';
 	/** PMV form */
 	if (document.getElementById('form_site') != undefined)
@@ -264,7 +264,7 @@ function updateJs()
 		str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;' + addReturn;
 	}
 	str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';' + addReturn;
-	str += 'initClickHeat(); //--&gt;\n';
+	str += 'initClickHeat(); //--&gt;<br />';
 	str += '&lt;/script&gt;';
 	document.getElementById('clickheat-js').innerHTML = str;
 }
