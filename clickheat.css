@@ -1,0 +1,18 @@
+body {
+	font-family: arial, helvetica, sans-serif;
+	font-size:0.8em;
+	color:#333;
+	margin:0;
+}
+h1 {
+	font-size:1.1em;
+	text-align:center;
+	margin:5px;
+}
+th {
+	text-align:left;
+	vertical-align:top;
+}
+input { border:1px solid #333;}
+img { border:0;}
+#url { float:right;}
