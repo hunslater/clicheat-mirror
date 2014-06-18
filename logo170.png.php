@@ -104,6 +104,10 @@ $string = 'ClickHeat';
 $x = 18;
 $y = 32;
 $font = '/mnt/win_dd/WINDOWS/Fonts/verdana.ttf';
+if (!file_exists($font))
+{
+	exit('Font not found');
+}
 $size = 25;
 for ($i = 0, $max = strlen($string); $i < $max; $i++)
 {

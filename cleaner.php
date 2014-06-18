@@ -12,54 +12,86 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 	exit;
 }
 
-/**
- * Clean the logs' directory according to configuration data
-**/
-if (CLICKHEAT_ADMIN === false || $clickheatConf['flush'] === 0 || is_dir($clickheatConf['logPath']) === false)
+if (CLICKHEAT_ADMIN === false)
 {
 	return false;
 }
-$logDir = dir($clickheatConf['logPath']);
 $deletedFiles = 0;
 $deletedDirs = 0;
-while (($dir = $logDir->read()) !== false)
+/**
+ * Clean the logs' directory according to configuration data
+**/
+if ($clickheatConf['flush'] !== 0 && is_dir($clickheatConf['logPath']) === true)
 {
-	if ($dir === '.' || $dir === '..' || !is_dir($logDir->path.$dir))
+	$logDir = dir($clickheatConf['logPath'].'/');
+	while (($dir = $logDir->read()) !== false)
 	{
-		continue;
-	}
+		if ($dir === '.' || $dir === '..' || !is_dir($logDir->path.$dir))
+		{
+			continue;
+		}
 
-	$d = dir($clickheatConf['logPath'].$dir.'/');
-	$deletedAll = true;
-	$oldestDate = mktime(0, 0, 0, date('m'), date('d') - $clickheatConf['flush'], date('Y'));
+		$d = dir($logDir->path.$dir.'/');
+		$deletedAll = true;
+		$oldestDate = mktime(0, 0, 0, date('m'), date('d') - $clickheatConf['flush'], date('Y'));
+		while (($file = $d->read()) !== false)
+		{
+			if ($file === '.' || $file === '..' || $file === 'url.txt')
+			{
+				continue;
+			}
+			$ext = explode('.', $file);
+			if (count($ext) !== 2)
+			{
+				$deletedAll = false;
+				continue;
+			}
+			$filemtime = filemtime($d->path.$file);
+			if ($ext[1] === 'log' && $filemtime <= $oldestDate)
+			{
+				@unlink($d->path.$file);
+				$deletedFiles++;
+				continue;
+			}
+			$deletedAll = false;
+		}
+		/** If every log file (but the url.txt) has been deleted, then we should delete the directory too */
+		if ($deletedAll === true)
+		{
+			@unlink($d->path.'/url.txt');
+			$deletedFiles++;
+			@rmdir($d->path);
+			$deletedDirs++;
+		}
+		$d->close();
+	}
+	$logDir->close();
+}
+
+/**
+ * Clean the cache directory for every file older than 2 minutes
+**/
+if (is_dir($clickheatConf['cachePath']) === true)
+{
+	$d = dir($clickheatConf['cachePath'].'/');
 	while (($file = $d->read()) !== false)
 	{
-		if ($file === '.' || $file === '..' || $file === '%%url.txt%%')
+		if ($file === '.' || $file === '..')
 		{
 			continue;
 		}
 		$ext = explode('.', $file);
 		if (count($ext) !== 2)
 		{
-			$deletedAll = false;
 			continue;
 		}
 		$filemtime = filemtime($d->path.$file);
 		switch ($ext[1])
 		{
-			case 'log%%':
-				{
-					/** Too old, must be deleted */
-					if ($filemtime <= $oldestDate)
-					{
-						@unlink($d->path.$file);
-						$deletedFiles++;
-						continue;
-					}
-					break;
-				}
-			case 'html%%':
-			case 'png%%':
+			case 'html':
+			case 'png':
+			case 'png_temp':
+			case 'png_log':
 				{
 					if ($filemtime + 120 < time())
 					{
@@ -70,19 +102,9 @@ while (($dir = $logDir->read()) !== false)
 					break;
 				}
 		}
-		$deletedAll = false;
-	}
-	/** If every log file (but the %%url.txt%%) has been deleted, then we should delete the directory too */
-	if ($deletedAll === true)
-	{
-		@unlink($d->path.'/%%url.txt%%');
-		$deletedFiles++;
-		@rmdir($d->path);
-		$deletedDirs++;
 	}
 	$d->close();
 }
-$logDir->close();
 
 if ($deletedDirs + $deletedFiles === 0)
 {

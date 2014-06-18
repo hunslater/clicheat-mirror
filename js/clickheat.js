@@ -1,10 +1,11 @@
 /**
 ClickHeat : Suivi et analyse des clics / Tracking and clicks analysis
 
-@author Yvan Taviaud - LabsMedia - www.labsmedia.com
+@author Yvan Taviaud - LabsMedia - www.labsmedia.com/clickheat/
 @since 27/10/2006
 @update 01/03/2007 - Yvan Taviaud : correctif Firefox (Károly Marton)
 @update 23/03/2007 - Yvan Taviaud : protection de 2 secondes entre chaque clic, et X clics maximum par page
+@update 18/05/2007 - Yvan Taviaud : suppression de clickHeatPage, ajout de clickHeatGroup et clickHeatSite
 
 Tested under :
 Windows 2000 - IE 6.0
@@ -22,6 +23,14 @@ function catchClickHeat(e)
 			if (clickHeatDebug == true)
 			{
 				alert('Click not logged: quota reached');
+			}
+			return true;
+		}
+		if (clickHeatGroup == '')
+		{
+			if (clickHeatDebug == true)
+			{
+				alert('Click not logged: group name empty (clickHeatGroup)');
 			}
 			return true;
 		}
@@ -97,7 +106,7 @@ function catchClickHeat(e)
 		b = navigator.userAgent != undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
 		b0 = b.replace(/^.*(firefox|kmeleon|safari|msie|opera).*$/, '$1');
 		if (b == b0 || b0 == '') b0 = 'unknown';
-		params = 'p=' + clickHeatPage + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&c=' + c + '&random=' + Date();
+		params = 's=' + clickHeatSite + '&g=' + clickHeatGroup + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&c=' + c + '&random=' + Date();
 		/** Local request? Try an ajax call */
 		var sent = false;
 		if (clickHeatServer.substring(0, 4) != 'http')
@@ -159,7 +168,9 @@ function catchClickHeat(e)
 	return true;
 }
 
-var clickHeatPage = '';
+var clickHeatPage = ''; /** Backward compatibility */
+var clickHeatGroup = '';
+var clickHeatSite = '';
 var clickHeatServer = '/clickheat/click.php';
 var clickHeatLastIframe = -1;
 var clickHeatTime = 0;
@@ -167,11 +178,16 @@ var clickHeatQuota = -1;
 var clickHeatDebug = (window.location.href.search(/debugclickheat/) != -1);
 function initClickHeat()
 {
-	if (clickHeatPage == '' || clickHeatServer == '')
+	/** Backward compatibility */
+	if (clickHeatGroup == '' && clickHeatPage != '')
+	{
+		clickHeatGroup = clickHeatPage;
+	}
+	if (clickHeatGroup == '' || clickHeatServer == '')
 	{
 		if (clickHeatDebug == true)
 		{
-			alert('ClickHeat NOT initialised: either clickHeatPage or clickHeatServer is empty');
+			alert('ClickHeat NOT initialised: either clickHeatGroup or clickHeatServer is empty');
 		}
 		return false;
 	}
@@ -201,6 +217,6 @@ function initClickHeat()
 	}
 	if (clickHeatDebug == true)
 	{
-		alert('ClickHeat initialised with:\npage = ' + clickHeatPage + '\nserver = ' + clickHeatServer + '\nquota = ' + (clickHeatQuota == -1 ? 'unlimited' : clickHeatQuota));
+		alert('ClickHeat initialised with:\nsite = ' + clickHeatSite + '\ngroup = ' + clickHeatGroup + '\nserver = ' + clickHeatServer + '\nquota = ' + (clickHeatQuota == -1 ? 'unlimited' : clickHeatQuota));
 	}
 }

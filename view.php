@@ -12,18 +12,52 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 	exit;
 }
 
-/** List of available pages */
-$__selectPages = array();
+/** List of available groups */
+$groups = array();
 $d = dir($clickheatConf['logPath']);
-while (($file = $d->read()) !== false)
+while (($dir = $d->read()) !== false)
 {
-	if (strpos($file, '.') !== false) continue;
-	$__selectPages[] = '<option value="'.$file.'">'.$file.'</option>';
+	if ($dir === '.' || $dir === '..' || !is_dir($d->path.$dir)) continue;
+	$pos = strpos($dir, ',');
+	if ($pos !== false)
+	{
+		$site = substr($dir, 0, $pos);
+	}
+	else
+	{
+		$site = '';
+	}
+	if (IS_PHPMV_MODULE === true)
+	{
+		if ($site !== $_GET['site'])
+		{
+			continue;
+		}
+		$site = '';
+	}
+	if (!isset($groups[$site]))
+	{
+		$groups[$site] = array();
+	}
+	$groups[$site][] = '<option value="'.$dir.'">'.($pos === false ? $dir : substr($dir, $pos + 1)).'</option>';
 }
 $d->close();
-/** Sort pages in alphabetical order */
-sort($__selectPages);
-$__selectPages = implode('', $__selectPages);
+/** Sort groups in alphabetical order */
+ksort($groups);
+$__selectGroups = '';
+foreach ($groups as $key => $options)
+{
+	sort($options);
+	if ($key !== '')
+	{
+		$__selectGroups .= '<optgroup label="'.$key.'">';
+	}
+	$__selectGroups .= implode("\n", $options);
+	if ($key !== '')
+	{
+		$__selectGroups .= '</optgroup>';
+	}
+}
 
 asort($__screenSizes);
 /** Screen sizes */
@@ -58,7 +92,7 @@ $__year = (int) date('Y', $date);
 <form action="<?php echo CLICKHEAT_INDEX_PATH ?>" method="get" onsubmit="return false;" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" id="clickTable">
 <tr>
-	<th><?php echo LANG_GROUP ?></th><td><select name="page" id="formPage" onchange="hidePageLayout(); loadIframe();"><?php echo $__selectPages ?></select><?php if (CLICKHEAT_ADMIN === true) echo ' <a href="#" onclick="showPageLayout(); return false;"><img src="', CLICKHEAT_PATH, 'images/layout.png" width="16" height="16" align="absmiddle" alt="Layout" /></a>'; ?></td>
+	<th><?php echo LANG_SITE ?> &amp; <?php echo LANG_GROUP ?></th><td><select name="group" id="formGroup" onchange="hideGroupLayout(); loadIframe();"><?php echo $__selectGroups ?></select><?php if (CLICKHEAT_ADMIN === true) echo ' <a href="#" onclick="showGroupLayout(); return false;"><img src="', CLICKHEAT_PATH, 'images/layout.png" width="16" height="16" align="absmiddle" alt="Layout" /></a>'; ?> <a href="#" onclick="updateHeatmap(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/reload.png" width="16" height="16" align="absmiddle" alt="Refresh" /></a></td>
 	<td rowspan="4">
 <?php
 $__calendar = '<table cellpadding="0" cellspacing="0" border="0" class="clickheat-calendar"><tr>';
@@ -147,6 +181,8 @@ echo $__calendar;
 pleaseWait = '<?php echo addslashes(LANG_ERROR_LOADING); ?>';
 cleanerRunning = '<?php echo addslashes(LANG_CLEANER_RUNNING); ?>';
 isJsOkay = '<?php echo CLICKHEAT_ADMIN === true ? '<a href="#" onclick="showJsCode(); return false;">'.addslashes(LANG_ERROR_JAVASCRIPT).'</a>' : '' ?>';
+hideIframes = <?php echo $clickheatConf['hideIframes'] === true ? 'true' : 'false' ?>;
+hideFlashes = <?php echo $clickheatConf['hideFlashes'] === true ? 'true' : 'false' ?>;
 scriptPath = '<?php echo CLICKHEAT_PATH ?>';
 scriptIndexPath = '<?php echo CLICKHEAT_INDEX_PATH ?>';
 lastDayOfMonth = <?php echo $__lastDayOfMonth ?>;

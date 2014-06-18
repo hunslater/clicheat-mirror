@@ -45,6 +45,13 @@ img {
 	color:#fff;
 	background-color:#55b;
 }
+#alphaSelector {
+	position:relative;
+	bottom:1px;
+}
+#formHeatmap {
+	margin:1px;
+}
 #pngDiv {
 	position:absolute;
 	text-align:center;
@@ -86,13 +93,20 @@ img {
 	margin-left:auto;
 	margin-right:auto;
 	border:1px solid #aaf;
-	width:600px;
+	width:800px;
 	padding:15px;
 	margin-top:20px;
 	clear:right;
 }
 #clickheat-box .center {
 	text-align:center;
+}
+#clickheat-box th {
+	font-weight:bold;
+	font-size:1em;
+	padding:10px 0 0 10px;
+	color:#55d;
+	border-bottom: 1px solid #aaf;
 }
 .error {
 	font-weight:bold;

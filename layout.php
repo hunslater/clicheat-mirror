@@ -1,6 +1,6 @@
 <?php
 /**
- * ClickHeat : Mise à jour des informations d'une page / Page info update
+ * ClickHeat : Mise à jour des informations d'un groupe / Group info update
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 04/04/2007
@@ -12,11 +12,11 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 	exit;
 }
 
-$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
+$group = isset($_GET['group']) ? str_replace('/', '', $_GET['group']) : '';
 
-if (file_exists($clickheatConf['logPath'].$page.'/%%url.txt%%'))
+if (file_exists($clickheatConf['logPath'].$group.'/url.txt'))
 {
-	$f = @fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'r');
+	$f = @fopen($clickheatConf['logPath'].$group.'/url.txt', 'r');
 	$webPage = trim(fgets($f, 1024));
 	fclose($f);
 }
@@ -34,11 +34,21 @@ $left = (int) $webPage[1];
 $center = (int) $webPage[2];
 $right = (int) $webPage[3];
 unset($webPage);
+
+$pos = strpos($group, ',');
+if ($pos === false)
+{
+	$groupTitle = &$group;
+}
+else 
+{
+	$groupTitle = substr($group, $pos + 1);
+}
 ?>
-<span class="float-right"><a href="#" onclick="hidePageLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/ko.png" width="16" height="16" align="absmiddle" alt="Close" /></a></span>
-<h1><?php echo LANG_LAYOUT ?> '<em><?php echo htmlentities($page); ?></em>'</h1>
+<span class="float-right"><a href="#" onclick="hideGroupLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/ko.png" width="16" height="16" align="absmiddle" alt="Close" /></a></span>
+<h1><?php echo LANG_LAYOUT ?> '<em><?php echo htmlentities($groupTitle); ?></em>'</h1>
 <form action="#" method="get" onsubmit="return false;">
-<?php echo LANG_EXAMPLE_URL ?> <input type="text" name="url" id="formUrl" value="<?php echo htmlentities($url); ?>" size="50" /> <a href="#" onclick="savePageLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/save.png" width="16" height="16" alt="Save" /></a><br />
+<?php echo LANG_EXAMPLE_URL ?> <input type="text" name="url" id="formUrl" value="<?php echo htmlentities($url); ?>" size="50" /> <a href="#" onclick="saveGroupLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/save.png" width="16" height="16" alt="Save" /></a><br />
 <span class="layout-left-fixed"><?php echo LANG_LAYOUT_FIXED ?></span> <span class="layout-left-liquid"><?php echo LANG_LAYOUT_LIQUID ?></span> <span class="layout-left-empty"><?php echo LANG_LAYOUT_NONE ?></span><br />
 <table cellpadding="0" cellspacing="2" border="0">
 <?php
@@ -54,7 +64,7 @@ for ($i = 0; $i < 7; $i++)
 	echo $leftFixed ? LANG_LAYOUT_LEFT.' <input type="text" name="left-'.$i.'" id="layout-left-'.$i.'" size="3" value="'.$left.'" /> ' : '<input type="hidden" name="left-'.$i.'" id="layout-left-'.$i.'" value="0" />';
 	echo $centerFixed && !$leftFixed && !$rightFixed ? LANG_LAYOUT_CENTER.' <input type="text" name="center-'.$i.'" id="layout-center-'.$i.'" size="3" value="'.$center.'" /> ' : '<input type="hidden" name="center-'.$i.'" id="layout-center-'.$i.'" value="0" />';
 	echo $rightFixed ? LANG_LAYOUT_RIGHT.' <input type="text" name="right-'.$i.'" id="layout-right-'.$i.'" size="3" value="'.$right.'" />' : '<input type="hidden" name="right-'.$i.'" id="layout-right-'.$i.'" value="0" />';
-	echo '<a href="#" onclick="savePageLayout(); return false;"><img src="', CLICKHEAT_PATH, 'images/save.png" width="16" height="16" align="absmiddle" alt="Save" /></a></span></td>';
+	echo '<a href="#" onclick="saveGroupLayout(); return false;"><img src="', CLICKHEAT_PATH, 'images/save.png" width="16" height="16" align="absmiddle" alt="Save" /></a></span></td>';
 	echo '<td><input type="radio" name="layout-radio" id="layout-radio-', $i, '"', $selected ? ' checked="checked"' : '', ' onclick="showRadioLayout(', $i, ');" /></td></tr>';
 }
 ?>

@@ -59,7 +59,7 @@ while(<LOGFILE>)
 	    $date =~ s#^(....)(..)(..)(..):(..):(..)#$1-$2-$3#;
 	    
 	    my $writeDir = $destPath.$page;
-	    my $writeFile = $writeDir.'/%%'.$date.'.log%%';
+	    my $writeFile = $writeDir.'/'.$date.'.log';
 	    mkdir($writeDir) if (!-d $destPath.$page);
 
 
@@ -94,7 +94,7 @@ while(<LOGFILE>)
 	    #
 	    if ($referer ne '')
 	    {
-		$writeFile = $writeDir . '/%%url.txt%%';
+		$writeFile = $writeDir . '/url.txt';
 		
 		if (!-f $writeFile)
 		{

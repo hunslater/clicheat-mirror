@@ -13,6 +13,9 @@ var currentWidth = 0;
 var pleaseWait = '';
 var cleanerRunning = '';
 var isJsOkay = '';
+var hideIframes = true;
+var hideFlashes = true;
+var isPmvModule = false;
 var scriptPath = '';
 var scriptIndexPath = '';
 
@@ -149,7 +152,7 @@ function updateHeatmap()
 	{
 		screen = document.getElementById('formScreen').value;
 	}
-	xmlhttp.open('GET', scriptIndexPath + 'action=generate&page=' + document.getElementById('formPage').value + '&screen=' + screen + '&browser=' + document.getElementById('formBrowser').value + '&date=' + currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0] + '&range=' + currentRange + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
+	xmlhttp.open('GET', scriptIndexPath + 'action=generate&group=' + document.getElementById('formGroup').value + '&screen=' + screen + '&browser=' + document.getElementById('formBrowser').value + '&date=' + currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0] + '&range=' + currentRange + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
 	xmlhttp.onreadystatechange = function()
 	{
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
@@ -162,12 +165,12 @@ function updateHeatmap()
 	xmlhttp.send(null);
 }
 
-/** Ajax request to show page layout */
-function showPageLayout()
+/** Ajax request to show group layout */
+function showGroupLayout()
 {
 	var xmlhttp;
 	xmlhttp = getXmlHttp();
-	xmlhttp.open('GET', scriptIndexPath + 'action=layout&page=' + document.getElementById('formPage').value + '&rand=' + Date(), true);
+	xmlhttp.open('GET', scriptIndexPath + 'action=layout&group=' + document.getElementById('formGroup').value + '&rand=' + Date(), true);
 	xmlhttp.onreadystatechange = function()
 	{
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
@@ -198,8 +201,8 @@ function showJsCode()
 	xmlhttp.send(null);
 }
 
-/** Hide page layout */
-function hidePageLayout()
+/** Hide group layout */
+function hideGroupLayout()
 {
 	document.getElementById('layoutDiv').style.display = 'none';
 	document.getElementById('layoutDiv').innerHTML = '';
@@ -211,30 +214,40 @@ function updateJs()
 	var str = '';
 	var language = (navigator.language !== undefined && navigator.language == 'fr' ? 'fr' : 'com');
 	str += '&lt;script type="text/javascript" src="' + scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;\n';
-	str += '&lt;script type="text/javascript"&gt;\n';
-	str += 'clickHeatPage = ';
-	if (document.getElementById('jsPage1').checked)
+	str += '&lt;script type="text/javascript"&gt;&lt;!--\n';
+	str += 'clickHeatSite = ';
+	/** PMV form */
+	if (document.getElementById('form_site') != undefined)
 	{
-		str += '\'<span class="error">ABC</span>\'';
+		str += document.getElementById('form_site').site.value.replace(/[^a-z0-9\-_\.]+/gi, '.');
 	}
-	if (document.getElementById('jsPage2').checked)
+	else
+	{
+		str += '\'<span class="error">' + document.getElementById('jsSite').value.replace(/[^a-z0-9\-_\.]+/gi, '.') + '</span>\'';
+	}
+	str += ';\nclickHeatGroup = ';
+	if (document.getElementById('jsGroup1').checked)
+	{
+		str += '\'<span class="error">' + document.getElementById('jsGroup').value.replace(/[^a-z0-9\-_\.]+/gi, '.') + '</span>\'';
+	}
+	if (document.getElementById('jsGroup2').checked)
 	{
 		str += 'document.title';
 	}
-	if (document.getElementById('jsPage3').checked)
+	if (document.getElementById('jsGroup3').checked)
 	{
 		str += 'window.location.pathname';
 	}
 	str += ';\n';
 	if (document.getElementById('jsQuota').value != 0)
 	{
-		str += 'clickHeatQuota = ' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + ';\n';
+		str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;\n';
 	}
 	if (scriptPath != '/clickheat/')
 	{
-		str += 'clickHeatServer = \'' + scriptPath + 'click.php\';\n';
+		str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';\n';
 	}
-	str += 'initClickHeat();\n';
+	str += 'initClickHeat();\n//--&gt;\n';
 	str += '&lt;/script&gt;\n';
 	if (document.getElementById('jsShowImage').checked)
 	{
@@ -257,7 +270,7 @@ function showRadioLayout()
 }
 
 /** Show layout's parameters */
-function savePageLayout()
+function saveGroupLayout()
 {
 	for (i = 0; i < 7; i++)
 	{
@@ -273,7 +286,7 @@ function savePageLayout()
 	}
 	var xmlhttp;
 	xmlhttp = getXmlHttp();
-	xmlhttp.open('GET', scriptIndexPath + 'action=layoutupdate&page=' + document.getElementById('formPage').value + '&url=' + document.getElementById('formUrl').value + '&left=' + document.getElementById('layout-left-' + i).value + '&right=' + document.getElementById('layout-right-' + i).value + '&center=' + document.getElementById('layout-center-' + i).value + '&rand=' + Date(), true);
+	xmlhttp.open('GET', scriptIndexPath + 'action=layoutupdate&group=' + document.getElementById('formGroup').value + '&url=' + document.getElementById('formUrl').value + '&left=' + document.getElementById('layout-left-' + i).value + '&right=' + document.getElementById('layout-right-' + i).value + '&center=' + document.getElementById('layout-center-' + i).value + '&rand=' + Date(), true);
 	xmlhttp.onreadystatechange = function()
 	{
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
@@ -282,19 +295,19 @@ function savePageLayout()
 			{
 				alert(xmlhttp.responseText);
 			}
-			hidePageLayout();
+			hideGroupLayout();
 			loadIframe();
 		}
 	}
 	xmlhttp.send(null);
 }
 
-/** Ajax request to get associated page in iframe */
+/** Ajax request to get associated group in iframe */
 function loadIframe()
 {
 	var xmlhttp;
 	xmlhttp = getXmlHttp();
-	xmlhttp.open('GET', scriptIndexPath + 'action=iframe&page=' + document.getElementById('formPage').value + '&rand=' + Date(), true);
+	xmlhttp.open('GET', scriptIndexPath + 'action=iframe&group=' + document.getElementById('formGroup').value + '&rand=' + Date(), true);
 	xmlhttp.onreadystatechange = function()
 	{
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
@@ -321,8 +334,12 @@ function cleanIframe()
 	{
 		return true;
 	}
-	try
+	if (hideIframes == false && hideFlashes == false)
 	{
+		return true;
+	}
+//	try
+//	{
 		var currentIframe = document.getElementById('webPageFrame');
 		if (currentIframe.contentDocument)
 		{
@@ -339,11 +356,28 @@ function cleanIframe()
 		}
 		newContent = currentIframeContent.body.innerHTML;
 		oldPos = 0;
+		if (hideIframes == false)
+		{
+			reg = 'object';
+		}
+		else
+		{
+			if (hideFlashes == false)
+			{
+				reg = 'iframe';
+			}
+			else
+			{
+				reg = 'object|iframe';
+			}
+		}
+		startReg = new RegExp('<(' + reg + ')', 'i');
+		endReg = new RegExp('<\/(' + reg + ')', 'i');
 		while (true)
 		{
-			pos = newContent.search(/<(object|iframe)/i);
-			pos2 = newContent.search(/<\/(object|iframe)>/i);
-			if (pos == -1 || pos2 == -1 || pos == oldPos) break;
+			pos = newContent.search(startReg);
+			pos2 = newContent.search(endReg);
+			if (pos == -1 || pos2 == -1 || pos == oldPos || pos > pos2) break;
 			pos2 += 9;
 			found = newContent.substring(pos, pos2);
 			width = found.match(/width=[^0-9]*(\d+)/);
@@ -354,8 +388,8 @@ function cleanIframe()
 			oldPos = pos;
 		}
 		currentIframeContent.body.innerHTML = newContent;
-	}
-	catch(e) {}
+//	}
+//	catch(e) {}
 }
 
 /** Draw alpha selector */

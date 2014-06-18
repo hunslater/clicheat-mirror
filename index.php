@@ -8,7 +8,6 @@
 
 $__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
 
-/** First of all, check if we are inside PhpMyVisites */
 if (isset($_SERVER['REQUEST_URI']) && $_SERVER['SCRIPT_NAME'] !== '')
 {
 	$realPath = &$_SERVER['REQUEST_URI'];
@@ -27,19 +26,22 @@ if (substr($realPath, -1, 1) === '/')
 	exit;
 }
 
-if (!defined('INCLUDE_PATH'))
+/** First of all, check if we are inside PhpMyVisites */
+if (defined('INCLUDE_PATH'))
 {
-	define('CLICKHEAT_PATH', rtrim(dirname($realPath), '/').'/');
-	define('CLICKHEAT_INDEX_PATH', rtrim(dirname($realPath), '/').'/index.php?');
-	define('CLICKHEAT_ROOT', './');
-	define('IS_PHPMV_MODULE', false);
+	define('CLICKHEAT_PATH', dirname($realPath).'/plugins/clickheat/libs/');
+	define('CLICKHEAT_INDEX_PATH', dirname($realPath).'/index.php?mod=clickheat.view_clickheat&');
+	define('CLICKHEAT_ROOT', dirname(__FILE__).'/');
+	define('CLICKHEAT_CONFIG', INCLUDE_PATH.'/config/clickheat.php');
+	define('IS_PHPMV_MODULE', true);
 }
 else
 {
-	define('CLICKHEAT_PATH', rtrim(dirname($realPath), '/').'/libs/clickheat/');
-	define('CLICKHEAT_INDEX_PATH', rtrim(dirname($realPath), '/').'/index.php?mod=view_clickheat&');
-	define('CLICKHEAT_ROOT', INCLUDE_PATH.'/libs/clickheat/');
-	define('IS_PHPMV_MODULE', true);
+	define('CLICKHEAT_PATH', dirname($realPath).'/');
+	define('CLICKHEAT_INDEX_PATH', dirname($realPath).'/index.php?');
+	define('CLICKHEAT_ROOT', dirname(__FILE__).'/');
+	define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');
+	define('IS_PHPMV_MODULE', false);
 }
 
 /** Improve buffer usage and compression */
@@ -66,7 +68,7 @@ unset($lang);
 include CLICKHEAT_ROOT.'languages/'.CLICKHEAT_LANGUAGE.'.php';
 
 /** If there's no config file, run check script */
-if (!file_exists(CLICKHEAT_ROOT.'config/config.php'))
+if (!file_exists(CLICKHEAT_CONFIG))
 {
 	if ($__action !== 'check' && $__action !== 'config')
 	{
@@ -75,13 +77,14 @@ if (!file_exists(CLICKHEAT_ROOT.'config/config.php'))
 }
 else
 {
-	include CLICKHEAT_ROOT.'config/config.php';
+	include CLICKHEAT_CONFIG;
 
 	/** Login check */
 	if (IS_PHPMV_MODULE === true)
 	{
-		/** Consider that we are already logged */
-		define('CLICKHEAT_ADMIN', true);
+		/** Call external check */
+		$me = User::getInstance();
+		define('CLICKHEAT_ADMIN', (bool) $me->hasSomeAdminRights());
 	}
 	elseif (isset($_COOKIE['clickheat']))
 	{
@@ -114,7 +117,17 @@ else
 				setcookie('clickheat', $clickheatConf['adminLogin'].'||'.$clickheatConf['adminPass'], 0, '/');
 				/** Redirect to index.php */
 				header('Content-Type: text/html');
-				header('Location: index.php?action=view');
+
+				/** Upgrade needed ? */
+				include CLICKHEAT_ROOT.'version.php';
+				if (!isset($clickheatConf['version']) || $clickheatConf['version'] !== CLICKHEAT_VERSION)
+				{
+					header('Location: '.CLICKHEAT_INDEX_PATH.'action=config');
+				}
+				else
+				{
+					header('Location: '.CLICKHEAT_INDEX_PATH.'action=view');
+				}
 				exit;
 			}
 			elseif ($clickheatConf['viewerLogin'] !== '' && $_POST['login'] === $clickheatConf['viewerLogin'] && md5($_POST['pass']) === $clickheatConf['viewerPass'])
@@ -123,7 +136,7 @@ else
 				setcookie('clickheat', $clickheatConf['viewerLogin'].'||'.$clickheatConf['viewerPass'], 0, '/');
 				/** Redirect to index.php */
 				header('Content-Type: text/html');
-				header('Location: index.php?action=view');
+				header('Location: '.CLICKHEAT_INDEX_PATH.'action=view');
 				exit;
 			}
 		}
@@ -138,10 +151,6 @@ if (!defined('CLICKHEAT_ADMIN'))
 /** Specific definitions */
 $__screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1600, 1800);
 $__browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet Explorer', 'safari' => 'Safari', 'opera' => 'Opera', 'kmeleon' => 'K-meleon', 'unknown' => '');
-define('CLICKHEAT_LOW_COLOR', 0); /** Niveau minimal de couleur RVB / Lower RGB level of color */
-define('CLICKHEAT_HIGH_COLOR', 255); /** Niveau maximal de couleur RVB / Higher RGB level of color */
-define('CLICKHEAT_GREY_COLOR', 240); /** Niveau du gris (couleur du 0 clic) / Grey level (color of no-click) */
-$__colorLevels = array(50, 70, 90, 110, 120); /** Dégradé de couleurs, 5 valeurs entre 0 et 127 / Color gradient, 5 values between 0 and 127 */
 
 switch ($__action)
 {
@@ -151,9 +160,16 @@ switch ($__action)
 	case 'login':
 		{
 			header('Content-Type: text/html; charset=utf-8');
-			if (IS_PHPMV_MODULE === false) include CLICKHEAT_ROOT.'header.php';
-			include CLICKHEAT_ROOT.$__action.'.php';
-			if (IS_PHPMV_MODULE === false) include CLICKHEAT_ROOT.'footer.php';
+			if ($__action !== 'view' || IS_PHPMV_MODULE === false)
+			{
+				include CLICKHEAT_ROOT.'header.php';
+				include CLICKHEAT_ROOT.$__action.'.php';
+				include CLICKHEAT_ROOT.'footer.php';
+			}
+			else
+			{
+				include CLICKHEAT_ROOT.$__action.'.php';
+			}
 			break;
 		}
 	case 'generate':
@@ -168,13 +184,13 @@ switch ($__action)
 		}
 	case 'iframe':
 		{
-			$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
-			if (is_dir($clickheatConf['logPath'].$page))
+			$group = isset($_GET['group']) ? str_replace('/', '', $_GET['group']) : '';
+			if (is_dir($clickheatConf['logPath'].$group))
 			{
 				$webPage = array('/');
-				if (file_exists($clickheatConf['logPath'].$page.'/%%url.txt%%'))
+				if (file_exists($clickheatConf['logPath'].$group.'/url.txt'))
 				{
-					$f = @fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'r');
+					$f = @fopen($clickheatConf['logPath'].$group.'/url.txt', 'r');
 					if ($f !== false)
 					{
 						$webPage = explode('>', trim(fgets($f, 1024)));
@@ -187,15 +203,7 @@ switch ($__action)
 		}
 	case 'png':
 		{
-			$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
-			$date = isset($_GET['date']) ? str_replace(array('.', '/'), array('', ''), $_GET['date']) : '1970-01-01';
-			$range = isset($_GET['range']) && in_array($_GET['range'], array('d', 'w', 'm')) ? $_GET['range'] : 'd';
-			$browser = isset($_GET['browser']) && isset($browsersList[$_GET['browser']]) ? $_GET['browser'] : 'all';
-			$screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
-			$image = isset($_GET['image']) ? (int) $_GET['image'] : 0;
-			$heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap'] : 0;
-
-			$imagePath = $clickheatConf['logPath'].$page.'/%%'.$date.'-'.$range.'-'.$screen.'-'.$browser.'-'.$heatmap.'-'.$image.'.png%%';
+			$imagePath = $clickheatConf['cachePath'].(isset($_GET['file']) ? str_replace('/', '', $_GET['file']) : '**unknown**');
 
 			header('Content-Type: image/png');
 			if (file_exists($imagePath))
@@ -210,18 +218,18 @@ switch ($__action)
 		}
 	case 'layoutupdate':
 		{
-			$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
+			$group = isset($_GET['group']) ? str_replace('/', '', $_GET['group']) : '';
 			$url = isset($_GET['url']) ? $_GET['url'] : '';
 			$left = isset($_GET['left']) ? (int) $_GET['left'] : 0;
 			$center = isset($_GET['center']) ? (int) $_GET['center'] : 0;
 			$right = isset($_GET['right']) ? (int) $_GET['right'] : 0;
 
-			if (!is_dir($clickheatConf['logPath'].$page) || $url === '')
+			if (!is_dir($clickheatConf['logPath'].$group) || $url === '')
 			{
 				exit('Error');
 			}
 
-			$f = @fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'w');
+			$f = @fopen($clickheatConf['logPath'].$group.'/url.txt', 'w');
 			fputs($f, $url.'>'.$left.'>'.$center.'>'.$right);
 			fclose($f);
 
