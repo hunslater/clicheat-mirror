@@ -10,6 +10,7 @@ ClickHeat : Suivi et analyse des clics / Tracking and clicks analysis
 @update 28/09/2007 - Yvan Taviaud : ajout de quelques messages de débug
 @update 16/03/2008 - Yvan Taviaud : utilisation des Listeners - ajout d'un délai pour enregistrer le clic correctement - correctif JSLint
 @update 05/07/2010 - Yvan Taviaud : ajout de Chrome, ajout du test non-Ajax pour libérer le clic plus rapidement
+@update 13/08/2010 - Yvan Taviaud : gestion de IE 8 qui posait des soucis sur l'event
 
 Tested under :
 Windows 2000 - IE 6.0
@@ -39,7 +40,7 @@ function showClickHeatDebug(str)
 		document.getElementById('clickHeatDebuggerSpan').innerHTML = str;
 		document.getElementById('clickHeatDebuggerDiv').style.display = 'block';
 	}
-}
+};
 
 /** Main function */
 function catchClickHeat(e)
@@ -62,14 +63,9 @@ function catchClickHeat(e)
 		if (e == undefined)
 		{
 			e = window.event;
-			c = e.button;
-			element = e.srcElement;
 		}
-		else
-		{
-			c = e.which;
-			element = null;
-		}
+		c = e.which || e.button;
+		element = e.srcElement || null;
 		if (c == 0)
 		{
 			showClickHeatDebug('Click not logged: no button pressed');
@@ -149,7 +145,7 @@ function catchClickHeat(e)
 						{
 							if (xmlhttp.status == 200)
 							{
-								showClickHeatDebug('Click recorded at ' + clickHeatServer + ' with the following parameters:<br />x = ' + (x + scrollx) + ' (' + x + 'px from left + ' + scrollx + 'px of horizontal scrolling)<br />y = ' + (y + scrolly) + ' (' + y + 'px from top + ' + scrolly + 'px of vertical scrolling)<br />width = ' + w + '<br />browser = ' + clickHeatBrowser + '<br />click = ' + c + '<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br /><br />Server answer: ' + xmlhttp.responseText);
+								showClickHeatDebug('Click recorded at ' + clickHeatServer + ' with the following parameters:<br/>x = ' + (x + scrollx) + ' (' + x + 'px from left + ' + scrollx + 'px of horizontal scrolling)<br/>y = ' + (y + scrolly) + ' (' + y + 'px from top + ' + scrolly + 'px of vertical scrolling)<br/>width = ' + w + '<br/>browser = ' + clickHeatBrowser + '<br/>click = ' + c + '<br/>site = ' + clickHeatSite + '<br/>group = ' + clickHeatGroup + '<br/><br/>Server answer: ' + xmlhttp.responseText);
 							}
 							else if (xmlhttp.status == 404)
 							{
@@ -175,7 +171,7 @@ function catchClickHeat(e)
 			/** This test is needed, as it includes the call to click.php in the iframe */
 			if (clickHeatDebug == true)
 			{
-				showClickHeatDebug('Click recorded at ' + clickHeatServer + ' with the following parameters:<br />x = ' + (x + scrollx) + ' (' + x + 'px from left + ' + scrollx + 'px of horizontal scrolling)<br />y = ' + (y + scrolly) + ' (' + y + 'px from top + ' + scrolly + 'px of vertical scrolling)<br />width = ' + w + '<br />browser = ' + clickHeatBrowser + '<br />click = ' + c + '<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br /><br />Server answer:<br />' + '<iframe src="' + clickHeatServer + '?' + params + '" width="700" height="60"></iframe>');
+				showClickHeatDebug('Click recorded at ' + clickHeatServer + ' with the following parameters:<br/>x = ' + (x + scrollx) + ' (' + x + 'px from left + ' + scrollx + 'px of horizontal scrolling)<br/>y = ' + (y + scrolly) + ' (' + y + 'px from top + ' + scrolly + 'px of vertical scrolling)<br/>width = ' + w + '<br/>browser = ' + clickHeatBrowser + '<br/>click = ' + c + '<br/>site = ' + clickHeatSite + '<br/>group = ' + clickHeatGroup + '<br/><br/>Server answer:<br/>' + '<iframe src="' + clickHeatServer + '?' + params + '" width="700" height="60"></iframe>');
 			}
 			else
 			{
@@ -197,14 +193,14 @@ function catchClickHeat(e)
 		showClickHeatDebug('An error occurred while processing click (Javascript error): ' + err.message);
 	}
 	return true;
-}
+};
 
 function initClickHeat()
 {
 	/** Debug Window */
 	if (clickHeatDebug == true)
 	{
-		document.write('<div id="clickHeatDebuggerDiv" style="padding:5px; display:none; position:absolute; top:10px; left:10px; border:1px solid #888; background-color:#eee; z-index:99;"><strong>ClickHeat debug: <a href="#" onmouseover="document.getElementById(\'clickHeatDebuggerDiv\').style.display = \'none\'; return false">Rollover to close</a></strong><br /><br /><span id="clickHeatDebuggerSpan"></span></div>');
+		document.write('<div id="clickHeatDebuggerDiv" style="padding:5px; display:none; position:absolute; top:200px; left:200px; border:1px solid #888; background-color:#eee; z-index:99;"><strong>ClickHeat debug: <a href="#" onmouseover="document.getElementById(\'clickHeatDebuggerDiv\').style.display = \'none\'; return false">Rollover to close</a></strong><br/><br/><span id="clickHeatDebuggerSpan"></span></div>');
 	}
 
 	if (clickHeatGroup == '' || clickHeatServer == '')
@@ -256,5 +252,5 @@ function initClickHeat()
 			break
 		}
 	}
-	showClickHeatDebug('ClickHeat initialised with:<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br />server = ' + clickHeatServer + '<br />quota = ' + (clickHeatQuota == -1 ? 'unlimited' : clickHeatQuota) + '<br /><br />browser = ' + clickHeatBrowser);
-}
+	showClickHeatDebug('ClickHeat initialised with:<br/>site = ' + clickHeatSite + '<br/>group = ' + clickHeatGroup + '<br/>server = ' + clickHeatServer + '<br/>quota = ' + (clickHeatQuota == -1 ? 'unlimited' : clickHeatQuota) + '<br/><br/>browser = ' + clickHeatBrowser + '<br/><strong>Click in a blank area (not on a link) to test ClickHeat</strong>');
+};
