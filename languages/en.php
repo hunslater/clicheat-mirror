@@ -1,6 +1,6 @@
 <?php
 /**
- * ClickHeat : Fichier de langue : anglais
+ * ClickHeat: Fichier de langue: anglais
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
@@ -41,8 +41,11 @@ define('LANG_LATEST_CHECK', 'Upgrade');
 define('LANG_LATEST_KO', 'Can\'t find latest available version. You can see it on our website:');
 define('LANG_LATEST_OK', 'You have the latest available version (%s)');
 define('LANG_LATEST_NO', 'Your version (%s) isn\'t the latest available one (%s). You can download the latest one on our website:');
+define('LANG_LOG_MY_CLICKS', 'Log my clicks?');
+define('LANG_JAVASCRIPT_ADMIN_COOKIE', 'In order to avoid pollution of your statistics,\nyou can choose not to log your own clicks\n\nOK = log my clicks\nCancel = don\'t log my clicks');
 define('LANG_JAVASCRIPT', 'Javascript code to be pasted on pages you want to study');
-define('LANG_JAVASCRIPT_IMAGE', 'Show ClickHeat logo on the studied page : ');
+define('LANG_JAVASCRIPT_IMAGE', 'Show ClickHeat logo on the studied page: ');
+define('LANG_JAVASCRIPT_SHORT', 'Short code (3 lines only)');
 define('LANG_JAVASCRIPT_QUOTA', 'Maximum clicks per page and visitor, next clicks won\'t be saved (0 = no limit, 3 is a good choice)');
 define('LANG_JAVASCRIPT_SITE', 'Website name (allowed characters: A-Z, a-z, 0-9, underscore, hyphen, dot)');
 define('LANG_JAVASCRIPT_GROUP', 'Group name, to group similar pages for a simpler analysis');
@@ -51,7 +54,7 @@ define('LANG_JAVASCRIPT_GROUP1', 'allowed characters: A-Z, a-z, 0-9, underscore,
 define('LANG_JAVASCRIPT_GROUP2', 'use a page\'s title (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
 define('LANG_JAVASCRIPT_GROUP3', 'use webpage\'s address (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Copy and paste the code below on your pages, just before the end of the page (before &lt;/body&gt; tag):');
-define('LANG_JAVASCRIPT_DEBUG', 'Once the code pasted on your pages, don\'t forget to test if the code works correctly, by calling your page with the parameter <span class="error">debugclickheat</span>. For example for http://www.site.com/index.html call http://www.site.com/index.html<span class="error">?debugclickheat</span>. You should see a Javascript alert showing the state of Clickheat. If you encounter any problem, feel free to contact us');
+define('LANG_JAVASCRIPT_DEBUG', 'Once the code pasted on your pages, don\'t forget to test if the code works correctly, by calling your page with the parameter <span class="error">debugclickheat</span>. For example for http://www.site.com/index.html call http://www.site.com/index.html<span class="error">?debugclickheat</span>. You should see a message showing the state of Clickheat. If you encounter any problem, feel free to contact us');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
 define('LANG_ERROR_GROUP', 'Unknown group. _JAVASCRIPT_');
 define('LANG_ERROR_DATA', 'No logs for the selected period (first think removing filters: browser, screensize). _JAVASCRIPT_');
@@ -85,7 +88,7 @@ define('LANG_CONFIG_REFERERS', 'Domain names (separated by commas) allowed to lo
 define('LANG_CONFIG_GROUPS', 'Group names (separated by commas) allowed to log clicks on this server');
 define('LANG_CONFIG_FILESIZE', 'Maximum logfile size (in KB) of a group over a day (1000 clicks are about 25KB, 0 = no size limit)');
 define('LANG_CONFIG_CHECK', 'Check configuration');
-define('LANG_CONFIG_MEMORY', 'Memory limit (default php.ini value: %dMB, limits : from %d to %dMB, but <a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">be careful with high values</a>)');
+define('LANG_CONFIG_MEMORY', 'Memory limit (default php.ini value: %dMB, limits: from %d to %dMB, but <a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">be careful with high values</a>)');
 define('LANG_CONFIG_MEMORY_KO', 'please stay in the specified range');
 define('LANG_CONFIG_STEP', 'Clicks grouping by X*X pixels\' zones (speed up display of heatmaps)');
 define('LANG_CONFIG_STEP_KO', 'zones can\'t be under 1x1 pixels');
@@ -110,7 +113,7 @@ define('LANG_CONFIG_PASS', 'password is empty');
 define('LANG_CONFIG_MATCH', 'passwords don\'t match');
 define('LANG_CONFIG_SAVE', 'Save configuration');
 define('LANG_CLEANER_RUNNING', 'Cleaning in progress...');
-define('LANG_CLEANER_RUN', 'Cleaning finished : %d files and %d directories have been deleted');
+define('LANG_CLEANER_RUN', 'Cleaning finished: %d files and %d directories have been deleted');
 define('LANG_CANCEL', 'Cancel');
 define('LANG_UPGRADE', 'Upgrade');
 define('LANG_UPGRADE_NEXT', 'Check your configuration, then save it to finish upgrade');

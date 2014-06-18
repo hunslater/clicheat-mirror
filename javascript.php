@@ -26,6 +26,7 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 	<input type="radio" name="jsRadioGroup" id="jsGroup3" value="2" onclick="updateJs();" /> <?php echo LANG_JAVASCRIPT_GROUP3 ?></td></tr>
 <tr><td><?php echo LANG_JAVASCRIPT_QUOTA ?></td><td><input type="text" name="js-quota" id="jsQuota" value="0" size="3" onchange="updateJs();" onkeyup="updateJs();" /></td></tr>
 <tr><td><?php echo LANG_JAVASCRIPT_IMAGE ?><img src="<?php echo CLICKHEAT_PATH ?>images/logo.png" width="80" height="15" border="0" alt="ClickHeat : track clicks" /></td><td><input type="checkbox" name="js-image" id="jsShowImage" onclick="updateJs();" /></td></tr>
+<tr><td><?php echo LANG_JAVASCRIPT_SHORT ?></td><td><input type="checkbox" name="jsShort" id="jsShort" checked="checked" onclick="updateJs();" /></td></tr>
 </table>
 <br />
 <?php echo LANG_JAVASCRIPT_PASTE ?><br />

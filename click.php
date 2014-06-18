@@ -34,12 +34,12 @@ if (is_array($clickheatConf['referers']))
 {
 	if (!isset($_SERVER['HTTP_REFERER']))
 	{
-		exit('No referer');
+		exit('No domain in referer');
 	}
 	$referer = parse_url($_SERVER['HTTP_REFERER']);
 	if (!in_array($referer['host'], $clickheatConf['referers']))
 	{
-		exit('Forbidden referer ('.$referer['host'].')');
+		exit('Forbidden domain ('.$referer['host'].')');
 	}
 }
 
@@ -55,7 +55,7 @@ if (is_array($clickheatConf['groups']))
 {
 	if (!in_array($group, $clickheatConf['groups']))
 	{
-		exit('Forbidden group');
+		exit('Forbidden group ('.$group.')');
 	}
 }
 $browser = preg_replace('/[^a-z]+/', '', strtolower($_GET['b']));
@@ -101,8 +101,15 @@ if ($f === false)
 }
 if ($f !== false)
 {
-	echo 'OK';
-	fputs($f, ((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser.'|'.((int) $_GET['c'])."\n");
+	if (isset($_COOKIE['clickheat-admin']))
+	{
+		echo 'OK, but click not logged as you selected it in the admin panel ("Log my clicks/Enregistrer mes clics")';
+	}
+	else
+	{
+		echo 'OK';
+		fputs($f, ((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser.'|'.((int) $_GET['c'])."\n");
+	}
 	fclose($f);
 }
 else

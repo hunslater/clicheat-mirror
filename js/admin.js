@@ -13,6 +13,7 @@ var currentWidth = 0;
 var pleaseWait = '';
 var cleanerRunning = '';
 var isJsOkay = '';
+var jsAdminCookie = '';
 var hideIframes = true;
 var hideFlashes = true;
 var isPmvModule = false;
@@ -213,8 +214,9 @@ function updateJs()
 {
 	var str = '';
 	var language = (navigator.language !== undefined && navigator.language == 'fr' ? 'fr' : 'com');
+	var addReturn = document.getElementById('jsShort').checked ? '' : '\n';
 	str += '&lt;script type="text/javascript" src="';
-	str += scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;\n';
+	str += scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;' + addReturn;
 	if (language == 'fr')
 	{
 		linkList = ['&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportementale des internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportement internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Outils d\'analyse d\'audience&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Carte température page web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse des clics&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation de l\'ergonomie&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation ergonimique&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils marketing&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils référencement&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Monétisation de contenu&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de site&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Marketing web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils seo&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils open source&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster gratuits&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils gratuits webmaster&lt;/a&gt;'];
@@ -225,12 +227,12 @@ function updateJs()
 	}
 	if (document.getElementById('jsShowImage').checked)
 	{
-		str += '&lt;a href="http://www.labsmedia.' + language + '/clickheat/index.html" title="ClickHeat: clicks heatmap"&gt;&lt;img src="' + scriptPath + 'images/logo.png" width="80" height="15" border="0" alt="ClickHeat : track clicks" /&gt;&lt;/a&gt;\n';
+		str += '&lt;a href="http://www.labsmedia.' + language + '/clickheat/index.html" title="ClickHeat: clicks heatmap"&gt;&lt;img src="' + scriptPath + 'images/logo.png" width="80" height="15" border="0" alt="ClickHeat : track clicks" /&gt;&lt;/a&gt;' + addReturn;
 	}
 	else
 	{
 		rand = Math.floor(Math.random() * linkList.length);
-		str += '&lt;noscript&gt;' + linkList[rand] + '&lt;/noscript&gt;\n';
+		str += '&lt;noscript&gt;' + linkList[rand] + '&lt;/noscript&gt;' + addReturn;
 	}
 	str += '&lt;script type="text/javascript"&gt;&lt;!--\n';
 	str += 'clickHeatSite = ';
@@ -243,7 +245,7 @@ function updateJs()
 	{
 		str += '\'<span class="error">' + document.getElementById('jsSite').value.replace(/[^a-z0-9\-_\.]+/gi, '.') + '</span>\'';
 	}
-	str += ';\nclickHeatGroup = ';
+	str += ';' + addReturn + 'clickHeatGroup = ';
 	if (document.getElementById('jsGroup1').checked)
 	{
 		str += '\'<span class="error">' + document.getElementById('jsGroup').value.replace(/[^a-z0-9\-_\.]+/gi, '.') + '</span>\'';
@@ -256,14 +258,14 @@ function updateJs()
 	{
 		str += 'window.location.pathname';
 	}
-	str += ';\n';
+	str += ';' + addReturn;
 	if (document.getElementById('jsQuota').value != 0)
 	{
-		str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;\n';
+		str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;' + addReturn;
 	}
-	str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';\n';
+	str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';' + addReturn;
 	str += 'initClickHeat(); //--&gt;\n';
-	str += '&lt;/script&gt;\n';
+	str += '&lt;/script&gt;';
 	document.getElementById('clickheat-js').innerHTML = str;
 }
 
@@ -345,58 +347,58 @@ function cleanIframe()
 	{
 		return true;
 	}
-	//	try
-	//	{
-	var currentIframe = document.getElementById('webPageFrame');
-	if (currentIframe.contentDocument)
+	try
 	{
-		currentIframeContent = currentIframe.contentDocument;
-	}
-	else if (currentIframe.Document)
-	{
-		currentIframeContent = currentIframe.Document;
-	}
-	/** Hide iframes and flashes content */
-	if (currentIframeContent == undefined)
-	{
-		return false;
-	}
-	newContent = currentIframeContent.body.innerHTML;
-	oldPos = 0;
-	if (hideIframes == false)
-	{
-		reg = 'object';
-	}
-	else
-	{
-		if (hideFlashes == false)
+		var currentIframe = document.getElementById('webPageFrame');
+		if (currentIframe.contentDocument)
 		{
-			reg = 'iframe';
+			currentIframeContent = currentIframe.contentDocument;
+		}
+		else if (currentIframe.Document)
+		{
+			currentIframeContent = currentIframe.Document;
+		}
+		/** Hide iframes and flashes content */
+		if (currentIframeContent == undefined)
+		{
+			return false;
+		}
+		newContent = currentIframeContent.body.innerHTML;
+		oldPos = 0;
+		if (hideIframes == false)
+		{
+			reg = 'object';
 		}
 		else
 		{
-			reg = 'object|iframe';
+			if (hideFlashes == false)
+			{
+				reg = 'iframe';
+			}
+			else
+			{
+				reg = 'object|iframe';
+			}
 		}
+		startReg = new RegExp('<(' + reg + ')', 'i');
+		endReg = new RegExp('<\/(' + reg + ')', 'i');
+		while (true)
+		{
+			pos = newContent.search(startReg);
+			pos2 = newContent.search(endReg);
+			if (pos == -1 || pos2 == -1 || pos == oldPos || pos > pos2) break;
+			pos2 += 9;
+			found = newContent.substring(pos, pos2);
+			width = found.match(/width=[^0-9]*(\d+)/);
+			if (width == null) width = [0, 300];
+			height = found.match(/height=[^0-9]*(\d+)/);
+			if (height == null) height = [0, 150];
+			newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;test' + newContent.substring(pos2, newContent.length);
+			oldPos = pos;
+		}
+		currentIframeContent.body.innerHTML = newContent;
 	}
-	startReg = new RegExp('<(' + reg + ')', 'i');
-	endReg = new RegExp('<\/(' + reg + ')', 'i');
-	while (true)
-	{
-		pos = newContent.search(startReg);
-		pos2 = newContent.search(endReg);
-		if (pos == -1 || pos2 == -1 || pos == oldPos || pos > pos2) break;
-		pos2 += 9;
-		found = newContent.substring(pos, pos2);
-		width = found.match(/width=[^0-9]*(\d+)/);
-		if (width == null) width = [0, 300];
-		height = found.match(/height=[^0-9]*(\d+)/);
-		if (height == null) height = [0, 150];
-		newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;test' + newContent.substring(pos2, newContent.length);
-		oldPos = pos;
-	}
-	currentIframeContent.body.innerHTML = newContent;
-	//	}
-	//	catch(e) {}
+	catch(e) {}
 }
 
 /** Draw alpha selector */
@@ -508,4 +510,19 @@ function hidePanel()
 	document.getElementById(div).style.display = 'none';
 	document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-down.png" width="11" height="6" alt="" />';
 	resizeDiv();
+}
+
+/** Reverse the state of the admin cookie (used not to log the clicks for admin user) */
+function adminCookie()
+{
+	if (confirm(jsAdminCookie))
+	{
+		document.cookie = 'clickheat-admin=; expires=Fri, 27 Jul 2001 01:00:00 UTC; path=/';
+	}
+	else
+	{
+		var date = new Date();
+		date.setTime(date.getTime() + 365 * 86400 * 1000);
+		document.cookie = 'clickheat-admin=1; expires=' + date.toGMTString() + '; path=/';
+	}
 }

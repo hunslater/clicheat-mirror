@@ -1,1 +1,1 @@
-<?php define('CLICKHEAT_VERSION', '1.4'); ?>
+<?php define('CLICKHEAT_VERSION', '1.5'); ?>

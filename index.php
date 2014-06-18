@@ -8,7 +8,7 @@
 
 $__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
 
-if (isset($_SERVER['REQUEST_URI']) && $_SERVER['SCRIPT_NAME'] !== '')
+if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] !== '')
 {
 	$realPath = &$_SERVER['REQUEST_URI'];
 }
@@ -27,9 +27,14 @@ if (substr($realPath, -1) === '/')
 }
 
 /** First of all, check if we are inside PhpMyVisites */
+$dirName = dirname($realPath);
+if ($dirName === '/')
+{
+	$dirName = '';
+}
 if (defined('INCLUDE_PATH'))
 {
-	define('CLICKHEAT_PATH', dirname($realPath).'/plugins/clickheat/libs/');
+	define('CLICKHEAT_PATH', $dirName.'/plugins/clickheat/libs/');
 	define('CLICKHEAT_INDEX_PATH', 'index.php?mod=clickheat.view_clickheat&');
 	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
 	define('CLICKHEAT_CONFIG', INCLUDE_PATH.'/config/clickheat.php');
@@ -37,7 +42,7 @@ if (defined('INCLUDE_PATH'))
 }
 else
 {
-	define('CLICKHEAT_PATH', dirname($realPath).'/');
+	define('CLICKHEAT_PATH', $dirName.'/');
 	define('CLICKHEAT_INDEX_PATH', 'index.php?');
 	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
 	define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');

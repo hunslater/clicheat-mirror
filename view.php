@@ -86,6 +86,7 @@ $__year = (int) date('Y', $date);
 ?>
 <div id="adminPanel"><span class="float-right">
 <a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a><br />
+<a href="#" onclick="adminCookie(); return false;"><?php echo LANG_LOG_MY_CLICKS ?></a>
 <?php if (CLICKHEAT_ADMIN === true) echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=config">', LANG_CONFIG, '</a> <a href="#" onclick="showJsCode(); return false;">Javascript</a> <a href="#" onclick="showLatestVersion(); return false;">', LANG_LATEST_CHECK, '</a> '; ?>
 <a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a><br />
 <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=en">English</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=fr">Français</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=ru">Русский</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=uk">Українська</a><br />
@@ -181,9 +182,10 @@ echo $__calendar;
 </div>
 <script type="text/javascript">
 <?php echo $__js ?>
-pleaseWait = '<?php echo addslashes(LANG_ERROR_LOADING); ?>';
-cleanerRunning = '<?php echo addslashes(LANG_CLEANER_RUNNING); ?>';
-isJsOkay = '<?php echo CLICKHEAT_ADMIN === true ? '<a href="#" onclick="showJsCode(); return false;">'.addslashes(LANG_ERROR_JAVASCRIPT).'</a>' : '' ?>';
+pleaseWait = '<?php echo str_replace('\'', '\\\'', LANG_ERROR_LOADING); ?>';
+cleanerRunning = '<?php echo str_replace('\'', '\\\'', LANG_CLEANER_RUNNING); ?>';
+isJsOkay = '<?php echo CLICKHEAT_ADMIN === true ? '<a href="#" onclick="showJsCode(); return false;">'.str_replace('\'', '\\\'', LANG_ERROR_JAVASCRIPT).'</a>' : '' ?>';
+jsAdminCookie = '<?php echo str_replace('\'', '\\\'', LANG_JAVASCRIPT_ADMIN_COOKIE) ?>';
 hideIframes = <?php echo $clickheatConf['hideIframes'] === true ? 'true' : 'false' ?>;
 hideFlashes = <?php echo $clickheatConf['hideFlashes'] === true ? 'true' : 'false' ?>;
 scriptPath = 'http://<?php echo $_SERVER['HTTP_HOST'].CLICKHEAT_PATH ?>';
