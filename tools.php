@@ -42,7 +42,7 @@ if (count($_POST) !== 0)
 				$result = cleanLogDir(CLICKHEAT_LOGPATH.$page.'/', $days);
 				if ($result === false)
 				{
-					$error = 'Wrong parameters';
+					$error = 'Wrong parameters or demo server';
 					break;
 
 				}

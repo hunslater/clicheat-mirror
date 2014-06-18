@@ -28,11 +28,10 @@ $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
 $width = isset($_GET['width']) ? (int) $_GET['width'] : 0;
 $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
 $heatmap = isset($_GET['heatmap']);
+$savePage = isset($_GET['savePage']);
 
 /** List of available pages */
 $selectPages = '';
-$firstPage = '';
-$pageExists = false;
 $d = @dir(CLICKHEAT_LOGPATH);
 if ($d === false)
 {
@@ -42,11 +41,13 @@ if ($d === false)
 while (($file = $d->read()) !== false)
 {
 	if (strpos($file, '.') !== false) continue;
-	$firstPage = $firstPage === '' ? $file : '';
+	if ($page === '')
+	{
+		$page = $file;
+	}
 	if ($page === $file)
 	{
 		$selectPages .= '<option value="'.$file.'" selected="selected">'.$file.'</option>';
-		$pageExists = true;
 	}
 	else
 	{
@@ -54,13 +55,16 @@ while (($file = $d->read()) !== false)
 	}
 }
 $d->close();
-if ($pageExists === false)
-{
-	$page = $firstPage !== '' ? $firstPage : '';
-}
 $webPage = '';
 if ($page !== '')
 {
+	$webPage = isset($_GET['webpage']) && is_array($_GET['webpage']) && count($_GET['webpage']) === 4 && $_GET['webpage'][0] !== '' ? $_GET['webpage'][0].'>'.((int) $_GET['webpage'][1]).'>'.((int) $_GET['webpage'][2]).'>'.((int) $_GET['webpage'][3]) : '';
+	if ($demoServer === false && $webPage !== '' && $savePage === true)
+	{
+		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'w');
+		fputs($f, $webPage);
+		fclose($f);
+	}
 	if (file_exists(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%'))
 	{
 		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'r');
@@ -70,17 +74,6 @@ if ($page !== '')
 	else
 	{
 		$webPage = '';
-	}
-	$webPageGet = isset($_GET['webpage']) && is_array($_GET['webpage']) && count($_GET['webpage']) === 4 && $_GET['webpage'][0] !== '' ? $_GET['webpage'][0].'>'.((int) $_GET['webpage'][1]).'>'.((int) $_GET['webpage'][2]).'>'.((int) $_GET['webpage'][3]) : '';
-	if ($demoServer === false)
-	{
-		if ($webPage !== $webPageGet && $webPageGet !== '')
-		{
-			$webPage = $webPageGet;
-			$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'w');
-			fputs($f, $webPage);
-			fclose($f);
-		}
 	}
 }
 $webPage = explode('>', $webPage);
@@ -96,7 +89,14 @@ $webPage[3] = (int) $webPage[3];
 $date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
 if ($date === '1970-01-01')
 {
-	$date = date('Y-m-d');
+	if ($demoServer === true)
+	{
+		$date = date('Y-m-d', time() - 86400);
+	}
+	else
+	{
+		$date = date('Y-m-d');
+	}
 }
 $days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
 
@@ -163,19 +163,19 @@ if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 <form action="index.php" method="get" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
-	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage0').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select></td>
-	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
+	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select></td><td>&nbsp;</td>
+	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /></td><td rowspan="2" valign="middle"><input type="checkbox" name="savePage" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td><td rowspan="2"></td></tr><?php } ?>
 <tr>
-	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<?php if ($demoServer === false) { ?><th><?php echo LANG_LAYOUT_WIDTH ?> <acronym onmouseover="showHelp('layout');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="webpage[1]" value="<?php echo $webPage[1] ?>" size="3" /> <input type="text" name="webpage[2]" value="<?php echo $webPage[2] ?>" size="3" /> <input type="text" name="webpage[3]" value="<?php echo $webPage[3] ?>" size="3" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
+	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?></td><td rowspan="3"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<?php if ($demoServer === false) { ?><th><?php echo LANG_LAYOUT_WIDTH ?> <acronym onmouseover="showHelp('layout');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="webpage[1]" value="<?php echo $webPage[1] ?>" size="3" /> <input type="text" name="webpage[2]" value="<?php echo $webPage[2] ?>" size="3" /> <input type="text" name="webpage[3]" value="<?php echo $webPage[3] ?>" size="3" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 </tr>
 <tr>
-	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser"><?php echo $selectBrowsers ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser"><?php echo $selectBrowsers ?></select></td>
+	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select></td><td rowspan="2" valign="middle"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 <tr>
-	<th><?php echo LANG_HEATMAP ?></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_HEATMAP ?></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /></td>
+	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select></td>
 </tr>
 </table>
 </form>
@@ -195,55 +195,52 @@ iH = oD.innerHeight != undefined ? oD.innerHeight : oD.clientHeight;
 document.getElementById('overflowDiv').style.height = (iH < 300 ? 400 : iH) - 130 + 'px';
 /** Width of main display */
 iW = oD.innerWidth != undefined ? oD.innerWidth : oD.clientWidth;
+<?php
 /** Must reload if width is not defined */
-<?php if ($width === 0 && !isset($_GET['width'])): ?>
-window.location.href = 'index.php?width=' + (iW < 300 ? 400 : iW);
-<?php endif; ?>
+if ($width === 0 && !isset($_GET['width'])) {
+	echo 'window.location.href = \'index.php?width=\' + (iW < 300 ? 400 : iW); </script></body></html>';
+	exit;
+}
+?>
 
 /** Ajax requests to update PNGs */
-function getNewPngs()
+document.getElementById('pngDiv').innerHTML = '<span class="error"><?php echo addslashes(LANG_ERROR_LOADING); ?></span>';
+try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
+catch (e)
 {
-	document.getElementById('pngDiv').innerHTML = '<span class="error"><?php echo addslashes(LANG_ERROR_LOADING); ?></span>';
-	try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
-	catch (e)
+	try { xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");	}
+	catch (oc) { xmlhttp = null; }
+}
+if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
+xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&days=' + document.getElementById('formDays').value + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
+xmlhttp.onreadystatechange = function()
+{
+	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 	{
-		try { xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");	}
-		catch (oc) { xmlhttp = null; }
-	}
-	if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
-	xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&days=' + document.getElementById('formDays').value + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
-	xmlhttp.onreadystatechange = function()
-	{
-		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+		document.getElementById('pngDiv').innerHTML = xmlhttp.responseText;
+		document.getElementById('webPageFrame').height = document.getElementById('pngDiv').offsetHeight < 100 ? 100 : document.getElementById('pngDiv').offsetHeight;
+		/**
+		* Correctly handle PNG transparency in Win IE 5.5 & 6. http://homepage.ntlworld.com/bobosola. Updated 18-Jan-2006.
+		* I've modified it a lot to meet my needs :-)
+		**/
+		if (correctPng == false) return true;
+
+		var arVersion = navigator.appVersion.split("MSIE");
+		var version = parseFloat(arVersion[1]);
+		if (version < 5.5 || document.body.filters == undefined) return true;
+
+		for (i = 0; i < document.images.length; i++)
 		{
-			document.getElementById('pngDiv').innerHTML = xmlhttp.responseText;
-			document.getElementById('webPageFrame').height = document.getElementById('pngDiv').offsetHeight < 100 ? 100 : document.getElementById('pngDiv').offsetHeight;
-			/**
-			* Correctly handle PNG transparency in Win IE 5.5 & 6. http://homepage.ntlworld.com/bobosola. Updated 18-Jan-2006.
-			* I've modified it a lot to meet my needs :-)
-			**/
-			if (correctPng == false) return true;
-
-			var arVersion = navigator.appVersion.split("MSIE");
-			var version = parseFloat(arVersion[1]);
-			if (version < 5.5 || document.body.filters == undefined) return true;
-
-			for (i = 0; i < document.images.length; i++)
+			var img = document.images[i];
+			if (img.src.search(/png\.php/) != -1)
 			{
-				var img = document.images[i];
-				if (img.src.search(/png\.php/) != -1)
-				{
-					img.outerHTML = '<span style="display:inline-block; margin-bottom:-1px; width:' + img.width + 'px; height:' + img.height + 'px; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'' + img.src + '\', sizingMethod=\'scale\');"></span>';
-					i--;
-				}
+				img.outerHTML = '<span style="display:inline-block; margin-bottom:-1px; width:' + img.width + 'px; height:' + img.height + 'px; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'' + img.src + '\', sizingMethod=\'scale\');"></span>';
+				i--;
 			}
 		}
 	}
-	xmlhttp.send(null);
 }
-var xmlhttp;
-
-getNewPngs();
+xmlhttp.send(null);
 
 /** Hide iframe's flashes and iframes */
 function cleanIframe()

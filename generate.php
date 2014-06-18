@@ -19,6 +19,9 @@ include './lang.'.$lang.'.php';
 /** Login check */
 include './login.php';
 
+/** Against people that just don't understand that a demo is not a tool to do harm to servers... */
+$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false;
+
 /** Screen size */
 $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
 $minScreen = 0;
@@ -78,7 +81,7 @@ if ($memoryLimit === 0)
 /** Calculating height from memory consumption, and add a 50% security margin : 10 => 15 */
 $height = floor(($memoryLimit - 500000 - 100 * (CLICKHEAT_DOT_WIDTH * 360 + 6000)) / (15 * $width));
 /** Limit height to 1000px max, with a modulo of 10 */
-$height = min(1000, $height - $height % 10);
+$height = max(100, min(1000, $height - $height % 10));
 
 /** Selected page */
 $page = isset($_GET['page']) ? $_GET['page'] : '';
@@ -145,6 +148,12 @@ $heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap']: 0;
 $dateStamp = isset($_GET['date']) ? strtotime($_GET['date']) : time();
 $date = date('Y-m-d', $dateStamp);
 $days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
+
+/** Against rude people on my demo server */
+if ($date === date('Y-m-d') && $demoServer === true)
+{
+	errorGenerate(LANG_ERROR_TODAY);
+}
 
 $imagePath = CLICKHEAT_LOGPATH.$page.'/%%'.$date.'-'.$days.'-'.$screen.'-'.($width + 40).'-'.$browser.'-'.$heatmap;
 

@@ -46,6 +46,7 @@ define('LANG_ERROR_PNG', 'This PNG file has not been created');
 define('LANG_ERROR_LOADING', 'Generating image, please wait...');
 define('LANG_ERROR_DIRECTORY', 'Logging directory doesn\'t exist => please run the <a href="check.php">check.php script</a> first');
 define('LANG_ERROR_FIXED', 'All widths are fixed, that is not possible. Please change one of your layout width above.');
+define('LANG_ERROR_TODAY', 'Today\'s data is forbidden in the demo, as some people make the server goes mad (caching is not available for the current day)');
 define('LANG_CHECKS', 'Main checks for ClickHeat');
 define('LANG_CHECKS_TO_BE', 'All rows must display OK so the script works well (except "Your system")');
 define('LANG_CHECK_SYSTEM', 'Your system (just for information)');

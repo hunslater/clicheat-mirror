@@ -3,9 +3,11 @@ ClickHeat : Suivi et analyse des clics / Tracking and clicks analysis
 
 @author Yvan Taviaud - LabsMedia - www.labsmedia.com
 @since 27/10/2006
+@update 01/03/2007 - Yvan Taviaud : correctif Firefox (Károly Marton)
 
-Tested under Windows XP, with the following browsers :
-Kmeleon 1.02, Firefox 2.0 (Linux too), IE7, IE6.0 (Win 2000), Opera 9.02
+Tested under :
+Windows 2000 - IE 6.0
+Linux - Firefox 2.0.0.1, Konqueror 3.5.5, IE 7
 */
 
 /** Main function */
@@ -38,24 +40,24 @@ function catchClickHeat(e)
 		}
 		else
 		{
-			/** Is it a left-click (not on iframe) ? */
+			/** Is it a left-click (not on iframe)? */
 			if (b != 1 && iFrameNumber == -1) return true;
 		}
 		x = e.clientX;
 		y = e.clientY;
 		d = document.documentElement != undefined && document.documentElement.clientHeight != 0 ? document.documentElement : document.body;
-		scrollx = d.scrollLeft != undefined ? d.scrollLeft : window.pageXOffset;
-		scrolly = d.scrollTop != undefined ? d.scrollTop : window.pageYOffset;
-		w = d.innerWidth != undefined ? d.innerWidth : d.clientWidth;
-		h = d.innerHeight != undefined ? d.innerHeight : d.clientHeight;
-		/** Is the click in the viewing area ?*/
+		scrollx = window.pageXOffset == undefined ? d.scrollLeft : window.pageXOffset;
+		scrolly = window.pageYOffset == undefined ? d.scrollTop : window.pageYOffset;
+		w = window.innerWidth == undefined ? d.clientWidth : window.innerWidth;
+		h = window.innerHeight == undefined ? d.clientHeight : window.innerHeight;
+		/** Is the click in the viewing area? Not on scrollbars */
 		if (x > w || y > h) return true;
 		/** Also the User-Agent is not the best value to use, it's the only one that gives the real browser */
 		b = navigator.userAgent != undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
 		b0 = b.replace(/^.*(firefox|kmeleon|safari|msie|opera).*$/, '$1');
 		if (b == b0 || b0 == '') b0 = 'unknown';
 		params = 'p=' + clickHeatPage + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&random=' + Date();
-		/** Local request ? Try an ajax call */
+		/** Local request? Try an ajax call */
 		if (clickHeatServer == '' || clickHeatServer.substring(0, 4) != 'http')
 		{
 			if (clickHeatServer == '')

@@ -46,6 +46,7 @@ define('LANG_ERROR_PNG', 'Ce fichier PNG n\'a pas été créé');
 define('LANG_ERROR_LOADING', 'Création de l\'image en cours, patience...');
 define('LANG_ERROR_DIRECTORY', 'Le répertoire des fichiers de suivi n\'existe pas => merci de lancer le <a href="check.php">script check.php</a> dans un premier temps');
 define('LANG_ERROR_FIXED', 'Toutes les largeurs sont fixes, ce qui est impossible. Merci de changer une des largeurs de votre mise en page ci-dessus.');
+define('LANG_ERROR_TODAY', 'Les données du jour sont interdites dans la démo, car certaines personnes rendent le serveur fou (le cache n\'étant pas actif pour les données du jour)');
 define('LANG_CHECKS', 'Vérifications principales pour ClickHeat');
 define('LANG_CHECKS_TO_BE', 'Tous les champs doivent afficher OK pour que le programme fonctionne bien (sauf "Votre système")');
 define('LANG_CHECK_SYSTEM', 'Votre système (pour information)');

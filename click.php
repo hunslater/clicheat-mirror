@@ -4,6 +4,7 @@
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
+ * @update 27/02/2007 - Yvan Taviaud : ajout du référant dans url.txt s'il n'existe pas encore.
 **/
 
 include './config.php';
@@ -37,6 +38,12 @@ if ($f === false)
 	if (!is_dir(CLICKHEAT_LOGPATH.$page))
 	{
 		@mkdir(CLICKHEAT_LOGPATH.$page.'/');
+		if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] !== '')
+		{
+			$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'w');
+			fputs($f, $_SERVER['HTTP_REFERER'].'>0>0>0');
+			fclose($f);
+		}
 	}
 	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.date('Y-m-d').'.log%%', 'a');
 }
