@@ -125,7 +125,7 @@ for ($d = 1; $d <= $before; $d++)
 	$__calendar .= '<td id="clickheat-calendar-10'.$d.'">'.($__lastDayOfMonth - $before + $d).'</td>';
 }
 $cols = $before - 1;
-$__js = 'var weekDays = [';
+$__js = 'weekDays = [';
 for ($d = 1, $days = date('t', $date); $d <= $days; $d++)
 {
 	$D = mktime(0, 0, 0, $__month, $d, $__year);
