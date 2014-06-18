@@ -41,13 +41,14 @@ define('IS_PIWIK_MODULE', false);
 /** Improve buffer usage and compression */
 if (function_exists('ob_start'))
 {
-	if (function_exists('ob_gzhandler'))
+	/** Check that Zlib is not enabled by default (value should be 1-9, else it will be an empty string) */
+	if (@ini_get('zlib.output_compression') || !function_exists('ob_gzhandler'))
 	{
-		ob_start('ob_gzhandler');
+		ob_start();
 	}
 	else
 	{
-		ob_start();
+		ob_start('ob_gzhandler');
 	}
 }
 
@@ -175,8 +176,15 @@ $__browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet
 
 switch ($__action)
 {
-	case 'check':
 	case 'config':
+		{
+			if (file_exists(CLICKHEAT_CONFIG) && CLICKHEAT_ADMIN !== true)
+			{
+				exit('Error');
+			}
+			/** No break here */
+		}
+	case 'check':
 	case 'view':
 	case 'login':
 		{
@@ -232,17 +240,39 @@ switch ($__action)
 		}
 	case 'layoutupdate':
 		{
+			if (CLICKHEAT_ADMIN !== true)
+			{
+				exit('Error');
+			}
 			$group = isset($_GET['group']) ? str_replace('/', '', $_GET['group']) : '';
 			$url = isset($_GET['url']) ? $_GET['url'] : '';
+			if (strpos($url, 'http') !== 0)
+			{
+				$url = 'http://'.$_SERVER['SERVER_NAME'].'/'.ltrim($url, '/');
+			}
+			/** Improved security for PHP injection (PMV2.3b3 bug) */
+			$url = parse_url(str_replace(array('<', '>'), array('', ''), $url));
 			$left = isset($_GET['left']) ? (int) $_GET['left'] : 0;
 			$center = isset($_GET['center']) ? (int) $_GET['center'] : 0;
 			$right = isset($_GET['right']) ? (int) $_GET['right'] : 0;
 
-			if (!is_dir($clickheatConf['logPath'].$group) || $url === '')
+			if (!is_dir($clickheatConf['logPath'].$group) || !isset($url['host']) || !isset($url['path']))
 			{
 				exit('Error');
 			}
 
+			if ($url['scheme'] !== 'http' && $url['scheme'] !== 'https')
+			{
+				$url['scheme'] = 'http';
+			}
+			if (isset($url['query']))
+			{
+				$url = $url['scheme'].'://'.$url['host'].$url['path'].'?'.$url['query'];
+			}
+			else
+			{
+				$url = $url['scheme'].'://'.$url['host'].$url['path'];
+			}
 			$f = fopen($clickheatConf['logPath'].$group.'/url.txt', 'w');
 			fputs($f, $url.'>'.$left.'>'.$center.'>'.$right);
 			fclose($f);
