@@ -59,17 +59,17 @@ foreach ($groups as $key => $options)
 	}
 }
 
-asort($__screenSizes);
+asort($clickheatConf['__screenSizes']);
 /** Screen sizes */
 $__selectScreens = '';
-for ($i = 0; $i < count($__screenSizes); $i++)
+for ($i = 0; $i < count($clickheatConf['__screenSizes']); $i++)
 {
-	$__selectScreens .= '<option value="'.$__screenSizes[$i].'">'.($__screenSizes[$i] === 0 ? LANG_ALL : $__screenSizes[$i].'px').'</option>';
+	$__selectScreens .= '<option value="'.$clickheatConf['__screenSizes'][$i].'">'.($clickheatConf['__screenSizes'][$i] === 0 ? LANG_ALL : $clickheatConf['__screenSizes'][$i].'px').'</option>';
 }
 
 /** Browsers */
 $__selectBrowsers = '';
-foreach ($__browsersList as $label => $name)
+foreach ($clickheatConf['__browsersList'] as $label => $name)
 {
 	$__selectBrowsers .= '<option value="'.$label.'">'.($label === 'all' ? LANG_ALL : ($label === 'unknown' ? LANG_UNKNOWN : $name)).'</option>';
 }

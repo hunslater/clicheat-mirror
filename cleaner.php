@@ -21,7 +21,7 @@ if (CLICKHEAT_ADMIN === false)
 
 if (IS_PIWIK_MODULE === true)
 {
-	$clickheatConf = &Piwik_ClickHeat_Controller::$conf;
+	$clickheatConf = Piwik_ClickHeat_Controller::conf();
 }
 
 $deletedFiles = 0;
