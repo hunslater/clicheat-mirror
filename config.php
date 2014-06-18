@@ -19,9 +19,9 @@ include CLICKHEAT_ROOT.'version.php';
 if (isset($_POST['save']) && isset($_POST['config']))
 {
 	$data = @unserialize(stripslashes($_POST['config']));
-	$data['version'] = CLICKHEAT_VERSION;
 	if ($data !== false)
 	{
+		$data['version'] = CLICKHEAT_VERSION;
 		if (function_exists('var_export'))
 		{
 			$config = '<?php $clickheatConf = '.var_export($data, true).'; ?>';
@@ -47,9 +47,30 @@ $checks = true;
 
 $memoryLimit = (int) @ini_get('memory_limit');
 /** Set default values if nothing is set in the config file */
+if (IS_PHPMV_MODULE === true)
+{
+	$basePath = explode('/', rtrim(CLICKHEAT_ROOT, '/'));
+	array_pop($basePath);
+	array_pop($basePath);
+	array_pop($basePath);
+	$basePath = implode('/', $basePath).'/datas';
+	if (!is_dir($basePath))
+	{
+		@mkdir($basePath);
+	}
+	$basePath .= '/clickheat';
+	if (!is_dir($basePath))
+	{
+		@mkdir($basePath);
+	}
+}
+else
+{
+	$basePath = preg_replace('~[\\\\/]+~', '/', dirname(__FILE__));
+}
 $clickheatDefault = array(
-'logPath'		=> IS_PHPMV_MODULE === true ? CLICKHEAT_ROOT.'../../../datas/clickheat/logs/' : dirname(__FILE__).'/logs/',
-'cachePath'		=> IS_PHPMV_MODULE === true ? CLICKHEAT_ROOT.'../../../datas/clickheat/cache/' : dirname(__FILE__).'/cache/',
+'logPath'		=> $basePath.'/logs/',
+'cachePath'		=> $basePath.'/cache/',
 'referers'		=> false,
 'groups'		=> false,
 'filesize'		=> 0,
@@ -80,11 +101,11 @@ else
 /** Overwrite value with POST */
 if (isset($_POST['logPath']))
 {
-	$clickheatConf['logPath'] = rtrim($_POST['logPath'], '/').'/';
+	$clickheatConf['logPath'] = preg_replace('~[\\\\/]+~', '/', rtrim($_POST['logPath'], '/')).'/';
 }
 if (isset($_POST['cachePath']))
 {
-	$clickheatConf['cachePath'] = rtrim($_POST['cachePath'], '/').'/';
+	$clickheatConf['cachePath'] = preg_replace('~[\\\\/]+~', '/', rtrim($_POST['cachePath'], '/')).'/';
 }
 if (isset($_POST['referers']))
 {
@@ -204,12 +225,12 @@ if ($memorySet === 0)
 	{
 		$memoryRange = array(8, 8);
 	}
-	else 
+	else
 	{
 		$memoryRange = array($memoryLimit, $memoryLimit);
 	}
 }
-else 
+else
 {
 	$memoryRange = array(1, 256);
 }
@@ -290,6 +311,10 @@ if ($check === true)
 {
 	if (is_dir(rtrim($clickheatConf['logPath'], '/')) === false)
 	{
+		@mkdir(rtrim($clickheatConf['logPath'], '/'));
+	}
+	if (is_dir(rtrim($clickheatConf['logPath'], '/')) === false)
+	{
 		$checks = false;
 		echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CONFIG_LOGPATH_DIR;
 	}
@@ -314,6 +339,10 @@ if ($check === true)
 <?php
 if ($check === true)
 {
+	if (is_dir(rtrim($clickheatConf['cachePath'], '/')) === false)
+	{
+		@mkdir(rtrim($clickheatConf['cachePath'], '/'));
+	}
 	if (is_dir(rtrim($clickheatConf['cachePath'], '/')) === false)
 	{
 		$checks = false;

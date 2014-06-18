@@ -7,7 +7,7 @@
 **/
 
 /** First of all, check if we are inside PhpMyVisites */
-define('INCLUDE_PATH', str_replace('/plugins/clickheat/libs', '', dirname(__FILE__)));
+define('INCLUDE_PATH', str_replace('/plugins/clickheat/libs', '', str_replace('\\', '/', dirname(__FILE__))));
 
 /** Include click file */
 include './click.php';

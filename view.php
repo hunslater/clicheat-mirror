@@ -29,7 +29,7 @@ while (($dir = $d->read()) !== false)
 	}
 	if (IS_PHPMV_MODULE === true)
 	{
-		if ($site !== $_GET['site'])
+		if ($site !== PHPMV_SELECTED_SITE)
 		{
 			continue;
 		}
@@ -84,11 +84,12 @@ $__day = (int) date('d', $date);
 $__month = (int) date('m', $date);
 $__year = (int) date('Y', $date);
 ?>
-<span class="float-right">
+<div id="adminPanel"><span class="float-right">
 <a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a><br />
 <?php if (CLICKHEAT_ADMIN === true) echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=config">', LANG_CONFIG, '</a> <a href="#" onclick="showJsCode(); return false;">Javascript</a> <a href="#" onclick="showLatestVersion(); return false;">', LANG_LATEST_CHECK, '</a> '; ?>
-<a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a>
-<br /><span id="cleaner"></span></span>
+<a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a><br />
+<a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=en">English</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=fr">Français</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=ru">Русский</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=uk">Українська</a><br />
+<span id="cleaner">&nbsp;</span></span>
 <form action="<?php echo CLICKHEAT_INDEX_PATH ?>" method="get" onsubmit="return false;" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" id="clickTable">
 <tr>
@@ -145,7 +146,7 @@ echo $__calendar;
 	<td rowspan="4">
 		<table cellpadding="1" cellspacing="0" border="0" class="clickheat-calendar">
 			<tr>
-				<th><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=<? echo ($__month == '1' ? $__year - 1 : $__year), '-', ($__month == '1' ? '12' : sprintf('%02d', $__month - 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/previous.png" width="16" height="16" align="absmiddle" alt="Previous" /></a><?php echo $months[$__month] ?><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=<? echo ($__month == '12' ? $__year + 1 : $__year), '-', ($__month == '12' ? '01' : sprintf('%02d', $__month + 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/next.png" width="16" height="16" align="absmiddle" alt="Next" /></a></th>
+				<th><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=<?php echo ($__month == '1' ? $__year - 1 : $__year), '-', ($__month == '1' ? '12' : sprintf('%02d', $__month - 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/previous.png" width="16" height="16" align="absmiddle" alt="Previous" /></a><?php echo $months[$__month] ?><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=<?php echo ($__month == '12' ? $__year + 1 : $__year), '-', ($__month == '12' ? '01' : sprintf('%02d', $__month + 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/next.png" width="16" height="16" align="absmiddle" alt="Next" /></a></th>
 			</tr>
 			<tr>
 				<td id="clickheat-calendar-d"><a href="#" onclick="currentRange = 'd'; this.blur(); updateCalendar(); return false;"><?php echo $ranges[0] ?></a></td>
@@ -170,6 +171,8 @@ echo $__calendar;
 </tr>
 </table>
 </form>
+</div>
+<div id="divPanel" onmouseover="showPanel();" onclick="hidePanel();"><img src="<?php echo CLICKHEAT_PATH ?>images/arrow-up.png" width="11" height="6" alt="" /></div>
 <script type="text/javascript" src="<?php echo CLICKHEAT_PATH ?>js/admin.js"></script>
 <div id="overflowDiv">
 	<div id="layoutDiv"></div>

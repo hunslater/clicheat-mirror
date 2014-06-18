@@ -93,7 +93,7 @@ if (is_dir($clickheatConf['cachePath']) === true)
 			case 'png_temp':
 			case 'png_log':
 				{
-					if ($filemtime + 120 < time())
+					if ($filemtime + 86400 < time())
 					{
 						@unlink($d->path.$file);
 						$deletedFiles++;

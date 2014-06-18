@@ -71,8 +71,9 @@ $date = date('Y-m-d', $dateStamp);
 
 $imagePath = $group.'-'.$date.'-'.$range.'-'.$screen.'-'.$browser.'-'.($heatmap === true ? 'heat' : 'click');
 
-/** If images are already created, just stop script here if these have less than 120 seconds */
-if (file_exists($clickheatConf['cachePath'].$imagePath.'.html') && filemtime($clickheatConf['cachePath'].$imagePath.'.html') > time() - 120)
+/** If images are already created, just stop script here if these have less than 120 seconds (today's log) or 86400 seconds (old logs) */
+$delay = $days === 1 && date('d', $dateStamp) !== date('d') ? 86400 : 120;
+if (file_exists($clickheatConf['cachePath'].$imagePath.'.html') && filemtime($clickheatConf['cachePath'].$imagePath.'.html') > time() - $delay)
 {
 	readfile($clickheatConf['cachePath'].$imagePath.'.html');
 	exit;
@@ -122,9 +123,10 @@ if ($result === false)
 	errorGenerate($clicksHeatmap->error);
 }
 $html = '';
+$time = isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
 for ($i = 0; $i < $result['count']; $i++)
 {
-	$html .= '<img src="'.CLICKHEAT_INDEX_PATH.'action=png&amp;file='.$result['filenames'][$i].'&amp;rand='.$_SERVER['REQUEST_TIME'].'" width="'.$result['width'].'" height="'.$result['height'].'" alt="" id="heatmap-'.$i.'" /><br />';
+	$html .= '<img src="'.CLICKHEAT_INDEX_PATH.'action=png&amp;file='.$result['filenames'][$i].'&amp;rand='.$time.'" width="'.$result['width'].'" height="'.$result['height'].'" alt="" id="heatmap-'.$i.'" /><br />';
 }
 echo $html;
 

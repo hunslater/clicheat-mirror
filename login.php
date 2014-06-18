@@ -13,7 +13,7 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 }
 
 ?>
-<span class="float-right"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></span>
+<span class="float-right"><a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a></span>
 <div id="clickheat-box">
 	<h1><?php echo LANG_LOGIN ?></h1>
 	<br />

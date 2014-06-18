@@ -39,7 +39,7 @@ if (is_array($clickheatConf['referers']))
 	$referer = parse_url($_SERVER['HTTP_REFERER']);
 	if (!in_array($referer['host'], $clickheatConf['referers']))
 	{
-		exit('Forbidden referer');
+		exit('Forbidden referer ('.$referer['host'].')');
 	}
 }
 

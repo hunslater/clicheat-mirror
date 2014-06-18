@@ -297,6 +297,7 @@ class Heatmap
 				{
 					/** Erase previous alpha channel so that clicks don't change the heatmap by combining their alpha */
 					imageline($img, ceil($i/2), 0, ceil($i/2), 10, 16777215);
+					/** Then put our alpha */
 					imageline($img, ceil($i/2), 0, ceil($i/2), 10, (127 - $i) * 16777216);
 				}
 			}
@@ -331,8 +332,11 @@ class Heatmap
 			if ($image === 0 && $this->rainbow === true)
 			{
 				imagerectangle($img, 0, 0, 65, 11, $white);
-				imagestring($img, 1, 1, 2, '0', $black);
-				imagestring($img, 1, 65 - strlen($this->maxClicks) * 5, 2, $this->maxClicks, $black);
+				imagefilledrectangle($img, 0, 11, 65, 18, $white);
+				imagestring($img, 1, 0, 11, '0', $black);
+				$right = 66 - strlen($this->maxClicks) * 5;
+				imagestring($img, 1, $right, 11, $this->maxClicks, $black);
+				imagestring($img, 1, floor($right / 2) - 12, 11, 'clicks', $black);
 			}
 
 			if ($image === $nbOfImages - 1)

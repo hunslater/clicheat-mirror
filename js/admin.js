@@ -338,58 +338,58 @@ function cleanIframe()
 	{
 		return true;
 	}
-//	try
-//	{
-		var currentIframe = document.getElementById('webPageFrame');
-		if (currentIframe.contentDocument)
+	//	try
+	//	{
+	var currentIframe = document.getElementById('webPageFrame');
+	if (currentIframe.contentDocument)
+	{
+		currentIframeContent = currentIframe.contentDocument;
+	}
+	else if (currentIframe.Document)
+	{
+		currentIframeContent = currentIframe.Document;
+	}
+	/** Hide iframes and flashes content */
+	if (currentIframeContent == undefined)
+	{
+		return false;
+	}
+	newContent = currentIframeContent.body.innerHTML;
+	oldPos = 0;
+	if (hideIframes == false)
+	{
+		reg = 'object';
+	}
+	else
+	{
+		if (hideFlashes == false)
 		{
-			currentIframeContent = currentIframe.contentDocument;
-		}
-		else if (currentIframe.Document)
-		{
-			currentIframeContent = currentIframe.Document;
-		}
-		/** Hide iframes and flashes content */
-		if (currentIframeContent == undefined)
-		{
-			return false;
-		}
-		newContent = currentIframeContent.body.innerHTML;
-		oldPos = 0;
-		if (hideIframes == false)
-		{
-			reg = 'object';
+			reg = 'iframe';
 		}
 		else
 		{
-			if (hideFlashes == false)
-			{
-				reg = 'iframe';
-			}
-			else
-			{
-				reg = 'object|iframe';
-			}
+			reg = 'object|iframe';
 		}
-		startReg = new RegExp('<(' + reg + ')', 'i');
-		endReg = new RegExp('<\/(' + reg + ')', 'i');
-		while (true)
-		{
-			pos = newContent.search(startReg);
-			pos2 = newContent.search(endReg);
-			if (pos == -1 || pos2 == -1 || pos == oldPos || pos > pos2) break;
-			pos2 += 9;
-			found = newContent.substring(pos, pos2);
-			width = found.match(/width=[^0-9]*(\d+)/);
-			if (width == null) width = [0, 300];
-			height = found.match(/height=[^0-9]*(\d+)/);
-			if (height == null) height = [0, 150];
-			newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;test' + newContent.substring(pos2, newContent.length);
-			oldPos = pos;
-		}
-		currentIframeContent.body.innerHTML = newContent;
-//	}
-//	catch(e) {}
+	}
+	startReg = new RegExp('<(' + reg + ')', 'i');
+	endReg = new RegExp('<\/(' + reg + ')', 'i');
+	while (true)
+	{
+		pos = newContent.search(startReg);
+		pos2 = newContent.search(endReg);
+		if (pos == -1 || pos2 == -1 || pos == oldPos || pos > pos2) break;
+		pos2 += 9;
+		found = newContent.substring(pos, pos2);
+		width = found.match(/width=[^0-9]*(\d+)/);
+		if (width == null) width = [0, 300];
+		height = found.match(/height=[^0-9]*(\d+)/);
+		if (height == null) height = [0, 150];
+		newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;test' + newContent.substring(pos2, newContent.length);
+		oldPos = pos;
+	}
+	currentIframeContent.body.innerHTML = newContent;
+	//	}
+	//	catch(e) {}
 }
 
 /** Draw alpha selector */
@@ -472,4 +472,33 @@ function showLatestVersion()
 		}
 	}
 	xmlhttp.send(null);
+}
+
+/** Shows main panel */
+function showPanel()
+{
+	var div = isPmvModule ? 'contenu' : 'adminPanel';
+	if (document.getElementById(div).style.display != 'none')
+	{
+		return true;
+	}
+	if (isPmvModule)
+	{
+		document.getElementById('loggued').style.display = 'block';
+	}
+	document.getElementById(div).style.display = 'block';
+	document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-up.png" width="11" height="6" alt="" />';
+	resizeDiv();
+}
+/** Hides main panel */
+function hidePanel()
+{
+	var div = isPmvModule ? 'contenu' : 'adminPanel';
+	if (isPmvModule)
+	{
+		document.getElementById('loggued').style.display = 'none';
+	}
+	document.getElementById(div).style.display = 'none';
+	document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-down.png" width="11" height="6" alt="" />';
+	resizeDiv();
 }

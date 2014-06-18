@@ -31,7 +31,7 @@ if (defined('INCLUDE_PATH'))
 {
 	define('CLICKHEAT_PATH', dirname($realPath).'/plugins/clickheat/libs/');
 	define('CLICKHEAT_INDEX_PATH', dirname($realPath).'/index.php?mod=clickheat.view_clickheat&');
-	define('CLICKHEAT_ROOT', dirname(__FILE__).'/');
+	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
 	define('CLICKHEAT_CONFIG', INCLUDE_PATH.'/config/clickheat.php');
 	define('IS_PHPMV_MODULE', true);
 }
@@ -39,7 +39,7 @@ else
 {
 	define('CLICKHEAT_PATH', dirname($realPath).'/');
 	define('CLICKHEAT_INDEX_PATH', dirname($realPath).'/index.php?');
-	define('CLICKHEAT_ROOT', dirname(__FILE__).'/');
+	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
 	define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');
 	define('IS_PHPMV_MODULE', false);
 }
@@ -57,11 +57,26 @@ if (function_exists('ob_start') && IS_PHPMV_MODULE === false)
 	}
 }
 
-/** Loading language according to browser's Accept-Language */
-$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)) : '';
-if (!in_array($lang, array('fr', 'en', 'ru')))
+/** Loading language according to browser's Accept-Language or cookie «language» */
+if (isset($_GET['language']))
+{
+	$lang = $_GET['language'];
+}
+elseif (isset($_COOKIE['language']))
+{
+	$lang = $_COOKIE['language'];
+}
+elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+{
+	$lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+}
+if (!isset($lang) || !in_array($lang, array('fr', 'en', 'ru', 'uk')))
 {
 	$lang = 'en';
+}
+if (!isset($_COOKIE['language']) || $_COOKIE['language'] !== $lang)
+{
+	setcookie('language', $lang, time() + 365 * 86400, '/');
 }
 define('CLICKHEAT_LANGUAGE', $lang);
 unset($lang);
@@ -85,6 +100,11 @@ else
 		/** Call external check */
 		$me = User::getInstance();
 		define('CLICKHEAT_ADMIN', (bool) $me->hasSomeAdminRights());
+		/** Viewer only, force it to 'view' action if not view|generate|png */
+		if (CLICKHEAT_ADMIN === false && $__action !== 'generate' && $__action !== 'png' && $__action !== 'iframe' && $__action !== 'cleaner' && $__action !== 'logout')
+		{
+			$__action = 'view';
+		}
 	}
 	elseif (isset($_COOKIE['clickheat']))
 	{
@@ -149,7 +169,7 @@ if (!defined('CLICKHEAT_ADMIN'))
 }
 
 /** Specific definitions */
-$__screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1600, 1800);
+$__screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1440, 1600, 1800);
 $__browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet Explorer', 'safari' => 'Safari', 'opera' => 'Opera', 'kmeleon' => 'K-meleon', 'unknown' => '');
 
 switch ($__action)

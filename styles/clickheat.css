@@ -37,7 +37,7 @@ img {
 	vertical-align:top;
 }
 .float-right {
-	padding:10px;
+	padding-right:10px;
 	float:right;
 	text-align:right;
 }
@@ -73,7 +73,6 @@ img {
 }
 #webPageFrame {
 	z-index:1;
-	border-top:1px solid #888;
 }
 #layoutDiv {
 	padding:2px;
@@ -115,8 +114,6 @@ img {
 .clickheat-calendar {
 	border-left:1px solid #bbf;
 	border-top:1px solid #bbf;
-	font-size:0.8em;
-	line-height:0.9em;
 }
 .clickheat-calendar th, .clickheat-calendar td {
 	text-align:center;
@@ -166,4 +163,12 @@ div.layout-left-fixed, div.layout-left-liquid, div.layout-left-empty {
 	background-color:#fff;
 	padding:5px;
 	margin:5px;
+}
+#divPanel {
+	margin:0;
+	padding-left:5px;
+	border-bottom:1px solid #66a;
+	background-color:#eef;
+	cursor:pointer;
+	color:#66a;
 }
