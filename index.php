@@ -6,7 +6,7 @@
  * @since 27/10/2006
 **/
 
-$__languages = array('bg', 'cz', /*'de',*/ 'en', 'es', 'fr', 'id', 'it', 'ja', 'nl', 'pl', 'pt', 'ro', 'ru', 'sr', 'tr', 'uk', 'zh');
+$__languages = array('bg', 'cz', 'de', 'en', 'es', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl', 'pt', 'ro', 'ru', 'sr', 'tr', 'uk', 'zh');
 $__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
 
 if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] !== '')

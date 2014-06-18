@@ -99,7 +99,7 @@ foreach ($__languages as $lang)
 <form action="<?php echo CLICKHEAT_INDEX_PATH ?>" method="get" onsubmit="return false;" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" id="clickTable">
 <tr>
-	<th><?php echo LANG_SITE ?> &amp; <?php echo LANG_GROUP ?></th><td><select name="group" id="formGroup" onchange="hideGroupLayout(); loadIframe();"><?php echo $__selectGroups ?></select><?php if (CLICKHEAT_ADMIN === true) echo ' <a href="#" onclick="showGroupLayout(); return false;"><img src="', CLICKHEAT_PATH, 'images/layout.png" width="16" height="16" align="absmiddle" alt="Layout" /></a>'; ?> <a href="#" onclick="updateHeatmap(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/reload.png" width="16" height="16" align="absmiddle" alt="Refresh" /></a></td>
+	<th><?php echo LANG_SITE ?> &amp; <?php echo LANG_GROUP ?></th><td><select name="group" id="formGroup" onchange="hideGroupLayout(); loadIframe();"><?php echo $__selectGroups ?></select><?php if (CLICKHEAT_ADMIN === true) echo ' <a href="#" onclick="showGroupLayout(); return false;"><img src="', CLICKHEAT_PATH, 'images/layout.png" width="16" height="16" alt="Layout" /></a>'; ?> <a href="#" onclick="updateHeatmap(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/reload.png" width="16" height="16" alt="Refresh" /></a></td>
 	<td rowspan="4">
 <?php
 $__calendar = '<table cellpadding="0" cellspacing="0" border="0" class="clickheat-calendar"><tr>';
@@ -151,7 +151,7 @@ echo $__calendar;
 	<td rowspan="4">
 		<table cellpadding="1" cellspacing="0" border="0" class="clickheat-calendar">
 			<tr>
-				<th><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=<?php echo ($__month == '1' ? $__year - 1 : $__year), '-', ($__month == '1' ? '12' : sprintf('%02d', $__month - 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/previous.png" width="16" height="16" align="absmiddle" alt="Previous" /></a><?php echo $months[$__month] ?><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=<?php echo ($__month == '12' ? $__year + 1 : $__year), '-', ($__month == '12' ? '01' : sprintf('%02d', $__month + 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/next.png" width="16" height="16" align="absmiddle" alt="Next" /></a></th>
+				<th><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&amp;date=<?php echo ($__month == '1' ? $__year - 1 : $__year), '-', ($__month == '1' ? '12' : sprintf('%02d', $__month - 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/previous.png" width="16" height="16" alt="Previous" /></a><?php echo $months[$__month] ?><a href="#" onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&amp;date=<?php echo ($__month == '12' ? $__year + 1 : $__year), '-', ($__month == '12' ? '01' : sprintf('%02d', $__month + 1)) ?>-01'; window.location.href = url; return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/next.png" width="16" height="16" alt="Next" /></a></th>
 			</tr>
 			<tr>
 				<td id="clickheat-calendar-d"><a href="#" onclick="currentRange = 'd'; this.blur(); updateCalendar(); return false;"><?php echo $ranges[0] ?></a></td>
@@ -182,9 +182,11 @@ echo $__calendar;
 <div id="overflowDiv">
 	<div id="layoutDiv"></div>
 	<div id="pngDiv"></div>
-	<p><iframe src="<?php echo CLICKHEAT_PATH ?>clickempty.html" id="webPageFrame" onload="cleanIframe();" frameborder="0" scrolling="no" width="50" height="0"></iframe></p>
+	<p><script type="text/javascript"><!--
+	document.write('<ifr' + 'ame src="<?php echo CLICKHEAT_PATH ?>clickempty.html" id="webPageFrame" onload="cleanIframe();" frameborder="0" scrolling="no" width="50" height="0"></if' + 'rame>'); //-->
+	</script></p>
 </div>
-<script type="text/javascript">
+<script type="text/javascript"><!--
 <?php echo $__js ?>
 pleaseWait = '<?php echo str_replace('\'', '\\\'', LANG_ERROR_LOADING); ?>';
 cleanerRunning = '<?php echo str_replace('\'', '\\\'', LANG_CLEANER_RUNNING); ?>';
@@ -208,5 +210,5 @@ resizeDiv();
 loadIframe();
 
 /** Run cleaner */
-runCleaner();
+runCleaner(); //-->
 </script>

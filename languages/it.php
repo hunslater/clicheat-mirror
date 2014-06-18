@@ -51,8 +51,8 @@ define('LANG_JAVASCRIPT_SITE', 'Nome del sito (caratteri permessi: A-Z, a-z, 0-9
 define('LANG_JAVASCRIPT_GROUP', 'Nome del gruppo, per raggruppare pagine simili e semplificare l\'analisi');
 define('LANG_JAVASCRIPT_GROUP0', 'usa una parola chiave');
 define('LANG_JAVASCRIPT_GROUP1', 'caratteri permessi: A-Z, a-z, 0-9, underscore, trattino, punto');
-define('LANG_JAVASCRIPT_GROUP2', 'usa il titolo della pagina (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">non consigliato</a>)');
-define('LANG_JAVASCRIPT_GROUP3', 'usa l\'URL della pagina (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">non consigliato</a>)');
+define('LANG_JAVASCRIPT_GROUP2', 'usa il titolo della pagina (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">non consigliato</a>)');
+define('LANG_JAVASCRIPT_GROUP3', 'usa l\'URL della pagina (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">non consigliato</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Copia ed incolla il codice sottostante nelle tue pagine poco prima della fine della pagina (prima del tag &lt;/body&gt;):');
 define('LANG_JAVASCRIPT_DEBUG', 'Una volta che hai inserito il codice nelle tue pagine, non dimenticare di controllare se il codice funziona correttamente caricando la pagina con il parametro <span class="error">debugclickheat</span>. Per esempio per http://www.site.com/index.html devi richiamare http://www.site.com/index.html<span class="error">?debugclickheat</span>. Dovresti vedere un messaggio che mostra lo stato di Clickheat. Se hai qualsiasi problema, contattaci');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
@@ -88,7 +88,7 @@ define('LANG_CONFIG_REFERERS', 'Nomi dei domini (separati da virgola) a cui è p
 define('LANG_CONFIG_GROUPS', 'Nomi dei gruppi (separati da virgola) a cui è permesso di registrare i click su questo server');
 define('LANG_CONFIG_FILESIZE', 'Dimensione massima del file di log (in KB) di un gruppo per giorno (1000 click sono circa 25KB, 0 = nessun limite)');
 define('LANG_CONFIG_CHECK', 'Controlla la configurazione');
-define('LANG_CONFIG_MEMORY', 'Limite di memoria (valore predefinito in php.ini: %dMB, limita da %d a %dMB, ma <a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">fai attenzione se inserisci valori molto alti</a>)');
+define('LANG_CONFIG_MEMORY', 'Limite di memoria (valore predefinito in php.ini: %dMB, limita da %d a %dMB, ma <a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">fai attenzione se inserisci valori molto alti</a>)');
 define('LANG_CONFIG_MEMORY_KO', 'per favore, resta nell\'intervallo specificato');
 define('LANG_CONFIG_STEP', 'Raggruppa i pixel per riquadri di X*X pixel (velocizza la visualizzazione della heatmaps)');
 define('LANG_CONFIG_STEP_KO', 'i riquadri non possono essere al di sotto di 1x1 pixels');

@@ -249,7 +249,7 @@ else
 }
 
 ?>
-<span class="float-right"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></span>
+<div class="float-right"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></div>
 <div id="clickheat-box">
 <h1><?php echo LANG_CONFIG ?></h1>
 <br /><br />
@@ -318,7 +318,7 @@ if ($check === true)
 }
 ?></td></tr>
 <tr><th colspan="2"><?php echo LANG_CONFIG_HEADER_HEATMAP ?></th></tr>
-<tr><td><?php echo LANG_CONFIG_LOGPATH ?></td><td><input type="text" name="logPath" value="<?php echo htmlentities($clickheatConf['logPath']) ?>" size="50" />
+<tr><td><?php echo LANG_CONFIG_LOGPATH ?></td><td><input type="text" name="logPath" value="<?php echo htmlspecialchars($clickheatConf['logPath']) ?>" size="50" />
 <?php
 if ($check === true)
 {
@@ -349,7 +349,7 @@ if ($check === true)
 	}
 }
 ?></td></tr>
-<tr><td><?php echo LANG_CONFIG_CACHEPATH ?></td><td><input type="text" name="cachePath" value="<?php echo htmlentities($clickheatConf['cachePath']) ?>" size="50" />
+<tr><td><?php echo LANG_CONFIG_CACHEPATH ?></td><td><input type="text" name="cachePath" value="<?php echo htmlspecialchars($clickheatConf['cachePath']) ?>" size="50" />
 <?php
 if ($check === true)
 {
@@ -433,14 +433,14 @@ if ($check === true)
 }
 ?></td></tr>
 <tr><th colspan="2"><?php echo LANG_CONFIG_HEADER_SECURITY ?></th></tr>
-<tr><td><?php echo LANG_CONFIG_REFERERS ?></td><td><input type="text" name="referers" value="<?php echo is_array($clickheatConf['referers']) ? htmlentities(implode(', ', $clickheatConf['referers'])) : '' ?>" size="50" />
+<tr><td><?php echo LANG_CONFIG_REFERERS ?></td><td><input type="text" name="referers" value="<?php echo is_array($clickheatConf['referers']) ? htmlspecialchars(implode(', ', $clickheatConf['referers'])) : '' ?>" size="50" />
 <?php
 if ($check === true)
 {
 	echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
 }
 ?></td></tr>
-<tr><td><?php echo LANG_CONFIG_GROUPS ?></td><td><input type="text" name="groups" value="<?php echo is_array($clickheatConf['groups']) ? htmlentities(implode(', ', $clickheatConf['groups'])) : '' ?>" size="50" />
+<tr><td><?php echo LANG_CONFIG_GROUPS ?></td><td><input type="text" name="groups" value="<?php echo is_array($clickheatConf['groups']) ? htmlspecialchars(implode(', ', $clickheatConf['groups'])) : '' ?>" size="50" />
 <?php
 if ($check === true)
 {
@@ -456,7 +456,7 @@ if ($check === true)
 ?></td></tr>
 <?php if (IS_PIWIK_MODULE === false): ?>
 <tr><th colspan="2"><?php echo LANG_CONFIG_HEADER_LOGIN ?></th></tr>
-<tr><td><?php echo LANG_CONFIG_ADMIN_LOGIN ?></td><td><input type="text" name="adminLogin" value="<?php echo htmlentities($clickheatConf['adminLogin']) ?>" />
+<tr><td><?php echo LANG_CONFIG_ADMIN_LOGIN ?></td><td><input type="text" name="adminLogin" value="<?php echo htmlspecialchars($clickheatConf['adminLogin']) ?>" />
 <?php
 if ($check === true)
 {
@@ -471,7 +471,7 @@ if ($check === true)
 	}
 }
 ?></td></tr>
-<tr><td><?php echo LANG_CONFIG_ADMIN_PASS ?></td><td><input type="password" name="_adminPass" /><br /><input type="password" name="_adminPass2" /><input type="hidden" name="adminPass" value="<?php echo htmlentities($clickheatConf['adminPass']) ?>" />
+<tr><td><?php echo LANG_CONFIG_ADMIN_PASS ?></td><td><input type="password" name="_adminPass" /><br /><input type="password" name="_adminPass2" /><input type="hidden" name="adminPass" value="<?php echo htmlspecialchars($clickheatConf['adminPass']) ?>" />
 <?php
 if ($check === true)
 {
@@ -491,7 +491,7 @@ if ($check === true)
 	}
 }
 ?></td></tr>
-<tr><td><?php echo LANG_CONFIG_VIEWER_LOGIN ?></td><td><input type="text" name="viewerLogin" value="<?php echo htmlentities($clickheatConf['viewerLogin']) ?>" />
+<tr><td><?php echo LANG_CONFIG_VIEWER_LOGIN ?></td><td><input type="text" name="viewerLogin" value="<?php echo htmlspecialchars($clickheatConf['viewerLogin']) ?>" />
 <?php
 if ($check === true)
 {
@@ -506,7 +506,7 @@ if ($check === true)
 	}
 }
 ?></td></tr>
-<tr><td><?php echo LANG_CONFIG_VIEWER_PASS ?></td><td><input type="password" name="_viewerPass" /><br /><input type="password" name="_viewerPass2" /><input type="hidden" name="viewerPass" value="<?php echo htmlentities($clickheatConf['viewerPass']) ?>" />
+<tr><td><?php echo LANG_CONFIG_VIEWER_PASS ?></td><td><input type="password" name="_viewerPass" /><br /><input type="password" name="_viewerPass2" /><input type="hidden" name="viewerPass" value="<?php echo htmlspecialchars($clickheatConf['viewerPass']) ?>" />
 <?php
 if ($check === true)
 {
@@ -536,7 +536,7 @@ if ($check === true)
 </form>
 <br />
 <form action="<?php echo CLICKHEAT_INDEX_PATH ?>action=config" method="post" class="center">
-<input type="hidden" name="config" value="<?php echo htmlentities(serialize($clickheatConf)) ?>" />
+<input type="hidden" name="config" value="<?php echo htmlspecialchars(serialize($clickheatConf)) ?>" />
 <?php
 if ($check === true && $checks === true)
 {

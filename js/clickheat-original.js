@@ -26,14 +26,14 @@ var clickHeatBrowser = '';
 var clickHeatDocument = '';
 var clickHeatWait = 500;
 var clickHeatLocalWait = 0;
-var clickHeatDebug = (window.location.href.search(/debugclickheat/) !== -1);
+var clickHeatDebug = (window.location.href.search(/debugclickheat/) != -1);
 
 /**
 * Shows a debug string
 **/
 function showClickHeatDebug(str)
 {
-	if (clickHeatDebug === true)
+	if (clickHeatDebug == true)
 	{
 		document.getElementById('clickHeatDebuggerSpan').innerHTML = str;
 		document.getElementById('clickHeatDebuggerDiv').style.display = 'block';
@@ -46,18 +46,18 @@ function catchClickHeat(e)
 	try
 	{
 		showClickHeatDebug('Gathering click data...');
-		if (clickHeatQuota === 0)
+		if (clickHeatQuota == 0)
 		{
 			showClickHeatDebug('Click not logged: quota reached');
 			return true;
 		}
-		if (clickHeatGroup === '')
+		if (clickHeatGroup == '')
 		{
 			showClickHeatDebug('Click not logged: group name empty (clickHeatGroup)');
 			return true;
 		}
 		/** Look for the real event */
-		if (e === undefined)
+		if (e == undefined)
 		{
 			e = window.event;
 			c = e.button;
@@ -68,15 +68,15 @@ function catchClickHeat(e)
 			c = e.which;
 			element = null;
 		}
-		if (c === 0)
+		if (c == 0)
 		{
 			showClickHeatDebug('Click not logged: no button pressed');
 			return true;
 		}
 		/** Filter for same iframe (focus on iframe => popup ad => close ad => new focus on same iframe) */
-		if (element !== null && element.tagName.toLowerCase() === 'iframe')
+		if (element != null && element.tagName.toLowerCase() == 'iframe')
 		{
-			if (element.sourceIndex === clickHeatLastIframe)
+			if (element.sourceIndex == clickHeatLastIframe)
 			{
 				showClickHeatDebug('Click not logged: same iframe (a click on iframe opens a popup and popup is closed => iframe gets the focus again)');
 				return true;
@@ -89,10 +89,10 @@ function catchClickHeat(e)
 		}
 		var x = e.clientX;
 		var y = e.clientY;
-		var w = clickHeatDocument.clientWidth !== undefined ? clickHeatDocument.clientWidth : window.innerWidth;
-		var h = clickHeatDocument.clientHeight !== undefined ? clickHeatDocument.clientHeight : window.innerHeight;
-		var scrollx = window.pageXOffset === undefined ? clickHeatDocument.scrollLeft : window.pageXOffset;
-		var scrolly = window.pageYOffset === undefined ? clickHeatDocument.scrollTop : window.pageYOffset;
+		var w = clickHeatDocument.clientWidth != undefined ? clickHeatDocument.clientWidth : window.innerWidth;
+		var h = clickHeatDocument.clientHeight != undefined ? clickHeatDocument.clientHeight : window.innerHeight;
+		var scrollx = window.pageXOffset == undefined ? clickHeatDocument.scrollLeft : window.pageXOffset;
+		var scrolly = window.pageYOffset == undefined ? clickHeatDocument.scrollTop : window.pageYOffset;
 		/** Is the click in the viewing area? Not on scrollbars. The problem still exists for FF on the horizontal scrollbar */
 		if (x > w || y > h)
 		{
@@ -115,7 +115,7 @@ function catchClickHeat(e)
 		showClickHeatDebug('Ready to send click data...');
 		/** Local request? Try an ajax call */
 		var sent = false;
-		if (clickHeatServer.substring(0, 4) !== 'http')
+		if (clickHeatServer.substring(0, 4) != 'http')
 		{
 			var xmlhttp = false;
 			try
@@ -133,25 +133,25 @@ function catchClickHeat(e)
 					xmlhttp = null;
 				}
 			}
-			if (!xmlhttp && typeof XMLHttpRequest !== undefined)
+			if (!xmlhttp && typeof XMLHttpRequest != undefined)
 			{
 				xmlhttp = new XMLHttpRequest();
 			}
 			if (xmlhttp)
 			{
-				if (clickHeatDebug === true)
+				if (clickHeatDebug == true)
 				{
 					xmlhttp.onreadystatechange = function()
 					{
-						if (xmlhttp.readyState === 4)
+						if (xmlhttp.readyState == 4)
 						{
-							if (xmlhttp.status === 200)
+							if (xmlhttp.status == 200)
 							{
 								showClickHeatDebug('Click recorded at ' + clickHeatServer + ' with the following parameters:<br />x = ' + (x + scrollx) + ' (' + x + 'px from left + ' + scrollx + 'px of horizontal scrolling)<br />y = ' + (y + scrolly) + ' (' + y + 'px from top + ' + scrolly + 'px of vertical scrolling)<br />width = ' + w + '<br />browser = ' + clickHeatBrowser + '<br />click = ' + c + '<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br /><br />Server answer: ' + xmlhttp.responseText);
 							}
-							else if (xmlhttp.status === 404)
+							else if (xmlhttp.status == 404)
 							{
-								showClickHeatDebug('click.php was not found at: ' + (clickHeatServer !== '' ? clickHeatServer : '/clickheat/click.php') + ' please set clickHeatServer value');
+								showClickHeatDebug('click.php was not found at: ' + (clickHeatServer != '' ? clickHeatServer : '/clickheat/click.php') + ' please set clickHeatServer value');
 							}
 							else
 							{
@@ -168,10 +168,10 @@ function catchClickHeat(e)
 				sent = true;
 			}
 		}
-		if (sent === false)
+		if (sent == false)
 		{
 			/** This test is needed, as it includes the call to click.php in the iframe */
-			if (clickHeatDebug === true)
+			if (clickHeatDebug == true)
 			{
 				showClickHeatDebug('Click recorded at ' + clickHeatServer + ' with the following parameters:<br />x = ' + (x + scrollx) + ' (' + x + 'px from left + ' + scrollx + 'px of horizontal scrolling)<br />y = ' + (y + scrolly) + ' (' + y + 'px from top + ' + scrolly + 'px of vertical scrolling)<br />width = ' + w + '<br />browser = ' + clickHeatBrowser + '<br />click = ' + c + '<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br /><br />Server answer:<br />' + '<iframe src="' + clickHeatServer + '?' + params + '" width="700" height="60"></iframe>');
 			}
@@ -199,12 +199,12 @@ function catchClickHeat(e)
 function initClickHeat()
 {
 	/** Debug Window */
-	if (clickHeatDebug === true)
+	if (clickHeatDebug == true)
 	{
 		document.write('<div id="clickHeatDebuggerDiv" style="padding:5px; display:none; position:absolute; top:10px; left:10px; border:1px solid #888; background-color:#eee; z-index:99;"><strong>ClickHeat debug: <a href="#" onmouseover="document.getElementById(\'clickHeatDebuggerDiv\').style.display = \'none\'; return false">Rollover to close</a></strong><br /><br /><span id="clickHeatDebuggerSpan"></span></div>');
 	}
 
-	if (clickHeatGroup === '' || clickHeatServer === '')
+	if (clickHeatGroup == '' || clickHeatServer == '')
 	{
 		showClickHeatDebug('ClickHeat NOT initialised: either clickHeatGroup or clickHeatServer is empty');
 		return false;
@@ -212,7 +212,7 @@ function initClickHeat()
 
 	/** If current website has the same domain as the script, we remove the domain so that the call is made using Ajax */
 	domain = window.location.href.match(/http:\/\/[^/]+\//);
-	if (domain !== null && clickHeatServer.substring(0, domain[0].length) === domain[0])
+	if (domain != null && clickHeatServer.substring(0, domain[0].length) == domain[0])
 	{
 		clickHeatServer = clickHeatServer.substring(domain[0].length - 1, clickHeatServer.length);
 	}
@@ -239,13 +239,13 @@ function initClickHeat()
 		}
 	}
 	/** Preparing main variables */
-	clickHeatDocument = (document.documentElement !== undefined && document.documentElement.clientHeight !== 0) ? document.documentElement : document.body;
+	clickHeatDocument = (document.documentElement != undefined && document.documentElement.clientHeight != 0) ? document.documentElement : document.body;
 	/** Also the User-Agent is not the best value to use, it's the only one that gives the real browser */
-	var b = navigator.userAgent !== undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
+	var b = navigator.userAgent != undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
 	clickHeatBrowser = b.replace(/iceweasel/, 'firefox').replace(/^.*(firefox|kmeleon|safari|msie|opera).*$/, '$1');
-	if (b === clickHeatBrowser || clickHeatBrowser === '')
+	if (b == clickHeatBrowser || clickHeatBrowser == '')
 	{
 		clickHeatBrowser = 'unknown';
 	}
-	showClickHeatDebug('ClickHeat initialised with:<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br />server = ' + clickHeatServer + '<br />quota = ' + (clickHeatQuota === -1 ? 'unlimited' : clickHeatQuota) + '<br /><br />browser = ' + clickHeatBrowser);
+	showClickHeatDebug('ClickHeat initialised with:<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br />server = ' + clickHeatServer + '<br />quota = ' + (clickHeatQuota == -1 ? 'unlimited' : clickHeatQuota) + '<br /><br />browser = ' + clickHeatBrowser);
 }

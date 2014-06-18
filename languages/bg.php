@@ -52,8 +52,8 @@ define('LANG_JAVASCRIPT_SITE', 'Име на уебсайта (позволени
 define('LANG_JAVASCRIPT_GROUP', 'Име на групата, за да групираме подобни страници за олеснен анализ');
 define('LANG_JAVASCRIPT_GROUP0', 'използва ключова дума');
 define('LANG_JAVASCRIPT_GROUP1', 'позволени символи: A-Z, a-z, 0-9, долна черта, тире, точка');
-define('LANG_JAVASCRIPT_GROUP2', ' използва заглавието на страницита (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">непрепорачителноно</a>)');
-define('LANG_JAVASCRIPT_GROUP3', 'използван адрес на страницата(<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">непрепорачително</a>)');
+define('LANG_JAVASCRIPT_GROUP2', ' използва заглавието на страницита (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">непрепорачителноно</a>)');
+define('LANG_JAVASCRIPT_GROUP3', 'използван адрес на страницата(<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">непрепорачително</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Copy and paste кода в долната част на вашата страницата, точно преди краят на страницата (преди &lt;/body&gt; tag):');
 define('LANG_JAVASCRIPT_DEBUG', 'веднаж поставен кода във вашата страница, незабравяите да тествате дали работи, извикваики вашата страница с паранетри <span class="error">debugclickheat</span>. За принер http://www.site.com/index.html извиква http://www.site.com/index.html<span class="error">?debugclickheat</span>. Трябва да видите съобщенир от мястото на Clickheat.  Ако има проблем, свържете се с наз');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
@@ -89,7 +89,7 @@ define('LANG_CONFIG_REFERERS', 'имена на домейните (раздел
 define('LANG_CONFIG_GROUPS', 'имена на групата (разделете със запетая) разреши лог кликване на този сервър');
 define('LANG_CONFIG_FILESIZE', 'максимален размер на лог файла (в KB) на групата през ден (1000 кликвания са около 25KB, 0 = няма лимит на размера)');
 define('LANG_CONFIG_CHECK', 'провери конфигурацията');
-define('LANG_CONFIG_MEMORY', 'ограничения запаметта (автоматично php.ini стойност: %dMB, лимит: от %d до %dMB, но <a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">бъдете внимателни с големи стойности</a>)');
+define('LANG_CONFIG_MEMORY', 'ограничения запаметта (автоматично php.ini стойност: %dMB, лимит: от %d до %dMB, но <a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">бъдете внимателни с големи стойности</a>)');
 define('LANG_CONFIG_MEMORY_KO', 'моля ограничете се с размера на спецификациите');
 define('LANG_CONFIG_STEP', 'Групиране на X*X pixels\' зона (увеличаване на скороста на heatmaps)');
 define('LANG_CONFIG_STEP_KO', 'зоната неможе да бъде под 1x1 pixels');

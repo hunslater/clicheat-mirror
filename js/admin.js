@@ -307,7 +307,7 @@ function saveGroupLayout()
 	}
 	var xmlhttp;
 	xmlhttp = getXmlHttp();
-	xmlhttp.open('GET', scriptIndexPath + 'action=layoutupdate&group=' + document.getElementById('formGroup').value + '&url=' + document.getElementById('formUrl').value + '&left=' + document.getElementById('layout-left-' + i).value + '&right=' + document.getElementById('layout-right-' + i).value + '&center=' + document.getElementById('layout-center-' + i).value + '&rand=' + Date(), true);
+	xmlhttp.open('GET', scriptIndexPath + 'action=layoutupdate&group=' + document.getElementById('formGroup').value + '&url=' + encodeURIComponent(document.getElementById('formUrl').value) + '&left=' + document.getElementById('layout-left-' + i).value + '&right=' + document.getElementById('layout-right-' + i).value + '&center=' + document.getElementById('layout-center-' + i).value + '&rand=' + Date(), true);
 	xmlhttp.onreadystatechange = function()
 	{
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
@@ -446,7 +446,7 @@ function changeAlpha(alpha)
 			document.images[i].style.opacity = alpha / 100;
 			if (document.body.filters != undefined)
 			{
-				document.images[i].style.filter = 'alpha(opacity:' + alpha + ')';
+				document.images[i].style.filter = 'alpha(opacity=' + alpha + ')';
 			}
 		}
 	}

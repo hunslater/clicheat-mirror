@@ -51,8 +51,8 @@ define('LANG_JAVASCRIPT_SITE', 'Nume site (caractere permise: A-Z, a-z, 0-9, _, 
 define('LANG_JAVASCRIPT_GROUP', 'Nume de grup, pentru a grupa pagini similare pentru o analiza mai simpla');
 define('LANG_JAVASCRIPT_GROUP0', 'foloseste un cuvant cheie');
 define('LANG_JAVASCRIPT_GROUP1', 'caractere permise: A-Z, a-z, 0-9, _, -, .');
-define('LANG_JAVASCRIPT_GROUP2', 'foloseste titlul unei pagini (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">nu este recomandat</a>)');
-define('LANG_JAVASCRIPT_GROUP3', 'foloseste adresa paginii (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">nu este recomandat</a>)');
+define('LANG_JAVASCRIPT_GROUP2', 'foloseste titlul unei pagini (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">nu este recomandat</a>)');
+define('LANG_JAVASCRIPT_GROUP3', 'foloseste adresa paginii (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">nu este recomandat</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Copiaza codul de mai jos in codul paginilor tale, chiar la sfarsitul paginii (inainte de &lt;/body&gt;):');
 define('LANG_JAVASCRIPT_DEBUG', 'Din momentul in care a fost copiat codul, nu uita sa-l testezi pentru a verifica daca functioneaza corect. Foloseste variabila <span class="error">?debugclickheat</span>. De exemplu: http://www.site-demo.com/index.html - tasteaza in browser http://www.site-demo.com/index.html<span class="error">?debugclickheat</span>. Vei vedea un mesaj care arata modul de functionare al aplicatiei. Daca ai o problema, te rugam sa ne contactezi');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
@@ -88,7 +88,7 @@ define('LANG_CONFIG_REFERERS', 'Nume de domenii (separate prin virgule) carora l
 define('LANG_CONFIG_GROUPS', 'Nume de grupuri (separate prin virgule) carora li se permite inregistrarea click-urilor pe acest server');
 define('LANG_CONFIG_FILESIZE', 'Marime maxima pentru un fisier de inregistrare (in KB) pentru un grup intr-o zi (1000 click-uri reprezinta proximativ 25KB, 0 = fara limite)');
 define('LANG_CONFIG_CHECK', 'Verifica configurare');
-define('LANG_CONFIG_MEMORY', 'Limita de memorie (valoare php.ini default: %dMB, limite: de la %d la %dMB, dar <a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">aveti grija cu valorile mari</a>)');
+define('LANG_CONFIG_MEMORY', 'Limita de memorie (valoare php.ini default: %dMB, limite: de la %d la %dMB, dar <a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">aveti grija cu valorile mari</a>)');
 define('LANG_CONFIG_MEMORY_KO', 'va rugam sa ramaneti in valorile specificate');
 define('LANG_CONFIG_STEP', 'Click-uri grupate in zone de X*X pixeli (influenteaza viteza de redare a hartii de click-uri)');
 define('LANG_CONFIG_STEP_KO', 'zonele nu pot avea sub 1x1 pixeli');

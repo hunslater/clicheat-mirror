@@ -51,8 +51,8 @@ define('LANG_JAVASCRIPT_SITE', 'Име сајта (дозвољени карак
 define('LANG_JAVASCRIPT_GROUP', 'Име групе, да се групишу стране за сличну анализу');
 define('LANG_JAVASCRIPT_GROUP0', 'користи кључну реч');
 define('LANG_JAVASCRIPT_GROUP1', 'дозвољени карактери: A-Z, a-z, 0-9, _, -, .');
-define('LANG_JAVASCRIPT_GROUP2', 'користи назив веб странице (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">није препоручено</a>)');
-define('LANG_JAVASCRIPT_GROUP3', 'користи линк веб странице (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">није препоручено</a>)');
+define('LANG_JAVASCRIPT_GROUP2', 'користи назив веб странице (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">није препоручено</a>)');
+define('LANG_JAVASCRIPT_GROUP3', 'користи линк веб странице (<a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">није препоручено</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Копирајте и ставите доњи код на ваше странице, пре самог краја стране (пре &lt;/body&gt; елемента):');
 define('LANG_JAVASCRIPT_DEBUG', 'Пошто је код стављен на ваше стране, не заборавите да тестирате да ли код ради добро, позивајући вашу страну са параметром <span class="error">debugclickheat</span>. На пример за http://www.site.com/index.html позовите http://www.site.com/index.html<span class="error">?debugclickheat</span>. Требали би видети поруку која показује стање Clickheatа. Ако се сусретнете са неким проблемом, молимо контактирајте нас');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
@@ -88,7 +88,7 @@ define('LANG_CONFIG_REFERERS', 'Имена домена (раздовљени з
 define('LANG_CONFIG_GROUPS', 'Имена група (раздовљени зарезима) којима је дозвољено да логују кликове на овом серверу');
 define('LANG_CONFIG_FILESIZE', 'Максимална величина лог фајла (у килобајтима) за групу у току дана (1000 кликова је око 25KB, 0 = нема лимита величине)');
 define('LANG_CONFIG_CHECK', 'Проверите конфигурацију');
-define('LANG_CONFIG_MEMORY', 'Лимит меморије (стандардна php.ini вредност: %dMB, лимити: од %d до %dMB, али <a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">будите опрезни са великим вредностима</a>)');
+define('LANG_CONFIG_MEMORY', 'Лимит меморије (стандардна php.ini вредност: %dMB, лимити: од %d до %dMB, али <a href="http://www.labsmedia.com/clickheat/performance.html" onclick="window.open(this.href, \'external\');return false">будите опрезни са великим вредностима</a>)');
 define('LANG_CONFIG_MEMORY_KO', 'молимо останите унутар специфицираног опсега');
 define('LANG_CONFIG_STEP', 'Груписање кликова по X*X пикселним зонама (убрзава презентацију топлотних мапа)');
 define('LANG_CONFIG_STEP_KO', 'зоне не могу бити мање од 1x1 пиксела');

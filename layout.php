@@ -1,7 +1,7 @@
 <?php
 /**
  * ClickHeat : Mise à jour des informations d'un groupe / Group info update
- * 
+ *
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 04/04/2007
 **/
@@ -40,15 +40,15 @@ if ($pos === false)
 {
 	$groupTitle = &$group;
 }
-else 
+else
 {
 	$groupTitle = substr($group, $pos + 1);
 }
 ?>
 <span class="float-right"><a href="#" onclick="hideGroupLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/ko.png" width="16" height="16" align="absmiddle" alt="Close" /></a></span>
-<h1><?php echo LANG_LAYOUT ?> '<em><?php echo htmlentities($groupTitle); ?></em>'</h1>
+<h1><?php echo LANG_LAYOUT ?> '<em><?php echo htmlspecialchars($groupTitle); ?></em>'</h1>
 <form action="#" method="get" onsubmit="return false;">
-<?php echo LANG_EXAMPLE_URL ?> <input type="text" name="url" id="formUrl" value="<?php echo htmlentities($url); ?>" size="50" /> <a href="#" onclick="saveGroupLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/save.png" width="16" height="16" alt="Save" /></a><br />
+<?php echo LANG_EXAMPLE_URL ?> <input type="text" name="url" id="formUrl" value="<?php echo htmlspecialchars($url); ?>" size="50" /> <a href="#" onclick="saveGroupLayout(); return false;"><img src="<?php echo CLICKHEAT_PATH ?>images/save.png" width="16" height="16" alt="Save" /></a><br />
 <span class="layout-left-fixed"><?php echo LANG_LAYOUT_FIXED ?></span> <span class="layout-left-liquid"><?php echo LANG_LAYOUT_LIQUID ?></span> <span class="layout-left-empty"><?php echo LANG_LAYOUT_NONE ?></span><br />
 <table cellpadding="0" cellspacing="2" border="0">
 <?php
