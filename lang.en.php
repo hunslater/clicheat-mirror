@@ -1,15 +1,22 @@
 <?php
 /**
- * ClickHeat : Fichier de langue : français
+ * ClickHeat : Fichier de langue : anglais
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
 **/
 
-define('LANG_TITLE', 'ClickHeat : what\'s hot on your webpage ?');
-define('LANG_H1', 'ClickHeat : what\'s hot on your webpage ?');
+define('LANG_TITLE', 'ClickHeat');
+define('LANG_INDEX', 'Results');
+define('LANG_TOOLS', 'Tools');
 define('LANG_AUTHORIZATION', 'Sorry, this webpage is protected, please provide the good password');
 define('LANG_DELETE_LOGS', 'Delete logs older than');
+define('LANG_DELETE_LOG_DIR', 'Delete all logs including the log directory (useful when you want to remove clickheat completly)');
+define('LANG_UPDATE_OLD_LOGS', 'Update old logs (before version 0.9) to version 0.9 or newer, as the format of logs has changed to improve security');
+define('LANG_DELETED_FILES', 'files were deleted');
+define('LANG_RENAMED_FILES', 'files were renamed');
+define('LANG_LOG_DELETED', 'The log directory has been deleted');
+define('LANG_LOG_NOT_DELETED', 'The log directory couldn\'t be deleted');
 define('LANG_DAYS', 'day(s)');
 define('LANG_SURE', 'Sure');
 define('LANG_UPDATE', 'Update');
@@ -19,12 +26,17 @@ define('LANG_BROWSER', 'Browser');
 define('LANG_ALL', 'All');
 define('LANG_UNKNOWN', 'Other/unknown');
 define('LANG_DATE', 'Start date');
+define('LANG_OK', 'OK');
 define('LANG_FOR', 'for');
+define('LANG_FOR_PAGE', 'for pages');
 define('LANG_EXAMPLE_URL', 'Webpage');
 define('LANG_LAYOUT_WIDTH', 'Layout widths : left, center, right');
 define('LANG_DISPLAY_WIDTH', 'Results display size');
 define('LANG_SCREENSIZE', 'Screen size');
 define('LANG_HEATMAP', 'Show as heatmap');
+define('LANG_CHECK_LATEST', 'Check latest available version');
+define('LANG_LATEST_VERSION', 'Latest version');
+define('LANG_YOUR_VERSION', 'Your version');
 define('LANG_ERROR_PASSWORD', 'Beware ! You didn\'t speficied any password or didn\'t change the default one, so anyone has access to this page');
 define('LANG_ERROR_PAGE', 'Unknown page');
 define('LANG_ERROR_DATA', 'No logs for the selected period');
@@ -48,7 +60,6 @@ define('LANG_CHECK_GD', 'GD graphic library');
 define('LANG_CHECK_GD_NA', 'GD isn\'t installed');
 define('LANG_CHECK_GD_IMG', 'imagecreatetruecolor() unavailable, can\'t create images (with good quality)');
 define('LANG_CHECK_GD_ALPHA', 'imagecolorallocatealpha() unavailable, can\'t create transparent images (you can ignore this, but transparency is really recommended)');
-define('LANG_CHECK_GD_ANTIALIAS', 'imagefilter() unavailable (PHP 5+ required), can\'t use antialias/gaussian filters (you can ignore this)');
 define('LANG_CHECK_OK', 'OK');
 $__jsHelp = array(
 	'layout' => 'Site layout : 0 = automatic width, else it\'s column\'s width in pixels.<br />Examples : fixed 100px left menu, content uses the available space left : 100 0 0<br />Content 750px, centered (with an optional menu within 750px) : 0 750 0<br />Left fixed 100px menu, content 650px align to the left : 100 650 0 or 750 0 0 (because everything is on the left)<br />Left and right menus, fixed 100px, central content uses the available space left : 100 0 100<br />100% content : 0 0 0<br /><br />If your main content is not fixed, you should select the same "Screen size" as "Results display size" so that the clicks are at the good position.',

@@ -20,7 +20,7 @@ include './lang.'.$lang.'.php';
 include './login.php';
 
 /** Protection of Labsmedia servers (hide critical info as the password is public) */
-$showCritical = strpos($_SERVER['HTTP_HOST'], '.labsmedia.') === false && strpos($_SERVER['HTTP_HOST'], '.lacoccinelle.net') === false;
+$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
@@ -32,7 +32,7 @@ $showCritical = strpos($_SERVER['HTTP_HOST'], '.labsmedia.') === false && strpos
 <body>
 <h1><?php echo LANG_CHECKS ?></h1>
 <table cellpadding="0" cellspacing="5" border="0">
-<tr><th><?php echo LANG_CHECK_SYSTEM ?></th><td>OS = <?php echo $showCritical ? PHP_OS : 'hidden' ?>, PHP = <?php echo $showCritical ? PHP_VERSION : 'hidden' ?></td></tr>
+<tr><th><?php echo LANG_CHECK_SYSTEM ?></th><td>OS = <?php echo $demoServer === false ? PHP_OS : 'hidden' ?>, PHP = <?php echo $demoServer === false ? PHP_VERSION : 'hidden' ?></td></tr>
 <tr><th><?php echo LANG_CHECK_LOGPATH ?></th><td>
 <?php
 /** Test of log directory : */
@@ -103,10 +103,6 @@ elseif (function_exists('imagecreatetruecolor') === false)
 elseif (function_exists('imagecolorallocatealpha') === false)
 {
 	echo LANG_CHECK_GD_ALPHA;
-}
-elseif (function_exists('imagefilter') === false)
-{
-	echo LANG_CHECK_GD_ANTIALIAS;
 }
 else
 {

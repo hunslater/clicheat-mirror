@@ -28,7 +28,7 @@ $screen = isset($_GET['screen']) && in_array($_GET['screen'], $screenSizes) ? (i
 $image = isset($_GET['image']) ? (int) $_GET['image'] : 0;
 $heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap'] : 0;
 
-$imagePath = CLICKHEAT_LOGPATH.$page.'/'.$date.'-'.$days.'-'.$screen.'-'.$width.'-'.$browser.'-'.$heatmap.'-'.$image.'.png';
+$imagePath = CLICKHEAT_LOGPATH.$page.'/%%'.$date.'-'.$days.'-'.$screen.'-'.$width.'-'.$browser.'-'.$heatmap.'-'.$image.'.png%%';
 
 if (file_exists($imagePath) === false)
 {

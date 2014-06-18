@@ -20,7 +20,7 @@ include './lang.'.$lang.'.php';
 include './login.php';
 
 /** Against people that just don't understand that a demo is not a tool to promote their url... */
-$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false || strpos($_SERVER['SERVER_NAME'], '.lacoccinelle.net') !== false;
+$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false;
 
 /** Input variables */
 $page = isset($_GET['page']) ? $_GET['page'] : '';
@@ -28,42 +28,6 @@ $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
 $width = isset($_GET['width']) ? (int) $_GET['width'] : 0;
 $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
 $heatmap = isset($_GET['heatmap']);
-
-/** Ask for page logs deletion (and png images too) */
-if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15)) && $page !== '' && $demoServer === false)
-{
-	$page = str_replace(array('.', '/'), array('', ''), $page);
-	if (is_dir(CLICKHEAT_LOGPATH.$page))
-	{
-		$d = dir(CLICKHEAT_LOGPATH.$page.'/');
-		$deletedAll = true;
-		while (($file = $d->read()) !== false)
-		{
-			if ($file === '.' || $file === '..' || $file === 'url.txt') continue;
-			$date = strtotime(substr($file, 0, 10));
-			/** The date is not valid (no reason for that, but hey, must check) */
-			if ($date === false)
-			{
-				$deletedAll = false;
-				continue;
-			}
-			/** Too old, must be deleted */
-			if ($date <= mktime(0, 0, 0, date('m'), date('d') - $_GET['delete_logs'], date('Y')))
-			{
-				@unlink($d->path.$file);
-				continue;
-			}
-			$deletedAll = false;
-		}
-		$d->close();
-		/** If every log file (but the url.txt) has been deleted, then we should delete the directory too */
-		if ($deletedAll === true)
-		{
-			@unlink(CLICKHEAT_LOGPATH.$page.'/url.txt');
-			@rmdir(CLICKHEAT_LOGPATH.$page);
-		}
-	}
-}
 
 /** List of available pages */
 $selectPages = '';
@@ -97,9 +61,9 @@ if ($pageExists === false)
 $webPage = '';
 if ($page !== '')
 {
-	if (file_exists(CLICKHEAT_LOGPATH.$page.'/url.txt'))
+	if (file_exists(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%'))
 	{
-		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'r');
+		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'r');
 		$webPage = trim(fgets($f, 1024));
 		fclose($f);
 	}
@@ -113,7 +77,7 @@ if ($page !== '')
 		if ($webPage !== $webPageGet && $webPageGet !== '')
 		{
 			$webPage = $webPageGet;
-			$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'w');
+			$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'w');
 			fputs($f, $webPage);
 			fclose($f);
 		}
@@ -191,15 +155,15 @@ foreach ($browsersList as $label => $name)
 <?php
 if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 {
-	echo '<small class="error" style="float:left;">'.LANG_ERROR_PASSWORD.'</small>';
+	echo '<small class="error" style="float:right;">'.LANG_ERROR_PASSWORD.'</small>';
 }
 ?>
-<span id="url"><a href="http://www.labsmedia.com/clickheat/"><img src="./logo.png" width="80" height="15" alt="ClickHeat" /></a></span>
-<h1><?php echo LANG_H1 ?></h1>
+<span id="float-right"><a href="http://www.labsmedia.com/clickheat/"><img src="./logo.png" width="80" height="15" alt="ClickHeat" /></a></span>
+<h1><?php echo LANG_TITLE ?> : <?php echo LANG_INDEX ?> - <a href="tools.php"><?php echo LANG_TOOLS ?></a></h1>
 <form action="index.php" method="get" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
-	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage0').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <?php if ($demoServer === false) { ?><small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small><?php } ?></td>
+	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage0').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select></td>
 	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 <tr>
 	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>

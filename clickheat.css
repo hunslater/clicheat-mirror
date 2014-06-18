@@ -25,9 +25,8 @@ img {
 	padding:0;
 	margin:0;
 }
-#url {
+#float-right {
 	float:right;
-	margin:5px;
 }
 #pngDiv {
 	position:absolute;

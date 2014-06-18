@@ -26,7 +26,7 @@ if ($browser === '')
 	$browser = 'unknown';
 }
 /** Logging the click */
-$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log', 'a');
+$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.date('Y-m-d').'.log%%', 'a');
 if ($f === false)
 {
 	/** Can't open the log, let's try to create the directory */
@@ -38,7 +38,7 @@ if ($f === false)
 	{
 		@mkdir(CLICKHEAT_LOGPATH.$page.'/');
 	}
-	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log', 'a');
+	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.date('Y-m-d').'.log%%', 'a');
 }
 if ($f !== false)
 {

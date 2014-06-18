@@ -56,8 +56,12 @@ function catchClickHeat(e)
 		if (b == b0 || b0 == '') b0 = 'unknown';
 		params = 'p=' + clickHeatPage + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&random=' + Date();
 		/** Local request ? Try an ajax call */
-		if (clickHeatServer == '')
+		if (clickHeatServer == '' || clickHeatServer.substring(0, 4) != 'http')
 		{
+			if (clickHeatServer == '')
+			{
+				clickHeatServer = '/clickheat/click.php';
+			}
 			try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
 			catch (e)
 			{
@@ -65,15 +69,12 @@ function catchClickHeat(e)
 				catch (oc) { xmlhttp = null; }
 			}
 			if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
-			if (!xmlhttp)
+			if (xmlhttp)
 			{
-				clickHeatServer = '/clickheat/click.php';
-			}
-			else
-			{
-				xmlhttp.open('GET', '/clickheat/click.php?' + params, true);
+				xmlhttp.open('GET', clickHeatServer + '?' + params, true);
 				xmlhttp.setRequestHeader('Connection', 'close');
 				xmlhttp.send(null);
+				clickHeatServer = '';
 			}
 		}
 		if (clickHeatServer != '')

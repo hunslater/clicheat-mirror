@@ -96,9 +96,9 @@ if ($file !== $page)
 	errorGenerate(LANG_ERROR_PAGE);
 }
 /** Get some data for the current page (centered and/or fixed layout) */
-if (file_exists(CLICKHEAT_LOGPATH.$page.'/url.txt'))
+if (file_exists(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%'))
 {
-	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'r');
+	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'r');
 	$webPage = trim(fgets($f, 1024));
 	fclose($f);
 }
@@ -146,12 +146,12 @@ $dateStamp = isset($_GET['date']) ? strtotime($_GET['date']) : time();
 $date = date('Y-m-d', $dateStamp);
 $days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
 
-$imagePath = CLICKHEAT_LOGPATH.$page.'/'.$date.'-'.$days.'-'.$screen.'-'.($width + 40).'-'.$browser.'-'.$heatmap;
+$imagePath = CLICKHEAT_LOGPATH.$page.'/%%'.$date.'-'.$days.'-'.$screen.'-'.($width + 40).'-'.$browser.'-'.$heatmap;
 
 /** If images are already created and older than the current day, just stop script here */
-if (file_exists($imagePath.'.html') && filemtime($imagePath.'.html') > mktime(23, 59, 59, date('m', $dateStamp), date('d', $dateStamp) + $days - 1, date('Y', $dateStamp)))
+if (file_exists($imagePath.'.html%%') && filemtime($imagePath.'.html%%') > mktime(23, 59, 59, date('m', $dateStamp), date('d', $dateStamp) + $days - 1, date('Y', $dateStamp)))
 {
-	readfile($imagePath.'.html');
+	readfile($imagePath.'.html%%');
 	exit;
 }
 
@@ -182,12 +182,12 @@ for ($image = 0; $image < $nbOfImages; $image++)
 	for ($day = 0; $day < $days; $day++)
 	{
 		$currentDate = date('Y-m-d', mktime(0, 0, 0, date('m', $dateStamp), date('d', $dateStamp) + $day, date('Y', $dateStamp)));
-		if (!file_exists(CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log'))
+		if (!file_exists(CLICKHEAT_LOGPATH.$page.'/%%'.$currentDate.'.log%%'))
 		{
 			continue;
 		}
 		/** Read clicks in the log file */
-		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log', 'r');
+		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.$currentDate.'.log%%', 'r');
 		if ($f === false)
 		{
 			errorGenerate(LANG_ERROR_FILE.': '.CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log');
@@ -315,11 +315,11 @@ for ($image = 0; $image < $nbOfImages; $image++)
 
 	if ($heatmap === 1)
 	{
-		imagepng($img, $imagePath.'-'.$image.'.pngs');
+		imagepng($img, $imagePath.'-'.$image.'.pngs%%');
 	}
 	else
 	{
-		imagepng($img, $imagePath.'-'.$image.'.png');
+		imagepng($img, $imagePath.'-'.$image.'.png%%');
 	}
 	imagedestroy($img);
 
@@ -355,60 +355,60 @@ if ($heatmap === 1)
 	 * 0	   $colorLevels[0]	   $colorLevels[1]	   $colorLevels[2]	   $colorLevels[3]	   128
 	**/
 	sort($colorLevels);
+	$colors = array();
 	for ($i = 0; $i < 128; $i++)
 	{
 		/** Red */
 		if ($i < $colorLevels[0])
 		{
-			$red = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
+			$colors[$i][0] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
 		}
 		elseif ($i < $colorLevels[2])
 		{
-			$red = CLICKHEAT_LOW_COLOR;
+			$colors[$i][0] = CLICKHEAT_LOW_COLOR;
 		}
 		elseif ($i < $colorLevels[3])
 		{
-			$red = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[2]) / ($colorLevels[3] - $colorLevels[2]);
+			$colors[$i][0] = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[2]) / ($colorLevels[3] - $colorLevels[2]);
 		}
 		else
 		{
-			$red = CLICKHEAT_HIGH_COLOR;
+			$colors[$i][0] = CLICKHEAT_HIGH_COLOR;
 		}
 		/** Green */
 		if ($i < $colorLevels[0])
 		{
-			$green = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
+			$colors[$i][1] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
 		}
 		elseif ($i < $colorLevels[1])
 		{
-			$green = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[0]) / ($colorLevels[1] - $colorLevels[0]);
+			$colors[$i][1] = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[0]) / ($colorLevels[1] - $colorLevels[0]);
 		}
 		elseif ($i < $colorLevels[3])
 		{
-			$green = CLICKHEAT_HIGH_COLOR;
+			$colors[$i][1] = CLICKHEAT_HIGH_COLOR;
 		}
 		else
 		{
-			$green = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[3]) / (127 - $colorLevels[3]);
+			$colors[$i][1] = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[3]) / (127 - $colorLevels[3]);
 		}
 		/** Blue */
 		if ($i < $colorLevels[0])
 		{
-			$blue = CLICKHEAT_GREY_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
+			$colors[$i][2] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
 		}
 		elseif ($i < $colorLevels[1])
 		{
-			$blue = CLICKHEAT_HIGH_COLOR;
+			$colors[$i][2] = CLICKHEAT_HIGH_COLOR;
 		}
 		elseif ($i < $colorLevels[2])
 		{
-			$blue = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[1]) / ($colorLevels[2] - $colorLevels[1]);
+			$colors[$i][2] = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[1]) / ($colorLevels[2] - $colorLevels[1]);
 		}
 		else
 		{
-			$blue = CLICKHEAT_LOW_COLOR;
+			$colors[$i][2] = CLICKHEAT_LOW_COLOR;
 		}
-		$colors[$i] = CLICKHEAT_ALPHA * 16777216 + ceil($red) * 65536 + ceil($green) * 256 + ceil($blue);
 	}
 	for ($image = 0; $image < $nbOfImages; $image++)
 	{
@@ -419,8 +419,8 @@ if ($heatmap === 1)
 		imagefilledrectangle($img, 0, 0, $width - 1, $height - 1, 0x7FFFFFFF);
 		imagealphablending($img, true);
 
-		$imgSrc = imagecreatefrompng($imagePath.'-'.$image.'.pngs');
-		unlink($imagePath.'-'.$image.'.pngs');
+		$imgSrc = imagecreatefrompng($imagePath.'-'.$image.'.pngs%%');
+		unlink($imagePath.'-'.$image.'.pngs%%');
 		for ($x = 0; $x < $width; $x++)
 		{
 			for ($y = 0; $y < $height; $y++)
@@ -435,14 +435,19 @@ if ($heatmap === 1)
 		/** Destroy image source */
 		imagedestroy($imgSrc);
 
-		/** Change the palette */
+		/** Change the palette, and create the 128 colors */
+		$allocatedColors = array();
+		for ($i = 0; $i < 128; $i++)
+		{
+			$allocatedColors[$i] = imagecolorallocatealpha($img, $colors[$i][0], $colors[$i][1], $colors[$i][2], CLICKHEAT_ALPHA);
+		}
 		imagealphablending($img, false);
 		for ($x = 0; $x < $width; $x++)
 		{
 			for ($y = 0; $y < $height; $y++)
 			{
 				/** Set a pixel with the new color, while reading the current alpha level */
-				imagesetpixel($img, $x, $y, $colors[127 - ((imagecolorat($img, $x, $y) & 0x7F000000) >> 24)]);
+				imagesetpixel($img, $x, $y, $allocatedColors[127 - ((imagecolorat($img, $x, $y) & 0x7F000000) >> 24)]);
 			}
 		}
 
@@ -453,14 +458,14 @@ if ($heatmap === 1)
 			$black = imagecolorallocate($img, 0, 0, 0);
 			for ($i = 1; $i < 128; $i += 2)
 			{
-				imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, $colors[$i]);
+				imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, $allocatedColors[$i]);
 			}
 			imagerectangle($img, 0, 0, 65, 11, $white);
 			imagestring($img, 1, 1, 2, '0', $black);
 			imagestring($img, 1, 65 - strlen($maxClicks) * 5, 2, $maxClicks, $black);
 		}
 		/** Save PNG file */
-		imagepng($img, $imagePath.'-'.$image.'.png');
+		imagepng($img, $imagePath.'-'.$image.'.png%%');
 		imagedestroy($img);
 	}
 	for ($i = 0; $i < 100; $i++)
@@ -471,10 +476,10 @@ if ($heatmap === 1)
 echo $html;
 
 /** Save the HTML code to speed up following queries */
-$f = fopen($imagePath.'.html', 'w');
+$f = fopen($imagePath.'.html%%', 'w');
 fputs($f, $html);
 fclose($f);
-touch($imagePath.'.html');
+touch($imagePath.'.html%%');
 
 /**
  * Retourne une erreur Ajax / Returns an Ajax error
