@@ -23,8 +23,8 @@ if ($f === false || is_null($f))
 	echo sprintf(LANG_LATEST_KO, CLICKHEAT_VERSION), ': <iframe src="http://www.labsmedia.com/clickheat/version.txt" frameborder="0" width="50" height="20" scrolling="no"></iframe> - <a href="http://www.labsmedia.com/clickheat/index.html">ClickHeat</a>';
 }
 else
- {
- 	fputs($f, "GET /clickheat/VERSION HTTP/1.1\r\nHost: www.labsmedia.com\r\n");
+{
+	fputs($f, "GET /clickheat/VERSION HTTP/1.1\r\nHost: www.labsmedia.com\r\n");
 	fputs($f, "Connection: close\r\n\r\n");
 	while (!feof($f) && trim(fgets($f)) !== '') {}
 	$latest = trim(fgets($f));
@@ -33,7 +33,7 @@ else
 	{
 		echo sprintf(LANG_LATEST_OK, $latest);
 	}
-	else 
+	else
 	{
 		echo sprintf(LANG_LATEST_NO, CLICKHEAT_VERSION, $latest), ' <a href="http://www.labsmedia.com/clickheat/index.html">ClickHeat</a>';
 	}

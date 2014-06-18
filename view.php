@@ -89,7 +89,12 @@ $__year = (int) date('Y', $date);
 <a href="#" onclick="adminCookie(); return false;"><?php echo LANG_LOG_MY_CLICKS ?></a>
 <?php if (CLICKHEAT_ADMIN === true) echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=config">', LANG_CONFIG, '</a> <a href="#" onclick="showJsCode(); return false;">Javascript</a> <a href="#" onclick="showLatestVersion(); return false;">', LANG_LATEST_CHECK, '</a> '; ?>
 <a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a><br />
-<a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=en">English</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=fr">Français</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=ru">Русский</a> <a href="<?php echo CLICKHEAT_INDEX_PATH ?>language=uk">Українська</a><br />
+<?php
+foreach ($__languages as $lang) 
+{
+	echo '<a href="', CLICKHEAT_INDEX_PATH, 'language=', $lang, '"><img src="', CLICKHEAT_PATH, 'images/flags/', $lang, '.png" width="18" height="12" alt="', $lang, '" /></a> ';
+}
+?><br />
 <span id="cleaner">&nbsp;</span></span>
 <form action="<?php echo CLICKHEAT_INDEX_PATH ?>" method="get" onsubmit="return false;" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" id="clickTable">

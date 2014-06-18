@@ -14,6 +14,13 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 
 $checks = true;
 ?>
+<span class="float-right">
+<?php
+foreach ($__languages as $lang) 
+{
+	echo '<a href="', CLICKHEAT_INDEX_PATH, 'language=', $lang, '"><img src="', CLICKHEAT_PATH, 'images/flags/', $lang, '.png" width="18" height="12" alt="', $lang, '" /></a> ';
+}
+?></span>
 <div id="clickheat-box">
 <h1><?php echo LANG_CHECKS ?></h1>
 <br /><br />

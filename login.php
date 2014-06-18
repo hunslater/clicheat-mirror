@@ -13,7 +13,13 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 }
 
 ?>
-<span class="float-right"><a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a></span>
+<span class="float-right"><a href="http://www.labsmedia.<?php echo CLICKHEAT_LANGUAGE === 'fr' ? 'fr' : 'com' ?>/clickheat/index.html"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></a><br />
+<?php
+foreach ($__languages as $lang) 
+{
+	echo '<a href="', CLICKHEAT_INDEX_PATH, 'language=', $lang, '"><img src="', CLICKHEAT_PATH, 'images/flags/', $lang, '.png" width="18" height="12" alt="', $lang, '" /></a> ';
+}
+?></span>
 <div id="clickheat-box">
 	<h1><?php echo LANG_LOGIN ?></h1>
 	<br />

@@ -6,6 +6,7 @@
  * @since 27/10/2006
 **/
 
+$__languages = array('en', 'es', 'fr', 'ja', 'ro', 'ru', 'uk', 'zh');
 $__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
 
 if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] !== '')
@@ -54,11 +55,11 @@ if (function_exists('ob_start') && IS_PHPMV_MODULE === false)
 {
 	if (function_exists('ob_gzhandler'))
 	{
-		ob_start('ob_gzhandler');
+		@ob_start('ob_gzhandler');
 	}
 	else
 	{
-		ob_start();
+		@ob_start();
 	}
 }
 
@@ -75,7 +76,7 @@ elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 {
 	$lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
 }
-if (!isset($lang) || !in_array($lang, array('fr', 'en', 'ru', 'uk')))
+if (!isset($lang) || !in_array($lang, $__languages))
 {
 	$lang = 'en';
 }

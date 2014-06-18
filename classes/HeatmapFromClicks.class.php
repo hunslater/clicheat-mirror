@@ -42,7 +42,7 @@ class HeatmapFromClicks extends Heatmap
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Find pixels coords and draw these on the current image
 	 *
@@ -67,7 +67,7 @@ class HeatmapFromClicks extends Heatmap
 						$c = (bool) $click[2];
 						if ($this->heatmap === true)
 						{
-							/** Apply a calculus for the step, with increases the speed of rendering : step = 3, then pixel is drawn at x = 2 (center of a 3x3 square) */
+							/** Apply a calculus for the step, with increases the speed of rendering: step = 3, then pixel is drawn at x = 2 (center of a 3x3 square) */
 							$x -= $x % $this->step - $this->startStep;
 							$y -= $y % $this->step - $this->startStep;
 							/** Add 1 to the current color of this pixel (color which represents the sum of clicks on this pixel) */
@@ -110,6 +110,7 @@ class HeatmapFromClicks extends Heatmap
 			/** Everything is fixed ?? */
 			return $this->raiseError(LANG_ERROR_FIXED);
 		}
+		$totalWidth = $leftWidth + $centerWidth + $rightWidth;
 
 		for ($file = 0; $file < count($this->files); $file++)
 		{
@@ -146,12 +147,17 @@ class HeatmapFromClicks extends Heatmap
 						continue;
 					}
 					/** Correction of X for liquid and/or fixed layouts */
-					if ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth === 0)
+
+					if ($w <= $totalWidth)
+					{
+						/** Display's width is less than fixed content's one, X is absolute, many thanks to «rollenc» for pointing this out and this fix */
+					}
+					elseif ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth === 0)
 					{
 						/** Left fixed menu */
 						if ($x <= $leftWidth)
 						{
-							/** Click in the left menu : X is good */
+							/** Click in the left menu: X is good */
 						}
 						else
 						{
@@ -164,7 +170,7 @@ class HeatmapFromClicks extends Heatmap
 						/** Right fixed menu */
 						if ($w - $x <= $rightWidth)
 						{
-							/** Click in the right menu : X is good, but relative to the right border */
+							/** Click in the right menu: X is good, but relative to the right border */
 							$x = $this->width - ($w - $x);
 						}
 						else
@@ -178,12 +184,12 @@ class HeatmapFromClicks extends Heatmap
 						/** Left and right fixed menus */
 						if ($w - $x <= $rightWidth)
 						{
-							/** Click in the right menu : X is good, but relative to the right border */
+							/** Click in the right menu: X is good, but relative to the right border */
 							$x = $this->width - ($w - $x);
 						}
 						elseif ($x <= $leftWidth)
 						{
-							/** Click in the left menu : X is good */
+							/** Click in the left menu: X is good */
 						}
 						else
 						{
@@ -225,7 +231,7 @@ class HeatmapFromClicks extends Heatmap
 					{
 						if ($this->heatmap === true)
 						{
-							/** Apply a calculus for the step, with increases the speed of rendering : step = 3, then pixel is drawn at x = 2 (center of a 3x3 square) */
+							/** Apply a calculus for the step, with increases the speed of rendering: step = 3, then pixel is drawn at x = 2 (center of a 3x3 square) */
 							$x -= $x % $this->step - $this->startStep;
 							$y -= $y % $this->step - $this->startStep;
 							/** Add 1 to the current color of this pixel (color which represents the sum of clicks on this pixel) */
@@ -261,7 +267,7 @@ class HeatmapFromClicks extends Heatmap
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Do some cleaning or ending tasks (close database, reset array...)
 	**/
