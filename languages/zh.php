@@ -80,7 +80,7 @@ define('LANG_CONFIG_HEADER_SECURITY', '安全配置');
 define('LANG_CONFIG_HEADER_LOGIN', '登陆配置');
 define('LANG_CONFIG_LOGPATH', '日志文件目录');
 define('LANG_CONFIG_LOGPATH_DIR', '日志文件夹不存在，请建立');
-define('LANG_CONFIG_LOGPATH_KO', '日志文件夹不可写，请修改文件夹权限。(如果你使用cronolog/rotatelog等特殊的日志模式，你可以忽略这个警告。)');
+define('LANG_CONFIG_LOGPATH_KO', '日志文件夹不可写，请修改文件夹权限。');
 define('LANG_CONFIG_CACHEPATH', '缓存文件目录');
 define('LANG_CONFIG_CACHEPATH_DIR', '缓存文件夹不存在，请建立');
 define('LANG_CONFIG_CACHEPATH_KO', '日志文件夹不可写，请修改文件夹权限。');

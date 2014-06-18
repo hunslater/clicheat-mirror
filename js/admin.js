@@ -7,7 +7,7 @@
 
 var currentAlpha = 80;
 var lastDayOfMonth = 0;
-var currentDate = [0, 0, 0, 0, 0];
+var currentDate = [0, 0, 0, 0, 0, 0];
 var currentRange = 'd';
 var currentWidth = 0;
 var pleaseWait = '';
@@ -16,7 +16,7 @@ var isJsOkay = '';
 var jsAdminCookie = '';
 var hideIframes = true;
 var hideFlashes = true;
-var isPmvModule = false;
+var isPiwikModule = false;
 var scriptPath = '';
 var scriptIndexPath = '';
 
@@ -57,25 +57,37 @@ function resizeDiv()
 /** Update calendar selected days */
 function updateCalendar(day)
 {
+	if (isPiwikModule == true)
+	{
+		return;
+	}
+	/** currentDate[day, month, year, saved_day, month_origin, year_origin] */
 	if (day != undefined)
 	{
-		currentDate[0] = day;
+		currentDate[3] = day;
 	}
-	currentDate[1] = currentDate[3];
-	currentDate[2] = currentDate[4];
+	currentDate[1] = currentDate[4];
+	currentDate[2] = currentDate[5];
+	/** Showing one day */
 	if (currentRange == 'd')
 	{
+		/** Remember the last day used */
+		currentDate[0] = currentDate[3];
 		min = currentDate[0];
 		max = currentDate[0];
 	}
+	/** Showing one month */
 	if (currentRange == 'm')
 	{
 		currentDate[0] = 1;
 		min = 1;
 		max = weekDays.length;
 	}
+	/** Showing one week */
 	if (currentRange == 'w')
 	{
+		/** Remember the last day used */
+		currentDate[0] = currentDate[3];
 		week = weekDays[currentDate[0]];
 		min = 0;
 		max = 0;
@@ -232,14 +244,14 @@ function updateJs()
 	else
 	{
 		rand = Math.floor(Math.random() * linkList.length);
-		str += '&lt;noscript&gt;' + linkList[rand] + '&lt;/noscript&gt;' + addReturn;
+		str += '&lt;noscript&gt;&lt;p&gt;' + linkList[rand] + '&lt;/p&gt;&lt;/noscript&gt;' + addReturn;
 	}
 	str += '&lt;script type="text/javascript"&gt;&lt;!--<br />';
 	str += 'clickHeatSite = ';
-	/** PMV form */
-	if (document.getElementById('form_site') != undefined)
+	/** Piwik form */
+	if (isPiwikModule == true)
 	{
-		str += document.getElementById('form_site').site.value.replace(/[^a-z0-9\-_\.]+/gi, '.');
+		str += document.getElementById('siteSelection').idSite.value;
 	}
 	else
 	{
@@ -252,18 +264,18 @@ function updateJs()
 	}
 	if (document.getElementById('jsGroup2').checked)
 	{
-		str += 'document.title';
+		str += '(document.title == \'\' ? \'-none-\' : encodeURIComponent(document.title))';
 	}
 	if (document.getElementById('jsGroup3').checked)
 	{
-		str += 'window.location.pathname';
+		str += 'encodeURIComponent(window.location.pathname+window.location.search)';
 	}
 	str += ';' + addReturn;
 	if (document.getElementById('jsQuota').value != 0)
 	{
 		str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;' + addReturn;
 	}
-	str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';' + addReturn;
+	str += 'clickHeatServer = \'' + scriptPath + 'click.php\';' + addReturn;
 	str += 'initClickHeat(); //--&gt;<br />';
 	str += '&lt;/script&gt;';
 	document.getElementById('clickheat-js').innerHTML = str;
@@ -393,7 +405,7 @@ function cleanIframe()
 			if (width == null) width = [0, 300];
 			height = found.match(/height=[^0-9]*(\d+)/);
 			if (height == null) height = [0, 150];
-			newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;test' + newContent.substring(pos2, newContent.length);
+			newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;' + newContent.substring(pos2, newContent.length);
 			oldPos = pos;
 		}
 		currentIframeContent.body.innerHTML = newContent;
@@ -477,7 +489,6 @@ function showLatestVersion()
 		{
 			document.getElementById('layoutDiv').innerHTML = xmlhttp.responseText;
 			document.getElementById('layoutDiv').style.display = 'block';
-			showRadioLayout();
 		}
 	}
 	xmlhttp.send(null);
@@ -486,12 +497,12 @@ function showLatestVersion()
 /** Shows main panel */
 function showPanel()
 {
-	var div = isPmvModule ? 'contenu' : 'adminPanel';
+	var div = isPiwikModule ? 'contenu' : 'adminPanel';
 	if (document.getElementById(div).style.display != 'none')
 	{
 		return true;
 	}
-	if (isPmvModule)
+	if (isPiwikModule)
 	{
 		document.getElementById('loggued').style.display = 'block';
 	}
@@ -502,8 +513,8 @@ function showPanel()
 /** Hides main panel */
 function hidePanel()
 {
-	var div = isPmvModule ? 'contenu' : 'adminPanel';
-	if (isPmvModule)
+	var div = isPiwikModule ? 'contenu' : 'adminPanel';
+	if (isPiwikModule)
 	{
 		document.getElementById('loggued').style.display = 'none';
 	}

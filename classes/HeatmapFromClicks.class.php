@@ -1,10 +1,10 @@
 <?php
 /**
  * ClickHeat : Classe de génération des cartes depuis un fichier ClickHeat / Maps generation class from a ClickHeat logfile
- * 
+ *
  * Cette classe est VOLONTAIREMENT écrite pour PHP 4
  * This class is VOLUNTARILY written for PHP 4
- * 
+ *
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 12/05/2007
 **/
@@ -141,8 +141,8 @@ class HeatmapFromClicks extends Heatmap
 					$y = (int) $clicks[2][$i]; // Y
 					$w = (int) $clicks[3][$i]; // display width
 					$c = ($clicks[4][$i] < 3); // left click
-					/** X is not in the range of sizes, or right click for heatmap, or X is greater than screen size, the website is too large for the window, so we don't know where the click is... ignore those clicks */
-					if ($x <= $this->minScreen || $x > $this->maxScreen || $this->heatmap === true && $c === false || $x > $w)
+					/** W is not in the range of sizes, or right click for heatmap, or X is greater than screen size, the website is too large for the window, so we don't know where the click is... ignore those clicks */
+					if ($w <= $this->minScreen || $w > $this->maxScreen || $this->heatmap === true && $c === false || $x > $w)
 					{
 						continue;
 					}

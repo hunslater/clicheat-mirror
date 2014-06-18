@@ -7,16 +7,17 @@
 **/
 
 /** First of all, check if we are inside PhpMyVisites */
-if (defined('INCLUDE_PATH'))
+if (strpos(str_replace('\\', '/', __FILE__), 'plugins/ClickHeat/libs') !== false)
 {
-	define('CLICKHEAT_ROOT', INCLUDE_PATH.'/libs/clickheat/');
-	define('IS_PHPMV_MODULE', true);
-	define('CLICKHEAT_CONFIG', INCLUDE_PATH.'/config/clickheat.php');
+	define('PIWIK_INCLUDE_PATH', str_replace('/plugins/ClickHeat/libs', '', str_replace('\\', '/', dirname(__FILE__))));
+	define('CLICKHEAT_ROOT', PIWIK_INCLUDE_PATH.'/libs/clickheat/');
+	define('IS_PIWIK_MODULE', true);
+	define('CLICKHEAT_CONFIG', PIWIK_INCLUDE_PATH.'/config/clickheat.php');
 }
 else
 {
 	define('CLICKHEAT_ROOT', './');
-	define('IS_PHPMV_MODULE', false);
+	define('IS_PIWIK_MODULE', false);
 	define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');
 }
 
@@ -39,7 +40,7 @@ if (is_array($clickheatConf['referers']))
 	$referer = parse_url($_SERVER['HTTP_REFERER']);
 	if (!in_array($referer['host'], $clickheatConf['referers']))
 	{
-		exit('Forbidden domain ('.$referer['host'].')');
+		exit('Forbidden domain ('.$referer['host'].'), change or remove security settings in the config panel to allow this one');
 	}
 }
 
@@ -55,7 +56,7 @@ if (is_array($clickheatConf['groups']))
 {
 	if (!in_array($group, $clickheatConf['groups']))
 	{
-		exit('Forbidden group ('.$group.')');
+		exit('Forbidden group ('.$group.'), change or remove security settings in the config panel to allow this one');
 	}
 }
 $browser = preg_replace('/[^a-z]+/', '', strtolower($_GET['b']));
@@ -74,12 +75,12 @@ if ($clickheatConf['filesize'] !== 0)
 }
 /** Logging the click */
 $f = fopen($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log', 'a');
-if ($f === false)
+if (!is_resource($f))
 {
 	/** Can't open the log, let's try to create the directory */
-	if (!is_dir(rtrim($clickheatConf['logPath'], '/')))
+	if (!is_dir(dirname($clickheatConf['logPath'])))
 	{
-		if (!mkdir(rtrim($clickheatConf['logPath'], '/')))
+		if (!mkdir(dirname($clickheatConf['logPath'])))
 		{
 			exit('Cannot create log directory: '.$clickheatConf['logPath']);
 		}
@@ -99,7 +100,7 @@ if ($f === false)
 	}
 	$f = fopen($clickheatConf['logPath'].$final.'/'.date('Y-m-d').'.log', 'a');
 }
-if ($f !== false)
+if (is_resource($f))
 {
 	if (isset($_COOKIE['clickheat-admin']))
 	{

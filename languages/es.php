@@ -80,7 +80,7 @@ define('LANG_CONFIG_HEADER_SECURITY', 'Securidad');
 define('LANG_CONFIG_HEADER_LOGIN', 'Parámetros para entrar');
 define('LANG_CONFIG_LOGPATH', 'Directorio de los ficheros de registro');
 define('LANG_CONFIG_LOGPATH_DIR', 'El directorio de los ficheros de registro, por favor, créelo.');
-define('LANG_CONFIG_LOGPATH_KO', 'El directorio de los ficheros de registro no tiene permisos de escritura, por favor déselos para el usuario PHP (ignore esta alerta si usa un registro concreto, creado por cronolog/rotatelog por ejemplo)');
+define('LANG_CONFIG_LOGPATH_KO', 'El directorio de los ficheros de registro no tiene permisos de escritura, por favor déselos para el usuario PHP');
 define('LANG_CONFIG_CACHEPATH', 'Directorio de archivos temporales');
 define('LANG_CONFIG_CACHEPATH_DIR', 'El directorio de archivos temporales no existe. Por favor, créelo.');
 define('LANG_CONFIG_CACHEPATH_KO', 'El directorio de archivos temporales no tiene permisos de escritura, por favor déselos para el usuario PHP');

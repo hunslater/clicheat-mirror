@@ -1,12 +1,12 @@
 <?php
 /**
  * ClickHeat : Fichier principal / Main file
- * 
+ *
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
 **/
 
-$__languages = array('en', 'es', 'fr', 'ja', 'ro', 'ru', 'uk', 'zh');
+$__languages = array('bg', 'cz', /*'de',*/ 'en', 'es', 'fr', 'id', 'it', 'ja', 'nl', 'pl', 'pt', 'ro', 'ru', 'sr', 'tr', 'uk', 'zh');
 $__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
 
 if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] !== '')
@@ -27,39 +27,27 @@ if (substr($realPath, -1) === '/')
 	exit;
 }
 
-/** First of all, check if we are inside PhpMyVisites */
 $dirName = dirname($realPath);
 if ($dirName === '/')
 {
 	$dirName = '';
 }
-if (defined('INCLUDE_PATH'))
-{
-	define('CLICKHEAT_PATH', $dirName.'/plugins/clickheat/libs/');
-	define('CLICKHEAT_INDEX_PATH', 'index.php?mod=clickheat.view_clickheat&');
-	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
-	define('CLICKHEAT_CONFIG', INCLUDE_PATH.'/config/clickheat.php');
-	define('IS_PHPMV_MODULE', true);
-}
-else
-{
-	define('CLICKHEAT_PATH', $dirName.'/');
-	define('CLICKHEAT_INDEX_PATH', 'index.php?');
-	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
-	define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');
-	define('IS_PHPMV_MODULE', false);
-}
+define('CLICKHEAT_PATH', $dirName.'/');
+define('CLICKHEAT_INDEX_PATH', 'index.php?');
+define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
+define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');
+define('IS_PIWIK_MODULE', false);
 
 /** Improve buffer usage and compression */
-if (function_exists('ob_start') && IS_PHPMV_MODULE === false)
+if (function_exists('ob_start'))
 {
 	if (function_exists('ob_gzhandler'))
 	{
-		@ob_start('ob_gzhandler');
+		ob_start('ob_gzhandler');
 	}
 	else
 	{
-		@ob_start();
+		ob_start();
 	}
 }
 
@@ -100,19 +88,7 @@ else
 {
 	include CLICKHEAT_CONFIG;
 
-	/** Login check */
-	if (IS_PHPMV_MODULE === true)
-	{
-		/** Call external check */
-		$me = User::getInstance();
-		define('CLICKHEAT_ADMIN', (bool) $me->hasSomeAdminRights());
-		/** Viewer only, force it to 'view' action if not view|generate|png */
-		if (CLICKHEAT_ADMIN === false && $__action !== 'generate' && $__action !== 'png' && $__action !== 'iframe' && $__action !== 'cleaner' && $__action !== 'logout')
-		{
-			$__action = 'view';
-		}
-	}
-	elseif (isset($_COOKIE['clickheat']))
+	if (isset($_COOKIE['clickheat']))
 	{
 		if ($_COOKIE['clickheat'] === $clickheatConf['adminLogin'].'||'.$clickheatConf['adminPass'])
 		{
@@ -148,11 +124,21 @@ else
 				include CLICKHEAT_ROOT.'version.php';
 				if (!isset($clickheatConf['version']) || $clickheatConf['version'] !== CLICKHEAT_VERSION)
 				{
-					header('Location: '.CLICKHEAT_INDEX_PATH.'action=config');
+					$url = CLICKHEAT_INDEX_PATH.'action=config';
 				}
 				else
 				{
-					header('Location: '.CLICKHEAT_INDEX_PATH.'action=view');
+					$url = CLICKHEAT_INDEX_PATH.'action=view';
+				}
+				/** IIS removes cookies when sending a 301/302 header, so we need to do some crap (and yes, this HTML code is crap too) */
+				if (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS'))
+				{
+					echo '<meta http-equiv="refresh" content="0;', $url, '" />';
+					echo '<a href="', $url, '">click here</a>';
+				}
+				else
+				{
+					header('Location: '.$url);
 				}
 				exit;
 			}
@@ -162,7 +148,16 @@ else
 				setcookie('clickheat', $clickheatConf['viewerLogin'].'||'.$clickheatConf['viewerPass'], 0, '/');
 				/** Redirect to index.php */
 				header('Content-Type: text/html');
-				header('Location: '.CLICKHEAT_INDEX_PATH.'action=view');
+				/** IIS removes cookies when sending a 301/302 header, so we need to do some crap (and yes, this HTML code is crap too) */
+				if (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS'))
+				{
+					echo '<meta http-equiv="refresh" content="0;', CLICKHEAT_INDEX_PATH, 'action=view" />';
+					echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=view">click here</a>';
+				}
+				else
+				{
+					header('Location: '.CLICKHEAT_INDEX_PATH.'action=view');
+				}
 				exit;
 			}
 		}
@@ -175,7 +170,7 @@ if (!defined('CLICKHEAT_ADMIN'))
 }
 
 /** Specific definitions */
-$__screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1440, 1600, 1800);
+$__screenSizes = array(0 /** Must start with 0 */, 240, 640, 800, 1024, 1152, 1280, 1440, 1600, 1800);
 $__browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet Explorer', 'safari' => 'Safari', 'opera' => 'Opera', 'kmeleon' => 'K-meleon', 'unknown' => '');
 
 switch ($__action)
@@ -186,16 +181,9 @@ switch ($__action)
 	case 'login':
 		{
 			header('Content-Type: text/html; charset=utf-8');
-			if ($__action !== 'view' || IS_PHPMV_MODULE === false)
-			{
-				include CLICKHEAT_ROOT.'header.php';
-				include CLICKHEAT_ROOT.$__action.'.php';
-				include CLICKHEAT_ROOT.'footer.php';
-			}
-			else
-			{
-				include CLICKHEAT_ROOT.$__action.'.php';
-			}
+			include CLICKHEAT_ROOT.'header.php';
+			include CLICKHEAT_ROOT.$__action.'.php';
+			include CLICKHEAT_ROOT.'footer.php';
 			break;
 		}
 	case 'generate':
@@ -216,7 +204,7 @@ switch ($__action)
 				$webPage = array('/');
 				if (file_exists($clickheatConf['logPath'].$group.'/url.txt'))
 				{
-					$f = @fopen($clickheatConf['logPath'].$group.'/url.txt', 'r');
+					$f = fopen($clickheatConf['logPath'].$group.'/url.txt', 'r');
 					if ($f !== false)
 					{
 						$webPage = explode('>', trim(fgets($f, 1024)));
@@ -255,7 +243,7 @@ switch ($__action)
 				exit('Error');
 			}
 
-			$f = @fopen($clickheatConf['logPath'].$group.'/url.txt', 'w');
+			$f = fopen($clickheatConf['logPath'].$group.'/url.txt', 'w');
 			fputs($f, $url.'>'.$left.'>'.$center.'>'.$right);
 			fclose($f);
 
@@ -265,7 +253,16 @@ switch ($__action)
 	case 'logout':
 		{
 			setcookie('clickheat', '', time() - 30 * 86400, '/');
-			header('Location: index.php');
+			/** IIS removes cookies when sending a 301/302 header, so we need to do some crap (and yes, this HTML code is crap too) */
+			if (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS'))
+			{
+				echo '<meta http-equiv="refresh" content="0;', CLICKHEAT_INDEX_PATH, 'action=view" />';
+				echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=view">click here</a>';
+			}
+			else
+			{
+				header('Location: index.php');
+			}
 			exit;
 			break;
 		}

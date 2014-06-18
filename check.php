@@ -28,7 +28,7 @@ foreach ($__languages as $lang)
 <tr><td><?php echo LANG_CHECK_WRITABLE ?><br />(<?php echo dirname(CLICKHEAT_CONFIG) ?>/)</td><td>
 <?php
 /** Test if current path is writable for config.php : */
-$f = @fopen(dirname(CLICKHEAT_CONFIG).'/temp.tmp', 'w');
+$f = fopen(dirname(CLICKHEAT_CONFIG).'/temp.tmp', 'w');
 if ($f === false)
 {
 	$checks = false;
@@ -38,7 +38,7 @@ else
 {
 	fputs($f, 'delete this file');
 	fclose($f);
-	@unlink(dirname(CLICKHEAT_CONFIG).'/temp.tmp');
+	unlink(dirname(CLICKHEAT_CONFIG).'/temp.tmp');
 	echo '<img src="'.CLICKHEAT_PATH.'images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
 }
 ?></td></tr>

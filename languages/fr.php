@@ -80,7 +80,7 @@ define('LANG_CONFIG_HEADER_SECURITY', 'Sécurité');
 define('LANG_CONFIG_HEADER_LOGIN', 'Paramètres de connexion');
 define('LANG_CONFIG_LOGPATH', 'Répertoire des fichiers de suivi');
 define('LANG_CONFIG_LOGPATH_DIR', 'Le répertoire des fichiers de suivi n\'existe pas. Merci de le créer');
-define('LANG_CONFIG_LOGPATH_KO', 'Le répertoire des fichiers de suivi n\'est pas accessible en écriture, merci de lui donner les droits d\'écriture pour l\'utilisateur PHP (ignorez cette alerte si vous passez par un log spécifique, créé par cronolog/rotatelog par exemple)');
+define('LANG_CONFIG_LOGPATH_KO', 'Le répertoire des fichiers de suivi n\'est pas accessible en écriture, merci de lui donner les droits d\'écriture pour l\'utilisateur PHP');
 define('LANG_CONFIG_CACHEPATH', 'Répertoire des fichiers temporaires');
 define('LANG_CONFIG_CACHEPATH_DIR', 'Le répertoire des fichiers temporaires n\'existe pas. Merci de le créer');
 define('LANG_CONFIG_CACHEPATH_KO', 'Le répertoire des fichiers temporaires n\'est pas accessible en écriture, merci de lui donner les droits d\'écriture pour l\'utilisateur PHP');

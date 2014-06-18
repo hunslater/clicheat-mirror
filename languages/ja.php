@@ -68,7 +68,6 @@ define('LANG_CHECKS', '事前チェック');
 define('LANG_CHECK_WRITABLE', '設定ディレクトリへの書き込み権限');
 define('LANG_CHECK_NOT_WRITABLE', 'PHP実行ユーザに設定ディレクトリへの書き込み権限がありません。');
 define('LANG_CHECK_GD', 'GDライブラリ');
-define('LANG_CHECK_GD', 'GDライブラリ');
 define('LANG_CHECK_GD_IMG', 'imagecreatetruecolor()が利用できないので、綺麗な画像を生成することができません。GDライブラリがインストールされているか確認してください。');
 define('LANG_CHECK_GD_ALPHA', 'imagecolorallocatealpha()が利用できないので、透過画像を生成することができません。（無視することもできますが、透過処理の利用は非常に推奨されます）');
 define('LANG_CHECK_GD_PNG', 'imagepng()が利用できないので、PNGファイルを生成することができません。');

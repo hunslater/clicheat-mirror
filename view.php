@@ -1,7 +1,7 @@
 <?php
 /**
  * ClickHeat : Fichier de résultats / Results file
- * 
+ *
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
 **/
@@ -17,7 +17,7 @@ $groups = array();
 $d = dir($clickheatConf['logPath']);
 while (($dir = $d->read()) !== false)
 {
-	if ($dir === '.' || $dir === '..' || !is_dir($d->path.$dir)) continue;
+	if ($dir[0] === '.' || !is_dir($d->path.$dir)) continue;
 	$pos = strpos($dir, ',');
 	if ($pos !== false)
 	{
@@ -27,7 +27,7 @@ while (($dir = $d->read()) !== false)
 	{
 		$site = '';
 	}
-	if (IS_PHPMV_MODULE === true)
+	if (IS_PIWIK_MODULE === true)
 	{
 		if ($site !== PHPMV_SELECTED_SITE)
 		{
@@ -90,7 +90,7 @@ $__year = (int) date('Y', $date);
 <?php if (CLICKHEAT_ADMIN === true) echo '<a href="', CLICKHEAT_INDEX_PATH, 'action=config">', LANG_CONFIG, '</a> <a href="#" onclick="showJsCode(); return false;">Javascript</a> <a href="#" onclick="showLatestVersion(); return false;">', LANG_LATEST_CHECK, '</a> '; ?>
 <a href="<?php echo CLICKHEAT_INDEX_PATH ?>action=logout"><?php echo LANG_LOGOUT ?></a><br />
 <?php
-foreach ($__languages as $lang) 
+foreach ($__languages as $lang)
 {
 	echo '<a href="', CLICKHEAT_INDEX_PATH, 'language=', $lang, '"><img src="', CLICKHEAT_PATH, 'images/flags/', $lang, '.png" width="18" height="12" alt="', $lang, '" /></a> ';
 }
@@ -103,7 +103,6 @@ foreach ($__languages as $lang)
 	<td rowspan="4">
 <?php
 $__calendar = '<table cellpadding="0" cellspacing="0" border="0" class="clickheat-calendar"><tr>';
-$clickheatConf['start'] = 'm';
 $days = explode(',', LANG_DAYS);
 for ($d = 0; $d < 7; $d++)
 {
@@ -196,7 +195,7 @@ hideFlashes = <?php echo $clickheatConf['hideFlashes'] === true ? 'true' : 'fals
 scriptPath = 'http://<?php echo $_SERVER['HTTP_HOST'].CLICKHEAT_PATH ?>';
 scriptIndexPath = '<?php echo CLICKHEAT_INDEX_PATH ?>';
 lastDayOfMonth = <?php echo $__lastDayOfMonth ?>;
-currentDate = [<?php echo $__day, ',', $__month, ',', $__year, ',', $__month, ',', $__year ?>];
+currentDate = [<?php echo $__day, ',', $__month, ',', $__year, ',', $__day, ',', $__month, ',', $__year ?>];
 currentAlpha = <?php echo $clickheatConf['alpha'] ?>;
 
 /** Draw the alpha selector */

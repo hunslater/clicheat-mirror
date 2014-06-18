@@ -51,8 +51,8 @@ define('LANG_JAVASCRIPT_SITE', 'Website name (allowed characters: A-Z, a-z, 0-9,
 define('LANG_JAVASCRIPT_GROUP', 'Group name, to group similar pages for a simpler analysis');
 define('LANG_JAVASCRIPT_GROUP0', 'use a keyword');
 define('LANG_JAVASCRIPT_GROUP1', 'allowed characters: A-Z, a-z, 0-9, underscore, hyphen, dot');
-define('LANG_JAVASCRIPT_GROUP2', 'use a page\'s title (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
-define('LANG_JAVASCRIPT_GROUP3', 'use webpage\'s address (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
+define('LANG_JAVASCRIPT_GROUP2', 'use webpage\'s title (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
+define('LANG_JAVASCRIPT_GROUP3', 'use webpage\'s URL (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Copy and paste the code below on your pages, just before the end of the page (before &lt;/body&gt; tag):');
 define('LANG_JAVASCRIPT_DEBUG', 'Once the code pasted on your pages, don\'t forget to test if the code works correctly, by calling your page with the parameter <span class="error">debugclickheat</span>. For example for http://www.site.com/index.html call http://www.site.com/index.html<span class="error">?debugclickheat</span>. You should see a message showing the state of Clickheat. If you encounter any problem, feel free to contact us');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
@@ -80,7 +80,7 @@ define('LANG_CONFIG_HEADER_SECURITY', 'Security');
 define('LANG_CONFIG_HEADER_LOGIN', 'Login parameters');
 define('LANG_CONFIG_LOGPATH', 'Logfiles\' directory');
 define('LANG_CONFIG_LOGPATH_DIR', 'Logfiles directory doesn\'t exist. Please create it');
-define('LANG_CONFIG_LOGPATH_KO', 'Logfiles directory doesn\'t have write permissions, please give it write permission for PHP user (ignore this alert if you use a specific log, created by cronolog/rotatelog for example)');
+define('LANG_CONFIG_LOGPATH_KO', 'Logfiles directory doesn\'t have write permissions, please give it write permission for PHP user');
 define('LANG_CONFIG_CACHEPATH', 'Temporary files directory');
 define('LANG_CONFIG_CACHEPATH_DIR', 'Temporary files directory doesn\'t exist. Please create it');
 define('LANG_CONFIG_CACHEPATH_KO', 'Temporary files directory doesn\'t have write permissions, please give it write permission for PHP user');

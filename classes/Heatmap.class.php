@@ -265,9 +265,9 @@ class Heatmap
 		for ($image = 0; $image < $nbOfImages; $image++)
 		{
 			$img = imagecreatetruecolor($this->width, $this->height);
-			/** Allocate white, so that this will fill the newly created image */
 			$white = imagecolorallocate($img, 255, 255, 255);
-			imagefill($img, 0, 0, $white);
+			/** «imagefill» doesn't work correctly on some hosts, ending on a red drawing */
+			imagefilledrectangle($img, 0, 0, $this->width - 1, $this->height - 1, $white);
 			imagealphablending($img, true);
 
 			$imgSrc = @imagecreatefrompng(sprintf($this->cache.$this->file.'_temp', $image));

@@ -1,7 +1,7 @@
 <?php
 /**
  * Clickheat : Fichier d'édition de la configuration / Config editor
- * 
+ *
  * @author Yvan Taviaud / Labsmedia
  * @since 02/04/2007
 **/
@@ -31,8 +31,8 @@ if (isset($_POST['save']) && isset($_POST['config']))
 			$config = '<?php $clickheatConf = unserialize(\''.str_replace('\'', '\\\'', serialize($data)).'\'); ?>';
 		}
 
-		$f = @fopen(CLICKHEAT_CONFIG, 'w');
-		if ($f !== false)
+		$f = fopen(CLICKHEAT_CONFIG, 'w');
+		if (is_resource($f))
 		{
 			fputs($f, $config, strlen($config));
 			fclose($f);
@@ -45,9 +45,17 @@ if (isset($_POST['save']) && isset($_POST['config']))
 $check = isset($_POST['check']);
 $checks = true;
 
-$memoryLimit = (int) @ini_get('memory_limit');
+$memoryLimit = @ini_get('memory_limit');
+if (strpos($memoryLimit, 'M') !== false)
+{
+	$memoryLimit = (int) $memoryLimit;
+}
+else
+{
+	$memoryLimit = floor($memoryLimit / (1024 * 1024));
+}
 /** Set default values if nothing is set in the config file */
-if (IS_PHPMV_MODULE === true)
+if (IS_PIWIK_MODULE === true)
 {
 	$basePath = explode('/', rtrim(CLICKHEAT_ROOT, '/'));
 	array_pop($basePath);
@@ -78,7 +86,7 @@ $clickheatDefault = array(
 'adminPass'		=> '',
 'viewerLogin'	=> '',
 'viewerPass'	=> '',
-'memory'		=> $memoryLimit,
+'memory'		=> $memoryLimit === 0 ? 8 : $memoryLimit,
 'step'			=> 5,
 'dot'			=> 19,
 'flush'			=> 40,
@@ -216,9 +224,8 @@ $clickheatConf['yesterday'] = (bool) $clickheatConf['yesterday'];
 $clickheatConf['alpha'] = min(100, (int) abs($clickheatConf['alpha']));
 
 /** Special checks for available memory */
-$memorySet = (int) @ini_set('memory_limit', '8M');
 /** Can't set the memory limit */
-if ($memorySet === 0)
+if (@ini_set('memory_limit', '5M') === false)
 {
 	/** PHP doesn't give us the real limit */
 	if ($memoryLimit === 0)
@@ -230,6 +237,11 @@ if ($memorySet === 0)
 	{
 		$memoryRange = array($memoryLimit, $memoryLimit);
 	}
+}
+elseif (@ini_get('memory_limit') !== '5M')
+{
+	/** Memory limit can be set but can't be changed */
+	$memoryRange = array($memoryLimit, $memoryLimit);
 }
 else
 {
@@ -310,11 +322,11 @@ if ($check === true)
 <?php
 if ($check === true)
 {
-	if (is_dir(rtrim($clickheatConf['logPath'], '/')) === false)
+	if (is_dir(dirname($clickheatConf['logPath'])) === false)
 	{
-		@mkdir(rtrim($clickheatConf['logPath'], '/'));
+		mkdir(dirname($clickheatConf['logPath']));
 	}
-	if (is_dir(rtrim($clickheatConf['logPath'], '/')) === false)
+	if (is_dir(dirname($clickheatConf['logPath'])) === false)
 	{
 		$checks = false;
 		echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CONFIG_LOGPATH_DIR;
@@ -322,15 +334,16 @@ if ($check === true)
 	else
 	{
 		/** Check if creation of a file is allowed */
-		$f = @fopen($clickheatConf['logPath'].'test.txt', 'w');
-		if ($f === false)
+		$f = fopen($clickheatConf['logPath'].'test.txt', 'w');
+		if (!is_resource($f))
 		{
-			echo '</td><td><img src="'.CLICKHEAT_PATH.'images/warning.png" width="16" height="16" alt="Warning" /></td><td>', LANG_CONFIG_LOGPATH_KO;
+			$checks = false;
+			echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CONFIG_LOGPATH_KO;
 		}
 		else
 		{
 			fclose($f);
-			@unlink($clickheatConf['logPath'].'test.txt');
+			unlink($clickheatConf['logPath'].'test.txt');
 			echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
 		}
 	}
@@ -340,11 +353,11 @@ if ($check === true)
 <?php
 if ($check === true)
 {
-	if (is_dir(rtrim($clickheatConf['cachePath'], '/')) === false)
+	if (is_dir(dirname($clickheatConf['cachePath'])) === false)
 	{
-		@mkdir(rtrim($clickheatConf['cachePath'], '/'));
+		mkdir(dirname($clickheatConf['cachePath']));
 	}
-	if (is_dir(rtrim($clickheatConf['cachePath'], '/')) === false)
+	if (is_dir(dirname($clickheatConf['cachePath'])) === false)
 	{
 		$checks = false;
 		echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CONFIG_CACHEPATH_DIR;
@@ -352,8 +365,8 @@ if ($check === true)
 	else
 	{
 		/** Check if creation of a file is allowed */
-		$f = @fopen($clickheatConf['cachePath'].'test.txt', 'w');
-		if ($f === false)
+		$f = fopen($clickheatConf['cachePath'].'test.txt', 'w');
+		if (!is_resource($f))
 		{
 			$checks = false;
 			echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CONFIG_CACHEPATH_KO;
@@ -361,7 +374,7 @@ if ($check === true)
 		else
 		{
 			fclose($f);
-			@unlink($clickheatConf['cachePath'].'test.txt');
+			unlink($clickheatConf['cachePath'].'test.txt');
 			echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
 		}
 	}
@@ -441,7 +454,7 @@ if ($check === true)
 	echo '</td><td><img src="'.CLICKHEAT_PATH.'images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
 }
 ?></td></tr>
-<?php if (IS_PHPMV_MODULE === false): ?>
+<?php if (IS_PIWIK_MODULE === false): ?>
 <tr><th colspan="2"><?php echo LANG_CONFIG_HEADER_LOGIN ?></th></tr>
 <tr><td><?php echo LANG_CONFIG_ADMIN_LOGIN ?></td><td><input type="text" name="adminLogin" value="<?php echo htmlentities($clickheatConf['adminLogin']) ?>" />
 <?php
@@ -529,7 +542,7 @@ if ($check === true && $checks === true)
 {
 	/** Test if config path is writable for config.php : */
 	$f = fopen(dirname(CLICKHEAT_CONFIG).'/temp.tmp', 'w');
-	if ($f === false)
+	if (!is_resource($f))
 	{
 		echo '<span class="error">'.LANG_CHECK_NOT_WRITABLE.' ('.dirname(CLICKHEAT_CONFIG).'/\')</span>';
 	}
@@ -537,7 +550,7 @@ if ($check === true && $checks === true)
 	{
 		fputs($f, 'delete this file');
 		fclose($f);
-		@unlink(dirname(CLICKHEAT_CONFIG).'/temp.tmp');
+		unlink(dirname(CLICKHEAT_CONFIG).'/temp.tmp');
 		echo '<input type="hidden" name="save" value="true" /><input type="submit" value="', LANG_CONFIG_SAVE, '" />';
 	}
 }
