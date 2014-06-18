@@ -71,13 +71,13 @@ if ($memoryLimit === 0)
 /**
  * Memory consumption :
  * imagecreate	: about 200,000 + 5 * $width * $height bytes
- * Antialias	: double this value (because another image is used to remember the values, but this image is deleted before the call to imagepng)
+ * dots			: about 6,000 + 360 * CLICKHEAT_DOT_WIDTH bytes each (100 dots)
  * imagepng		: about 4 * $width * $height bytes
- * So a rough idea of the memory is 10 * $width * $height + 500,000
+ * So a rough idea of the memory is 10 * $width * $height + 500,000 (2 images) + 100 * (CLICKHEAT_DOT_WIDTH * 360 + 6000)
 **/
-/** Calculating height from memory consumption, with a modulo of 10 */
-$height = floor(($memoryLimit - 500000) / (10 * $width));
-/** Limit height to 1000px max */
+/** Calculating height from memory consumption, and add a 50% security margin : 10 => 15 */
+$height = floor(($memoryLimit - 500000 - 100 * (CLICKHEAT_DOT_WIDTH * 360 + 6000)) / (15 * $width));
+/** Limit height to 1000px max, with a modulo of 10 */
 $height = min(1000, $height - $height % 10);
 
 /** Selected page */
@@ -157,7 +157,6 @@ if (file_exists($imagePath.'.html') && filemtime($imagePath.'.html') > mktime(23
 
 $nbOfImages = 1; /** Will be modified after the first image is created */
 $maxClicks = 1; /** Must not be zero for divisions */
-$maxAlias = 1;
 $html = '';
 for ($image = 0; $image < $nbOfImages; $image++)
 {
@@ -289,10 +288,10 @@ for ($image = 0; $image < $nbOfImages; $image++)
 				{
 					if ($heatmap === 1)
 					{
-						/** Add 10 to the current color of this pixel (color which represents the sum of clicks on this pixel multiplied by 10, because of the PHP gaussian filter that reduces a lot the color of a lonely pixel) */
-						$color = imagecolorat($img, $x, $y - $height * $image) + 10;
+						/** Add 1 to the current color of this pixel (color which represents the sum of clicks on this pixel) */
+						$color = imagecolorat($img, $x, $y - $height * $image) + 1;
 						imagesetpixel($img, $x, $y - $height * $image, $color);
-						$maxClicks = max($maxClicks, $color / 10);
+						$maxClicks = max($maxClicks, $color);
 					}
 					else
 					{
@@ -314,24 +313,6 @@ for ($image = 0; $image < $nbOfImages; $image++)
 		$nbOfImages = ceil($maxY / $height);
 	}
 
-	/** If anti-alias is selected and PHP is 5+ */
-	if ($heatmap === 1 && CLICKHEAT_ANTIALIAS === true && function_exists('imagefilter'))
-	{
-		imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
-		/** Maximum color value must be evaluated again */
-		for ($x = 0; $x < $width; $x++)
-		{
-			for ($y = 0; $y < $height; $y++)
-			{
-				$maxAlias = max(imagecolorat($img, $x, $y), $maxAlias);
-			}
-		}
-	}
-	else
-	{
-		$maxAlias = $maxClicks * 10;
-	}
-
 	if ($heatmap === 1)
 	{
 		imagepng($img, $imagePath.'-'.$image.'.pngs');
@@ -346,98 +327,146 @@ for ($image = 0; $image < $nbOfImages; $image++)
 	$html .= '<img src="./png.php?page='.$page.'&amp;date='.$date.'&amp;days='.$days.'&amp;image='.$image.'&amp;browser='.$browser.'&amp;screen='.$screen.'&amp;width='.($width + 40).'&amp;heatmap='.$heatmap.'&amp;rand='.(time() + microtime()).'" width="'.$width.'" height="'.$height.'" alt="" /><br />';
 }
 
-/**
- * Now, our image is a direct representation of the clicks on each pixel (with antialias if asked for).
- * But colors must be changed to be visible, so let's generate a clean palette of colors
- * Colors creation : grey => deep blue (rgB) => light blue (rGB) => green (rGb) => yellow (RGb) => red (Rgb), 25 colors between each of these
-**/
-for ($image = 0; $image < $nbOfImages && $heatmap === 1; $image++)
+/** Now, our image is a direct representation of the clicks on each pixel, so create some fuzzy dots to put a nice blur effect if user asks for a heatmap */
+if ($heatmap === 1)
 {
-	$img = imagecreatefrompng($imagePath.'-'.$image.'.pngs');
-	unlink($imagePath.'-'.$image.'.pngs');
-	imagealphablending($img, false);
-	imagesavealpha($img, true);
-	for ($i = 0; $i < 110; $i++)
+	for ($i = 0; $i < 100; $i++)
+	{
+		$dots[$i] = imagecreatetruecolor(CLICKHEAT_DOT_WIDTH, CLICKHEAT_DOT_WIDTH);
+		imagealphablending($dots[$i], false);
+	}
+	for ($x = 0; $x < CLICKHEAT_DOT_WIDTH; $x++)
+	{
+		for ($y = 0; $y < CLICKHEAT_DOT_WIDTH; $y++)
+		{
+			$sinX = sin($x * pi() / CLICKHEAT_DOT_WIDTH);
+			$sinY = sin($y * pi() / CLICKHEAT_DOT_WIDTH);
+			for ($i = 0; $i < 100; $i++)
+			{
+				/** Alpha range is only 27 => 127 to limit the effect on nearby pixels */
+				$alpha = 127 - $i * $sinX * $sinY * $sinX * $sinY;
+				imagesetpixel($dots[$i], $x, $y, ((int) $alpha) * 16777216);
+			}
+		}
+	}
+	/**
+	 * Colors creation :
+	 * grey	=> deep blue (rgB)	=> light blue (rGB)	=> green (rGb)		=> yellow (RGb)		=> red (Rgb)
+	 * 0	   $colorLevels[0]	   $colorLevels[1]	   $colorLevels[2]	   $colorLevels[3]	   128
+	**/
+	sort($colorLevels);
+	for ($i = 0; $i < 128; $i++)
 	{
 		/** Red */
-		if ($i < 10)
+		if ($i < $colorLevels[0])
 		{
-			$red = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / 10;
+			$red = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
 		}
-		elseif ($i < 60)
+		elseif ($i < $colorLevels[2])
 		{
 			$red = CLICKHEAT_LOW_COLOR;
 		}
-		elseif ($i < 85)
+		elseif ($i < $colorLevels[3])
 		{
-			$red = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - 60) / 35;
+			$red = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[2]) / ($colorLevels[3] - $colorLevels[2]);
 		}
 		else
 		{
 			$red = CLICKHEAT_HIGH_COLOR;
 		}
 		/** Green */
-		if ($i < 10)
+		if ($i < $colorLevels[0])
 		{
-			$green = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / 10;
+			$green = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
 		}
-		elseif ($i < 35)
+		elseif ($i < $colorLevels[1])
 		{
-			$green = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * $i / 35;
+			$green = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[0]) / ($colorLevels[1] - $colorLevels[0]);
 		}
-		elseif ($i < 85)
+		elseif ($i < $colorLevels[3])
 		{
 			$green = CLICKHEAT_HIGH_COLOR;
 		}
 		else
 		{
-			$green = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - 85) / 35;
+			$green = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[3]) / (127 - $colorLevels[3]);
 		}
 		/** Blue */
-		if ($i < 10)
+		if ($i < $colorLevels[0])
 		{
-			$blue = CLICKHEAT_GREY_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_GREY_COLOR) * $i / 10;
+			$blue = CLICKHEAT_GREY_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
 		}
-		elseif ($i < 35)
+		elseif ($i < $colorLevels[1])
 		{
 			$blue = CLICKHEAT_HIGH_COLOR;
 		}
-		elseif ($i < 60)
+		elseif ($i < $colorLevels[2])
 		{
-			$blue = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - 35) / 35;
+			$blue = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[1]) / ($colorLevels[2] - $colorLevels[1]);
 		}
 		else
 		{
 			$blue = CLICKHEAT_LOW_COLOR;
 		}
-		$colors[$i] = imagecolorallocatealpha($img, ceil($red), ceil($green), ceil($blue), CLICKHEAT_ALPHA);
+		$colors[$i] = CLICKHEAT_ALPHA * 16777216 + ceil($red) * 65536 + ceil($green) * 256 + ceil($blue);
 	}
-
-	/** Colorize the image according to the new palette */
-	for ($x = 0; $x < $width; $x++)
+	for ($image = 0; $image < $nbOfImages; $image++)
 	{
-		for ($y = 0; $y < $height; $y++)
-		{
-			imagesetpixel($img, $x, $y, $colors[ceil(imagecolorat($img, $x, $y) / $maxAlias * 109)]);
-		}
-	}
+		$img = imagecreatetruecolor($width, $height);
+		imagesavealpha($img, true);
+		/** We don't use imagefill() because this function is buggy on the French host Free.fr */
+		imagealphablending($img, false);
+		imagefilledrectangle($img, 0, 0, $width - 1, $height - 1, 0x7FFFFFFF);
+		imagealphablending($img, true);
 
-	/** Rainbow and maxClicks */
-	if ($image === 0)
-	{
-		$white = imagecolorallocate($img, 255, 255, 255);
-		$black = imagecolorallocate($img, 0, 0, 0);
-		for ($i = 1; $i < 110; $i += 2)
+		$imgSrc = imagecreatefrompng($imagePath.'-'.$image.'.pngs');
+		unlink($imagePath.'-'.$image.'.pngs');
+		for ($x = 0; $x < $width; $x++)
 		{
-			imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, $colors[$i]);
+			for ($y = 0; $y < $height; $y++)
+			{
+				$dot = (int) ceil(imagecolorat($imgSrc, $x, $y) / $maxClicks * 99);
+				if ($dot !== 0)
+				{
+					imagecopy($img, $dots[$dot], ceil($x - CLICKHEAT_DOT_WIDTH / 2), ceil($y - CLICKHEAT_DOT_WIDTH / 2), 0, 0, CLICKHEAT_DOT_WIDTH, CLICKHEAT_DOT_WIDTH);
+				}
+			}
 		}
-		imagerectangle($img, 0, 0, 56, 11, $white);
-		imagestring($img, 1, 1, 2, '0', $black);
-		imagestring($img, 1, 56 - strlen($maxClicks) * 5, 2, $maxClicks, $black);
+		/** Destroy image source */
+		imagedestroy($imgSrc);
+
+		/** Change the palette */
+		imagealphablending($img, false);
+		for ($x = 0; $x < $width; $x++)
+		{
+			for ($y = 0; $y < $height; $y++)
+			{
+				/** Set a pixel with the new color, while reading the current alpha level */
+				imagesetpixel($img, $x, $y, $colors[127 - ((imagecolorat($img, $x, $y) & 0x7F000000) >> 24)]);
+			}
+		}
+
+		/** Rainbow and maxClicks */
+		if ($image === 0)
+		{
+			$white = imagecolorallocate($img, 255, 255, 255);
+			$black = imagecolorallocate($img, 0, 0, 0);
+			for ($i = 1; $i < 128; $i += 2)
+			{
+				imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, $colors[$i]);
+			}
+			imagerectangle($img, 0, 0, 65, 11, $white);
+			imagestring($img, 1, 1, 2, '0', $black);
+			imagestring($img, 1, 65 - strlen($maxClicks) * 5, 2, $maxClicks, $black);
+		}
+		/** Save PNG file */
+		imagepng($img, $imagePath.'-'.$image.'.png');
+		imagedestroy($img);
 	}
-	/** Save PNG file */
-	imagepng($img, $imagePath.'-'.$image.'.png');
-	imagedestroy($img);
+	for ($i = 0; $i < 100; $i++)
+	{
+		imagedestroy($dots[$i]);
+	}
 }
 echo $html;
 

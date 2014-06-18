@@ -107,7 +107,7 @@ if ($page !== '')
 	{
 		$webPage = '';
 	}
-	$webPageGet = isset($_GET['webpage']) && is_array($_GET['webpage']) && count($_GET['webpage']) === 4 ? $_GET['webpage'][0].'>'.((int) $_GET['webpage'][1]).'>'.((int) $_GET['webpage'][2]).'>'.((int) $_GET['webpage'][3]) : '';
+	$webPageGet = isset($_GET['webpage']) && is_array($_GET['webpage']) && count($_GET['webpage']) === 4 && $_GET['webpage'][0] !== '' ? $_GET['webpage'][0].'>'.((int) $_GET['webpage'][1]).'>'.((int) $_GET['webpage'][2]).'>'.((int) $_GET['webpage'][3]) : '';
 	if ($demoServer === false)
 	{
 		if ($webPage !== $webPageGet && $webPageGet !== '')
@@ -199,7 +199,7 @@ if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 <form action="index.php" method="get" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
-	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <?php if ($demoServer === false) { ?><small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small><?php } ?></td>
+	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage0').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <?php if ($demoServer === false) { ?><small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small><?php } ?></td>
 	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 <tr>
 	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>

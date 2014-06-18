@@ -31,7 +31,7 @@ define('CLICKHEAT_PASSWORD', 'demo');
  * 
  * Screen sizes (for click grouping), maximum value defines the largest screen-size that would be shown
 **/
-$screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1600);
+$screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1600, 1800);
 
 /**
  * Navigateurs / Browsers
@@ -49,9 +49,10 @@ $availableLanguages = array('en', 'fr');
  * PNG parameters : antialias, memory limit...
 **/
 define('CLICKHEAT_MEMORY', 0); /** Limite mémoire de PHP, si ini_get() ne renvoie rien cette valeur sera utilisée, il faudra donc la renseigner en accord avec le php.ini si le check.php en parle / PHP memory limit, if ini_get() doesn't return anything this value will be used, so change it accordingly to the php.ini if check.php complains about it */
-define('CLICKHEAT_ANTIALIAS', true); /** Antialias, nécessite PHP 5 / Antialias, PHP 5 required */
+define('CLICKHEAT_DOT_WIDTH', 19); /** Taille du point pour l'affichage des clics / Plot size for click view */
 define('CLICKHEAT_LOW_COLOR', 0); /** Niveau minimal de couleur RVB / Lower RGB level of color */
 define('CLICKHEAT_HIGH_COLOR', 255); /** Niveau maximal de couleur RVB / Higher RGB level of color */
 define('CLICKHEAT_GREY_COLOR', 240); /** Niveau du gris (couleur du 0 clic) / Grey level (color of no-click) */
-define('CLICKHEAT_ALPHA', 20); /** Niveau d'alpha (transparence) / Alpha-level (transparency) */
+define('CLICKHEAT_ALPHA', 20); /** Niveau d'alpha final (transparence) / Final alpha-level (transparency) */
+$colorLevels = array(50, 70, 90, 110, 120); /** Dégradé de couleurs, 5 valeurs entre 0 et 127 / Color gradient, 5 values between 0 and 127 */
 ?>
