@@ -6,6 +6,9 @@
  * @since 27/10/2006
 **/
 
+sleep(1);
+
+
 /** First of all, check if we are inside PhpMyVisites */
 if (strpos(str_replace('\\', '/', __FILE__), 'plugins/ClickHeat/libs') !== false)
 {

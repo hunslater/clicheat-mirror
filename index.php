@@ -172,7 +172,7 @@ if (!defined('CLICKHEAT_ADMIN'))
 
 /** Specific definitions */
 $__screenSizes = array(0 /** Must start with 0 */, 240, 640, 800, 1024, 1152, 1280, 1440, 1600, 1800);
-$__browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet Explorer', 'safari' => 'Safari', 'opera' => 'Opera', 'kmeleon' => 'K-meleon', 'unknown' => '');
+$__browsersList = array('all' => '', 'msie' => 'Internet Explorer', 'firefox' => 'Firefox', 'chrome' => 'Chrome', 'safari' => 'Safari', 'opera' => 'Opera', 'unknown' => '');
 
 switch ($__action)
 {

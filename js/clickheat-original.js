@@ -9,6 +9,7 @@ ClickHeat : Suivi et analyse des clics / Tracking and clicks analysis
 @update 27/08/2007 - Yvan Taviaud : changement du système de débug
 @update 28/09/2007 - Yvan Taviaud : ajout de quelques messages de débug
 @update 16/03/2008 - Yvan Taviaud : utilisation des Listeners - ajout d'un délai pour enregistrer le clic correctement - correctif JSLint
+@update 05/07/2010 - Yvan Taviaud : ajout de Chrome, ajout du test non-Ajax pour libérer le clic plus rapidement
 
 Tested under :
 Windows 2000 - IE 6.0
@@ -39,6 +40,7 @@ function showClickHeatDebug(str)
 		document.getElementById('clickHeatDebuggerDiv').style.display = 'block';
 	}
 }
+
 /** Main function */
 function catchClickHeat(e)
 {
@@ -179,6 +181,7 @@ function catchClickHeat(e)
 			{
 				var clickHeatImg = new Image();
 				clickHeatImg.src = clickHeatServer + '?' + params;
+				//			clickHeatImg.onload = function() { clickHeatLocalWait = 0; }
 			}
 		}
 		/** Little waiting cycle: default is to wait until Ajax sent or until the end of the time if no Ajax is available */
@@ -191,7 +194,7 @@ function catchClickHeat(e)
 	}
 	catch(err)
 	{
-		showClickHeatDebug('An error occurred while processing click (Javascript error): ' + e.message);
+		showClickHeatDebug('An error occurred while processing click (Javascript error): ' + err.message);
 	}
 	return true;
 }
@@ -227,7 +230,7 @@ function initClickHeat()
 	}
 	/** Add onfocus event on iframes (mostly ads) - Does NOT work with Gecko-powered browsers, because onfocus doesn't exist on iframes */
 	iFrames = document.getElementsByTagName('iframe');
-	for (i = 0; i < iFrames.length; i++)
+	for (var i = 0; i < iFrames.length; i++)
 	{
 		if (document.addEventListener)
 		{
@@ -242,10 +245,16 @@ function initClickHeat()
 	clickHeatDocument = (document.documentElement != undefined && document.documentElement.clientHeight != 0) ? document.documentElement : document.body;
 	/** Also the User-Agent is not the best value to use, it's the only one that gives the real browser */
 	var b = navigator.userAgent != undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
-	clickHeatBrowser = b.replace(/iceweasel/, 'firefox').replace(/^.*(firefox|kmeleon|safari|msie|opera).*$/, '$1');
-	if (b == clickHeatBrowser || clickHeatBrowser == '')
+	/** Always test Chrome before Safari */
+	var browsers = ['chrome', 'firefox', 'safari', 'msie', 'opera'];
+	clickHeatBrowser = 'unknown';
+	for (var i = 0; i < browsers.length; i++)
 	{
-		clickHeatBrowser = 'unknown';
+		if (b.indexOf(browsers[i]) != -1)
+		{
+			clickHeatBrowser = browsers[i];
+			break
+		}
 	}
 	showClickHeatDebug('ClickHeat initialised with:<br />site = ' + clickHeatSite + '<br />group = ' + clickHeatGroup + '<br />server = ' + clickHeatServer + '<br />quota = ' + (clickHeatQuota == -1 ? 'unlimited' : clickHeatQuota) + '<br /><br />browser = ' + clickHeatBrowser);
 }
