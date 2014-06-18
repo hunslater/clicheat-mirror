@@ -17,8 +17,7 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
-$_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD)
+if ((CLICKHEAT_USER !== '' || CLICKHEAT_PASSWORD !== '') && (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || $_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD))
 {
 	header('WWW-Authenticate: Basic realm="Click Tracker"');
 	header('HTTP/1.0 401 Unauthorized');
@@ -31,6 +30,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : '';
 $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
 $width = isset($_GET['width']) ? (int) $_GET['width'] : 0;
 $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
+$heatmap = isset($_GET['heatmap']);
 
 /** Ask for page logs deletion (and png images too) */
 if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15)) && $page !== '')
@@ -124,12 +124,13 @@ if ($webPage === '')
 	$webPage = '../';
 }
 
-/** Date */
+/** Date and days */
 $date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
 if ($date === '1970-01-01')
 {
-	$date = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
+	$date = date('Y-m-d');
 }
+$days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
 
 asort($screenSizes);
 /** Width of display */
@@ -183,26 +184,30 @@ foreach ($browsersList as $label => $name)
 <link rel="stylesheet" type="text/css" href="./clickheat.css" />
 </head>
 <body>
-<span id="url"><a href="http://www.labsmedia.com/clickheat/"><img src="./logo.png" width="80" height="15" alt="ClickHeat" /></a></span>
-<h1><?php echo LANG_H1 ?></h1>
 <?php
-if (CLICKHEAT_USER === 'demo' && CLICKHEAT_PASSWORD === 'demo')
+if (CLICKHEAT_USER === '' && CLICKHEAT_PASSWORD === '' || CLICKHEAT_USER === 'demo' && CLICKHEAT_PASSWORD === 'demo')
 {
-	echo '<small class="error">'.LANG_ERROR_PASSWORD.'</small>';
+	echo '<small class="error" style="float:left;">'.LANG_ERROR_PASSWORD.'</small>';
 }
 ?>
+<span id="url"><a href="http://www.labsmedia.com/clickheat/"><img src="./logo.png" width="80" height="15" alt="ClickHeat" /></a></span>
+<h1><?php echo LANG_H1 ?></h1>
 <form action="index.php" method="get" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
 	<th><?php echo LANG_PAGE ?></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small></td>
 	<?php if (strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') === false && strpos($_SERVER['SERVER_NAME'], '.lacoccinelle.net') === false) { ?><th><?php echo LANG_EXAMPLE_URL ?></th><td><input type="text" id="webpage" name="webpage" value="<?php echo htmlentities($webPage)?>" size="30" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 <tr>
-	<th><?php echo LANG_DATE ?></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_DATE ?></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 <tr>
 	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser"><?php echo $selectBrowsers ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+</tr>
+<tr>
+	<th><?php echo LANG_HEATMAP ?></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th></th><td>&nbsp;</td>
 </tr>
 </table>
 </form>
@@ -238,7 +243,7 @@ function getNewPngs()
 		catch (oc) { xmlhttp = null; }
 	}
 	if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
-	xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&rand=' + Date(), true);
+	xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&days=' + document.getElementById('formDays').value + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
 	xmlhttp.onreadystatechange = function()
 	{
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)

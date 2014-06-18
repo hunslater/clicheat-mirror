@@ -116,6 +116,10 @@ elseif (function_exists('imagecolorallocatealpha') === false)
 {
 	echo LANG_CHECK_GD_ALPHA;
 }
+elseif (function_exists('imagefilter') === false)
+{
+	echo LANG_CHECK_GD_ANTIALIAS;
+}
 else
 {
 	echo LANG_CHECK_OK;

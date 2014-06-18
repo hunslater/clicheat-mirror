@@ -54,29 +54,44 @@ function catchClickHeat(e)
 		b = navigator.userAgent != undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
 		b0 = b.replace(/^.*(firefox|kmeleon|safari|msie|opera).*$/, '$1');
 		if (b == b0 || b0 == '') b0 = 'unknown';
-		/** Send an Ajax request */
-		try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
-		catch (e)
-		{
-			try { xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");	}
-			catch (oc) { xmlhttp = null; }
-		}
-		if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
 		params = 'p=' + clickHeatPage + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&random=' + Date();
-		xmlhttp.open('POST', '/clickheat/click.php', true);
-		xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-		xmlhttp.setRequestHeader('Content-length', params.length);
-		xmlhttp.setRequestHeader('Connection', 'close');
-		xmlhttp.send(params);
+		/** Local request ? Try an ajax call */
+		if (clickHeatServer == '')
+		{
+			try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
+			catch (e)
+			{
+				try { xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");	}
+				catch (oc) { xmlhttp = null; }
+			}
+			if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
+			if (!xmlhttp)
+			{
+				clickHeatServer = '/clickheat/click.php';
+			}
+			else
+			{
+				xmlhttp.open('GET', '/clickheat/click.php?' + params, true);
+				xmlhttp.setRequestHeader('Connection', 'close');
+				xmlhttp.send(null);
+			}
+		}
+		if (clickHeatServer != '')
+		{
+			var clickHeatImg = new Image();
+			clickHeatImg.src = clickHeatServer + '?' + params;
+		}
 	} catch(e) {}
 	return true;
 }
 
 var clickHeatPage = '';
+var clickHeatServer = '';
 var clickHeatLastIframe = -1;
-function initClickHeat(page)
+function initClickHeat(page, server)
 {
 	clickHeatPage = page;
+	clickHeatServer = (server == undefined ? '' : server);
 	/** Add onmousedown event */
 	if (typeof document.onmousedown == 'function')
 	{

@@ -17,8 +17,7 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
-$_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD)
+if ((CLICKHEAT_USER !== '' || CLICKHEAT_PASSWORD !== '') && (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || $_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD))
 {
 	header('WWW-Authenticate: Basic realm="Click Tracker"');
 	header('HTTP/1.0 401 Unauthorized');
@@ -63,7 +62,7 @@ if (!isset($browsersList[$browser]))
 }
 
 /** Time and memory limits */
-set_time_limit(120);
+@set_time_limit(120);
 $memoryLimit = (int) @ini_get('memory_limit') * 1048576;
 /** ini_get is not available ! Use the CLICKHEAT_MEMORY value */
 if ($memoryLimit === 0)
@@ -103,17 +102,18 @@ if ($file !== $page)
 	errorGenerate(LANG_ERROR_PAGE);
 }
 
-/** Date */
-$date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
-if (!file_exists(CLICKHEAT_LOGPATH.$page.'/'.$date.'.log'))
-{
-	errorGenerate(LANG_ERROR_DATA);
-}
+/** Show clicks or heatmap */
+$heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap']: 0;
 
-$imagePath = CLICKHEAT_LOGPATH.$page.'/'.$date.'-'.$screen.'-'.($width + 40).'-'.$browser;
+/** Date and days */
+$dateStamp = isset($_GET['date']) ? strtotime($_GET['date']) : time();
+$date = date('Y-m-d', $dateStamp);
+$days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
 
-/** If images are already created and older than the log file, just stop script here */
-if (file_exists($imagePath.'.html') && filemtime($imagePath.'.html') >= filemtime(CLICKHEAT_LOGPATH.$page.'/'.$date.'.log'))
+$imagePath = CLICKHEAT_LOGPATH.$page.'/'.$date.'-'.$days.'-'.$screen.'-'.($width + 40).'-'.$browser.'-'.$heatmap;
+
+/** If images are already created and older than the current day, just stop script here */
+if (file_exists($imagePath.'.html') && filemtime($imagePath.'.html') > mktime(23, 59, 59, date('m', $dateStamp), date('d', $dateStamp) + $days - 1, date('Y', $dateStamp)))
 {
 	readfile($imagePath.'.html');
 	exit;
@@ -122,106 +122,128 @@ if (file_exists($imagePath.'.html') && filemtime($imagePath.'.html') >= filemtim
 $nbOfImages = 1; /** Will be modified after the first image is created */
 $maxClicks = 1; /** Must not be zero for divisions */
 $maxAlias = 1;
+$html = '';
 for ($image = 0; $image < $nbOfImages; $image++)
 {
 	$minHeight = $image * $height;
 	$maxHeight = ($image + 1) * $height - 1;
 	/** Image creation */
 	$img = imagecreatetruecolor($width, $height);
-	$white = imagecolorallocate($img, 255, 255, 255);
-	$black = imagecolorallocate($img, 0, 0, 0);
-
-	/** Image is filled in the color "0", which means 0 click */
-	imagefill($img, 0, 0, 0);
-
-	/** Read clicks in the log file */
-	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.$date.'.log', 'r');
-	if ($f === false)
+	if ($heatmap === 0)
 	{
-		errorGenerate(LANG_ERROR_FILE);
+		$red = imagecolorallocate($img, 255, 0, 0);
+		$grey = imagecolorallocatealpha($img, CLICKHEAT_GREY_COLOR, CLICKHEAT_GREY_COLOR, CLICKHEAT_GREY_COLOR, CLICKHEAT_ALPHA);
+		imagealphablending($img, false);
+		imagesavealpha($img, true);
+		imagefill($img, 0, 0, $grey);
+	}
+	else
+	{
+		/** Image is filled in the color "0", which means 0 click */
+		imagefill($img, 0, 0, 0);
 	}
 
 	$maxY = 0;
-	while (feof($f) === false)
+	for ($day = 0; $day < $days; $day++)
 	{
-		$click = explode('|', trim(fgets($f, 1024)));
-		if (count($click) === 4 && $click[2] > $minScreen && $click[2] <= $maxScreen && ($browser === 'all' || $browser === $click[3]))
+		$currentDate = date('Y-m-d', mktime(0, 0, 0, date('m', $dateStamp), date('d', $dateStamp) + $day, date('Y', $dateStamp)));
+		if (!file_exists(CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log'))
 		{
-			/** If X-position is greater than screen size, the website is too large for the window, so we don't know where the click is... so treat is as absolute */
-			if ((int) $click[0] < (int) $click[2])
+			continue;
+		}
+		/** Read clicks in the log file */
+		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log', 'r');
+		if ($f === false)
+		{
+			errorGenerate(LANG_ERROR_FILE.': '.CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log');
+		}
+
+		while (feof($f) === false)
+		{
+			$click = explode('|', trim(fgets($f, 1024)));
+			if (count($click) === 4 && $click[2] > $minScreen && $click[2] <= $maxScreen && ($browser === 'all' || $browser === $click[3]))
 			{
-				$x = $width / (int) $click[2] * (int) $click[0];
-			}
-			elseif ((int) $click[0] <= $width)
-			{
-				$x = (int) $click[0];
-			}
-			else
-			{
-				$x = -1;
-			}
-			$y = (int) $click[1];
-			if ($image === 0)
-			{
-				/** Look for the maximum height of click */
-				$maxY = max($y, $maxY);
-			}
-			if ($y >= $minHeight && $y < $maxHeight && $x >= 0)
-			{
-				/** Add 1 to the current color of this pixel (color which represents the sum of clicks on this pixel) */
-				$color = imagecolorat($img, $x, $y - $height * $image) + 1;
-				imagesetpixel($img, $x, $y - $height * $image, $color);
-				$maxClicks = max($maxClicks, $color);
+				/** If X-position is greater than screen size, the website is too large for the window, so we don't know where the click is... so treat is as absolute */
+				$click[0] = (int) $click[0];
+				$click[1] = (int) $click[1];
+				$click[2] = (int) $click[2];
+				if ($click[0] < $click[2])
+				{
+					$x = ceil($width / $click[2] * $click[0]);
+				}
+				elseif ($click[0] <= $width)
+				{
+					$x = $click[0];
+				}
+				else
+				{
+					$x = -1;
+				}
+				$y = $click[1];
+				if ($image === 0)
+				{
+					/** Look for the maximum height of click */
+					$maxY = max($y, $maxY);
+				}
+				if ($y >= $minHeight && $y < $maxHeight && $x >= 0)
+				{
+					if ($heatmap === 1)
+					{
+						/** Add 10 to the current color of this pixel (color which represents the sum of clicks on this pixel multiplied by 10, because of the PHP gaussian filter that reduces a lot the color of a lonely pixel) */
+						$color = imagecolorat($img, $x, $y - $height * $image) + 10;
+						imagesetpixel($img, $x, $y - $height * $image, $color);
+						$maxClicks = max($maxClicks, $color / 10);
+					}
+					else
+					{
+						/** Put a red cross at the click location */
+						imageline($img, $x - 2, $y - $height * $image - 2, $x + 2, $y - $height * $image + 2, $red);
+						imageline($img, $x + 2, $y - $height * $image - 2, $x - 2, $y - $height * $image + 2, $red);
+					}
+				}
 			}
 		}
+		fclose($f);
 	}
-	fclose($f);
 	if ($image === 0)
 	{
+		if ($maxY === 0)
+		{
+			errorGenerate(LANG_ERROR_DATA);
+		}
 		$nbOfImages = ceil($maxY / $height);
 	}
 
-	$maxAlias = max($maxAlias, $maxClicks);
-	/** If anti-alias is selected | This part is really slow, must be rewritten */
-	if (CLICKHEAT_ANTIALIAS !== 0)
+	/** If anti-alias is selected and PHP is 5+ */
+	if ($heatmap === 1 && CLICKHEAT_ANTIALIAS === true && function_exists('imagefilter'))
 	{
-		/** First of all, make a copy of the current map */
-		$copy = imagecreatetruecolor($width, $height);
-		imagecopy($copy, $img, 0, 0, 0, 0, $width, $height);
-
-		/** Now, apply some sort of antialias */
-		$power = array();
-		for ($dx = -CLICKHEAT_ANTIALIAS; $dx <= CLICKHEAT_ANTIALIAS; $dx++)
+		imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
+		/** Maximum color value must be evaluated again */
+		for ($x = 0; $x < $width; $x++)
 		{
-			for ($dy = -CLICKHEAT_ANTIALIAS; $dy <= CLICKHEAT_ANTIALIAS; $dy++)
+			for ($y = 0; $y < $height; $y++)
 			{
-				$power[$dx][$dy] = 2 * CLICKHEAT_ANTIALIAS - abs($dx) - abs($dy);
+				$maxAlias = max(imagecolorat($img, $x, $y), $maxAlias);
 			}
 		}
-
-		for ($x = CLICKHEAT_ANTIALIAS; $x < $width - CLICKHEAT_ANTIALIAS; $x++)
-		{
-			for ($y = CLICKHEAT_ANTIALIAS; $y < $height - CLICKHEAT_ANTIALIAS; $y++)
-			{
-				$color = 0;
-				for ($dx = -CLICKHEAT_ANTIALIAS; $dx <= CLICKHEAT_ANTIALIAS; $dx++)
-				{
-					for ($dy = -CLICKHEAT_ANTIALIAS; $dy <= CLICKHEAT_ANTIALIAS; $dy++)
-					{
-						$color += imagecolorat($copy, $x + $dx, $y + $dy) * $power[$dx][$dy];
-					}
-				}
-				$color = ceil($color);
-				imagesetpixel($img, $x, $y, $color);
-				$maxAlias = max($maxAlias, $color);
-			}
-		}
-
-		/** Delete copied image for memory */
-		imagedestroy($copy);
 	}
-	imagepng($img, $imagePath.'-'.$image.'.pngs');
+	else
+	{
+		$maxAlias = $maxClicks * 10;
+	}
+
+	if ($heatmap === 1)
+	{
+		imagepng($img, $imagePath.'-'.$image.'.pngs');
+	}
+	else
+	{
+		imagepng($img, $imagePath.'-'.$image.'.png');
+	}
 	imagedestroy($img);
+
+	/** Generate HTML code */
+	$html .= '<img src="./png.php?page='.$page.'&amp;date='.$date.'&amp;days='.$days.'&amp;image='.$image.'&amp;browser='.$browser.'&amp;screen='.$screen.'&amp;width='.($width + 40).'&amp;heatmap='.$heatmap.'&amp;rand='.(time() + microtime()).'" width="'.$width.'" height="'.$height.'" alt="" /><br />';
 }
 
 /**
@@ -229,8 +251,7 @@ for ($image = 0; $image < $nbOfImages; $image++)
  * But colors must be changed to be visible, so let's generate a clean palette of colors
  * Colors creation : grey => deep blue (rgB) => light blue (rGB) => green (rGb) => yellow (RGb) => red (Rgb), 25 colors between each of these
 **/
-$html = '';
-for ($image = 0; $image < $nbOfImages; $image++)
+for ($image = 0; $image < $nbOfImages && $heatmap === 1; $image++)
 {
 	$img = imagecreatefrompng($imagePath.'-'.$image.'.pngs');
 	unlink($imagePath.'-'.$image.'.pngs');
@@ -304,6 +325,8 @@ for ($image = 0; $image < $nbOfImages; $image++)
 	/** Rainbow and maxClicks */
 	if ($image === 0)
 	{
+		$white = imagecolorallocate($img, 255, 255, 255);
+		$black = imagecolorallocate($img, 0, 0, 0);
 		for ($i = 1; $i < 110; $i += 2)
 		{
 			imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, $colors[$i]);
@@ -315,9 +338,6 @@ for ($image = 0; $image < $nbOfImages; $image++)
 	/** Save PNG file */
 	imagepng($img, $imagePath.'-'.$image.'.png');
 	imagedestroy($img);
-
-	/** Generate HTML code */
-	$html .= '<img src="./png.php?page='.$page.'&amp;date='.$date.'&amp;image='.$image.'&amp;browser='.$browser.'&amp;screen='.$screen.'&amp;width='.($width + 40).'&amp;rand='.(time() + microtime()).'" width="'.$width.'" height="'.$height.'" alt="" /><br />';
 }
 echo $html;
 

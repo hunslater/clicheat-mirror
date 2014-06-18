@@ -17,8 +17,7 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
-$_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD)
+if ((CLICKHEAT_USER !== '' || CLICKHEAT_PASSWORD !== '') && (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) || $_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD))
 {
 	header('WWW-Authenticate: Basic realm="Click Tracker"');
 	header('HTTP/1.0 401 Unauthorized');
@@ -28,12 +27,14 @@ $_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLIC
 
 $page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
 $date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
+$days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
 $browser = isset($_GET['browser']) && isset($browsersList[$_GET['browser']]) ? $_GET['browser'] : '';
 $width = isset($_GET['width']) && in_array($_GET['width'], $screenSizes) ? (int) $_GET['width'] : 0;
 $screen = isset($_GET['screen']) && in_array($_GET['screen'], $screenSizes) ? (int) $_GET['screen'] : 0;
 $image = isset($_GET['image']) ? (int) $_GET['image'] : 0;
+$heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap'] : 0;
 
-$imagePath = CLICKHEAT_LOGPATH.$page.'/'.$date.'-'.$screen.'-'.$width.'-'.$browser.'-'.$image.'.png';
+$imagePath = CLICKHEAT_LOGPATH.$page.'/'.$date.'-'.$days.'-'.$screen.'-'.$width.'-'.$browser.'-'.$heatmap.'-'.$image.'.png';
 
 if (file_exists($imagePath) === false)
 {
