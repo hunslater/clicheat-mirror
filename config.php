@@ -193,7 +193,7 @@ if ($check === true)
 			@rmdir($clickheatConf['logPath'].'test_dir');
 		}
 		/** Remove logs directory if empty, as tests may create many directories. There's no risk in doing this, as a filled directory won't be removed */
-		@rmdir($clickheatConf['logPath']);
+//		@rmdir($clickheatConf['logPath']);
 	}
 }
 ?></td></tr>

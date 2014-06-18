@@ -71,7 +71,7 @@ $height = floor(($memoryLimit - 500000 - 100 * ($clickheatConf['dot'] * 360 + 60
 $height = max(100, min(1000, $height - $height % 10));
 
 /** Selected page */
-$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '****dead_directory****';
+$page = isset($_GET['page']) ? str_replace('/', '', $_GET['page']) : '****dead_directory****';
 if (!is_dir($clickheatConf['logPath'].$page))
 {
 	errorGenerate(LANG_ERROR_GROUP);
