@@ -13,7 +13,7 @@ if (CLICKHEAT_PASSWORD !== '' && (!isset($_COOKIE['clickheat']) || $_COOKIE['cli
 	if (isset($_POST['pass']) && $_POST['pass'] === CLICKHEAT_PASSWORD)
 	{
 		setcookie('clickheat', md5(CLICKHEAT_PASSWORD), 0, '/');
-		header('Location: index.php');
+		header('Location: '.$_SERVER['PHP_SELF']);
 		exit;
 	}
 	echo '<html><body><form method="post">', LANG_AUTHORIZATION, ' : <input type="password" name="pass"/><input type="submit" value="', LANG_CHECK_OK, '" /></form></body></html>';

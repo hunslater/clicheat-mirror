@@ -97,7 +97,7 @@ if ($page !== '')
 	if (file_exists(CLICKHEAT_LOGPATH.$page.'/url.txt'))
 	{
 		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'r');
-		$webPage = fgets($f, 1024);
+		$webPage = trim(fgets($f, 1024));
 		fclose($f);
 	}
 	else
@@ -105,7 +105,7 @@ if ($page !== '')
 		$webPage = '';
 	}
 	/** Against people that just don't understand that a demo is not a tool to promote their url... */
-	if (isset($_GET['webpage']) && $webPage !== $_GET['webpage'] && $_GET['webpage'] !== '' && strpos($_SERVER['HOST_NAME'], '.labsmedia.com') === false && strpos($_SERVER['HOST_NAME'], '.lacoccinelle.net') === false)
+	if (isset($_GET['webpage']) && $webPage !== $_GET['webpage'] && $_GET['webpage'] !== '' && strpos($_SERVER['HTTP_HOST'], '.labsmedia.') === false && strpos($_SERVER['HTTP_HOST'], '.lacoccinelle.net') === false)
 	{
 		$webPage = $_GET['webpage'];
 		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'w');

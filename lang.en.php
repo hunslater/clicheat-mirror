@@ -37,7 +37,6 @@ define('LANG_CHECKS_TO_BE', 'All rows must display OK so the script works well (
 define('LANG_CHECK_SYSTEM', 'Your system (just for information)');
 define('LANG_CHECK_LOGPATH', 'Checking logs\' path');
 define('LANG_CHECK_LOGPATH_DIR', 'can\'t create the directory, please try to create it yourself ('.CLICKHEAT_LOGPATH.')');
-define('LANG_CHECK_LOGPATH_CHMOD', 'can\'t change the permissions of the directory (chmod), please check your permissions on it, or delete the directory and recreate it by running this script again ('.CLICKHEAT_LOGPATH.')');
 define('LANG_CHECK_LOGPATH_MKDIR', 'can\'t create a new sub-directory, please check permissions of the directory (must be writeable to the Apache user)');
 define('LANG_CHECK_LOGPATH_TOUCH', 'can\'t touch a file in the sub-directory (that should not occur)');
 define('LANG_CHECK_MEMORY', 'Memory limit');

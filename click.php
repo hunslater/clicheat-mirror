@@ -32,18 +32,10 @@ if (@error_log(((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).
 	if (!is_dir(CLICKHEAT_LOGPATH))
 	{
 		@mkdir(CLICKHEAT_LOGPATH);
-		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')
-		{
-			@chmod(CLICKHEAT_LOGPATH, 0755);
-		}
 	}
 	if (!is_dir(CLICKHEAT_LOGPATH.$page))
 	{
 		@mkdir(CLICKHEAT_LOGPATH.$page.'/');
-		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')
-		{
-			@chmod(CLICKHEAT_LOGPATH.$page.'/', 0755);
-		}
 	}
 	@error_log(((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser."\n", 3, CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log');
 }

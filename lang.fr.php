@@ -37,7 +37,6 @@ define('LANG_CHECKS_TO_BE', 'Tous les champs doivent afficher OK pour que le pro
 define('LANG_CHECK_SYSTEM', 'Votre système (pour information)');
 define('LANG_CHECK_LOGPATH', 'Vérification du répertoire des fichiers de suivi');
 define('LANG_CHECK_LOGPATH_DIR', 'impossible de créer le répertoire, merci d\'essayer de le créer vous-mêmes ('.CLICKHEAT_LOGPATH.')');
-define('LANG_CHECK_LOGPATH_CHMOD', 'impossible de changer les permissions du répertoire (chmod), merci de vérifier vos droits sur le répertoire ou de tenter de le supprimer pour qu\'il soit recréé par ce script ('.CLICKHEAT_LOGPATH.')');
 define('LANG_CHECK_LOGPATH_MKDIR', 'impossible de créer un sous-répertoire, merci de vérifier les permissions du répertoire (il doit avoir les droits d\'écriture pour l\'utilisateur Apache)');
 define('LANG_CHECK_LOGPATH_TOUCH', 'impossible de créer un fichier dans le sous-répertoire (ceci ne devrait pas arriver normalement)');
 define('LANG_CHECK_MEMORY', 'Limite mémoire');

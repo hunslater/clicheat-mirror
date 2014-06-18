@@ -18,18 +18,21 @@ include './lang.'.$lang.'.php';
 
 /** Login check */
 include './login.php';
+
+/** Protection of Labsmedia servers (hide critical info as the password is public) */
+$showCritical = strpos($_SERVER['HTTP_HOST'], '.labsmedia.') === false && strpos($_SERVER['HTTP_HOST'], '.lacoccinelle.net') === false;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
 <head>
 <title><?php echo LANG_TITLE ?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="./clickheat.css" />
 </head>
 <body>
 <h1><?php echo LANG_CHECKS ?></h1>
 <table cellpadding="0" cellspacing="5" border="0">
-<tr><th><?php echo LANG_CHECK_SYSTEM ?></th><td>OS = <?php echo PHP_OS ?>, PHP = <?php echo PHP_VERSION ?></td></tr>
+<tr><th><?php echo LANG_CHECK_SYSTEM ?></th><td>OS = <?php echo $showCritical ? PHP_OS : 'hidden' ?>, PHP = <?php echo $showCritical ? PHP_VERSION : 'hidden' ?></td></tr>
 <tr><th><?php echo LANG_CHECK_LOGPATH ?></th><td>
 <?php
 /** Test of log directory : */
@@ -43,32 +46,24 @@ if (is_dir(CLICKHEAT_LOGPATH) === false)
 }
 if (is_dir(CLICKHEAT_LOGPATH) === true)
 {
-	/** Can I chmod it to 0755 ? Don't try this under Windows */
-	if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && @chmod(CLICKHEAT_LOGPATH, 0755) === false)
+	/** Check if creation of directories is allowed */
+	if (@mkdir(CLICKHEAT_LOGPATH.'test_dir') === false)
 	{
-		echo LANG_CHECK_LOGPATH_CHMOD;
+		echo LANG_CHECK_LOGPATH_MKDIR;
 	}
 	else
 	{
-		/** Check if creation of directories is allowed */
-		if (mkdir(CLICKHEAT_LOGPATH.'test_dir') === false || strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && @chmod(CLICKHEAT_LOGPATH.'test_dir', 0755) === false)
+		/** Check if creation of a file is allowed */
+		if (@touch(CLICKHEAT_LOGPATH.'test_dir/test.txt') === false)
 		{
-			echo LANG_CHECK_LOGPATH_MKDIR;
+			echo LANG_CHECK_LOGPATH_TOUCH;
 		}
 		else
 		{
-			/** Check if creation of a file is allowed */
-			if (touch(CLICKHEAT_LOGPATH.'test_dir/test.txt') === false)
-			{
-				echo LANG_CHECK_LOGPATH_TOUCH;
-			}
-			else
-			{
-				unlink(CLICKHEAT_LOGPATH.'test_dir/test.txt');
-				echo LANG_CHECK_OK;
-			}
-			rmdir(CLICKHEAT_LOGPATH.'test_dir');
+			@unlink(CLICKHEAT_LOGPATH.'test_dir/test.txt');
+			echo LANG_CHECK_OK;
 		}
+		@rmdir(CLICKHEAT_LOGPATH.'test_dir');
 	}
 }
 ?></td></tr>
@@ -90,7 +85,7 @@ if ($memory === 0)
 		echo LANG_CHECK_OK;
 	}
 }
-else 
+else
 {
 	echo LANG_CHECK_OK;
 }
