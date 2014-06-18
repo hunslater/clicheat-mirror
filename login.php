@@ -1,26 +1,30 @@
 <?php
 /**
- * ClickHeat : vérification admin / Login check
+ * ClickHeat : formulaire de connexion / Login form
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 03/01/2007
 **/
 
-/** Login check */
-if (CLICKHEAT_PASSWORD !== '' && (!isset($_COOKIE['clickheat']) || $_COOKIE['clickheat'] !== md5(CLICKHEAT_PASSWORD)))
+/** Direct call forbidden */
+if (!defined('CLICKHEAT_LANGUAGE'))
 {
-	/** Password is ok */
-	if (isset($_POST['pass']) && $_POST['pass'] === CLICKHEAT_PASSWORD)
-	{
-		setcookie('clickheat', md5(CLICKHEAT_PASSWORD), 0, '/');
-		/** Content-Type for IIS only, else a CGI error appears */
-		header('Content-Type: text/html');
-		header('Location: '.$_SERVER['PHP_SELF']);
-		echo 'Location: '.$_SERVER['PHP_SELF'];
-		exit;
-	}
-	/** Content-Type for IIS only, else a CGI error appears */
-	header('Content-Type: text/html');
-	echo '<html><body><form method="post">', LANG_AUTHORIZATION, ' : <input type="password" name="pass"/><input type="submit" value="', LANG_CHECK_OK, '" /></form></body></html>';
 	exit;
 }
+
+?>
+<span class="float-right"><img src="<?php echo CLICKHEAT_PATH ?>images/logo170.png" width="170" height="35" alt="ClickHeat" /></span>
+<div id="clickheat-box">
+	<h1><?php echo LANG_LOGIN ?></h1>
+	<br />
+	<form action="index.php?action=view" method="post">
+	<table cellpadding="0" cellspacing="5" border="0">
+	<tr><th><?php echo LANG_USER ?></th><td><input type="text" name="login" size="15" /></td></tr>
+	<tr><th><?php echo LANG_PASSWORD ?></th><td><input type="password" name="pass" size="15" /></td></tr>
+	<tr><td colspan="2" class="center">
+		<input type="submit" value="<?php echo LANG_LOGIN ?>" />
+		<?php if (isset($_POST['login'])) echo '<br /><br /><span class="error">', LANG_LOGIN_ERROR, '</span>'; ?>
+	</td></tr>
+	</table>
+	</form>
+</div>

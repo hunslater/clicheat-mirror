@@ -4,52 +4,75 @@
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
- * @update 27/02/2007 - Yvan Taviaud : ajout du référant dans url.txt s'il n'existe pas encore.
 **/
 
-include './config.php';
+/** First of all, check if we are inside PhpMyVisites */
+if (!defined('INCLUDE_PATH'))
+{
+	define('CLICKHEAT_ROOT', './');
+	define('IS_PHPMV_MODULE', false);
+}
+else
+{
+	define('CLICKHEAT_ROOT', INCLUDE_PATH.'/libs/clickheat/');
+	define('IS_PHPMV_MODULE', true);
+}
+
+/** If there's no config file, run check script */
+include CLICKHEAT_ROOT.'config/config.php';
 
 /** Check parameters */
-if (!isset($_GET['x']) || !isset($_GET['y']) || !isset($_GET['w']) || !isset($_GET['p']) || !isset($_GET['b']) || !isset($_GET['c']))
+if (!isset($clickheatConf) || !isset($_GET['x']) || !isset($_GET['y']) || !isset($_GET['w']) || !isset($_GET['p']) || !isset($_GET['b']) || !isset($_GET['c']))
 {
-	exit;
+	exit('Parameters or config error');
 }
 
 /** Check if page and browser are letters-only */
-$page = preg_replace('/[^a-z_0-9]+/i', '', $_GET['p']);
+$page = strtolower(substr(preg_replace('/[^a-z_0-9\-]+/i', '.', $_GET['p']), 0, 50));
 if ($page === '')
 {
-	$page = 'none';
+	exit('No page specified (clickHeatPage empty)');
 }
 $browser = preg_replace('/[^a-z]+/', '', strtolower($_GET['b']));
 if ($browser === '')
 {
-	$browser = 'unknown';
+	exit('Browser empty');
 }
 /** Logging the click */
-$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.date('Y-m-d').'.log%%', 'a');
+$f = @fopen($clickheatConf['logPath'].$page.'/%%'.date('Y-m-d').'.log%%', 'a');
 if ($f === false)
 {
 	/** Can't open the log, let's try to create the directory */
-	if (!is_dir(CLICKHEAT_LOGPATH))
+	if (!is_dir($clickheatConf['logPath']))
 	{
-		@mkdir(CLICKHEAT_LOGPATH);
+		if (!@mkdir(rtrim($clickheatConf['logPath'], '/')))
+		{
+			exit('Cannot create log directory: '.$clickheatConf['logPath']);
+		}
 	}
-	if (!is_dir(CLICKHEAT_LOGPATH.$page))
+	if (!is_dir($clickheatConf['logPath'].$page))
 	{
-		@mkdir(CLICKHEAT_LOGPATH.$page.'/');
+		if (!@mkdir($clickheatConf['logPath'].$page))
+		{
+			exit('Cannot create log directory: '.$clickheatConf['logPath']);
+		}
 		if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] !== '')
 		{
-			$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'w');
+			$f = fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'w');
 			fputs($f, $_SERVER['HTTP_REFERER'].'>0>0>0');
 			fclose($f);
 		}
 	}
-	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.date('Y-m-d').'.log%%', 'a');
+	$f = fopen($clickheatConf['logPath'].$page.'/%%'.date('Y-m-d').'.log%%', 'a');
 }
 if ($f !== false)
 {
+	echo 'OK';
 	fputs($f, ((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser.'|'.((int) $_GET['c'])."\n");
 	fclose($f);
+}
+else
+{
+	echo 'KO, file not writable';
 }
 ?>

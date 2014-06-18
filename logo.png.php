@@ -94,7 +94,7 @@ for ($x = 0; $x < 80; $x++)
 	}
 }
 header('Content-Type: image/png');
-imagepng($img, './logo.png');
+imagepng($img, './images/logo.png');
 imagepng($img);
 imagedestroy($img);
 ?>

@@ -52,7 +52,7 @@ define('LANG_CHECKS', 'Haupt-&Uuml;berpr&uuml;fung f&uuml;r ClickHeat');
 define('LANG_CHECKS_TO_BE', 'Alle Zeilen m&uuml;ssen OK anzeigen damit das Script ordnungsgem&auml;&szlig; funktioniert (au&szlig;er "Ihr System")');
 define('LANG_CHECK_SYSTEM', 'Ihr System (nur zur Information)');
 define('LANG_CHECK_LOGPATH', 'Pr&uuml;fe Protokoll-Pfad');
-define('LANG_CHECK_LOGPATH_DIR', 'Der Ordner kann nicht angelegt werden. Bitte versuchen Sie ihn selbst manuell anzulegen ('.CLICKHEAT_LOGPATH.')');
+define('LANG_CHECK_LOGPATH_DIR', 'Der Ordner kann nicht angelegt werden. Bitte versuchen Sie ihn selbst manuell anzulegen');
 define('LANG_CHECK_LOGPATH_MKDIR', 'Unterordner kann nicht angelegt werden. Bitte &uuml;berpr&uuml;fen Sie die Ordnerrechte des Ordners \'logs\ (muss schreibbar f&uuml;r den Apache Benutzer sein [CHMOD 0777]).');
 define('LANG_CHECK_LOGPATH_TOUCH', 'Eine Datei in einem Unterordner kann nicht bearbeitet werden. (Das sollte nicht auftreten)');
 define('LANG_CHECK_MEMORY', 'Speicher Limit');

@@ -6,54 +6,41 @@
  * @since 27/10/2006
 **/
 
-include './config.php';
-
-/** Loading language according to browser's Accept-Language */
-$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)) : 'en';
-if (!in_array($lang, $availableLanguages))
+/** Direct call forbidden */
+if (!defined('CLICKHEAT_LANGUAGE'))
 {
-	$lang = $availableLanguages[0];
+	exit;
 }
-include './lang.'.$lang.'.php';
-
-/** Login check */
-include './login.php';
-
-/** Against people that just don't understand that a demo is not a tool to do harm to servers... */
-$demoServer = strpos($_SERVER['SERVER_NAME'], 'www.labsmedia.com') !== false;
 
 /** Screen size */
 $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
 $minScreen = 0;
-if (!in_array($screen, $screenSizes) || $screen === 0)
+if ($screen < 0)
 {
-	$screen = 0;
-	$maxScreen = $screenSizes[count($screenSizes) - 1];
+	$width = abs($screen);
+	$maxScreen = 3000;
 }
 else
 {
 	$maxScreen = $screen;
-	for ($i = 1; $i < count($screenSizes); $i++)
+	if (!in_array($screen, $__screenSizes) || $screen === 0)
 	{
-		if ($screenSizes[$i] === $screen)
+		errorGenerate(LANG_ERROR_SCREEN);
+	}
+	for ($i = 1; $i < count($__screenSizes); $i++)
+	{
+		if ($__screenSizes[$i] === $screen)
 		{
-			$minScreen = $screenSizes[$i - 1];
+			$minScreen = $__screenSizes[$i - 1];
 			break;
 		}
 	}
+	$width = $screen - 25;
 }
-
-/** Width */
-$width = isset($_GET['width']) ? (int) $_GET['width'] : 0;
-if (!in_array($width, $screenSizes) || $width === 0)
-{
-	$width = $screenSizes[1];
-}
-$width = $width - 40;
 
 /** Browser */
 $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
-if (!isset($browsersList[$browser]))
+if (!isset($__browsersList[$browser]))
 {
 	$browser = 'all';
 }
@@ -64,7 +51,7 @@ $memoryLimit = (int) @ini_get('memory_limit') * 1048576;
 /** ini_get is not available ! Use the CLICKHEAT_MEMORY value */
 if ($memoryLimit === 0)
 {
-	$memoryLimit = CLICKHEAT_MEMORY * 1048576;
+	$memoryLimit = $clickheatConf['memory'] * 1048576;
 }
 if ($memoryLimit === 0)
 {
@@ -78,30 +65,21 @@ if ($memoryLimit === 0)
  * imagepng		: about 4 * $width * $height bytes
  * So a rough idea of the memory is 10 * $width * $height + 500,000 (2 images) + 100 * (CLICKHEAT_DOT_WIDTH * 360 + 6000)
 **/
-/** Calculating height from memory consumption, and add a 50% security margin : 10 => 15 */
-$height = floor(($memoryLimit - 500000 - 100 * (CLICKHEAT_DOT_WIDTH * 360 + 6000)) / (15 * $width));
+/** Calculating height from memory consumption, and add a 100% security margin : 10 => 20 */
+$height = floor(($memoryLimit - 500000 - 100 * ($clickheatConf['dot'] * 360 + 6000)) / (20 * $width));
 /** Limit height to 1000px max, with a modulo of 10 */
 $height = max(100, min(1000, $height - $height % 10));
 
 /** Selected page */
-$page = isset($_GET['page']) ? $_GET['page'] : '';
-$d = dir(CLICKHEAT_LOGPATH);
-while (($file = $d->read()) !== false)
+$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '****dead_directory****';
+if (!is_dir($clickheatConf['logPath'].$page))
 {
-	if ($file === '.' || $file === '..') continue;
-	if ($file === $page)
-	{
-		break;
-	}
-}
-if ($file !== $page)
-{
-	errorGenerate(LANG_ERROR_PAGE);
+	errorGenerate(LANG_ERROR_GROUP);
 }
 /** Get some data for the current page (centered and/or fixed layout) */
-if (file_exists(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%'))
+if (file_exists($clickheatConf['logPath'].$page.'/%%url.txt%%'))
 {
-	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'r');
+	$f = @fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'r');
 	$webPage = trim(fgets($f, 1024));
 	fclose($f);
 }
@@ -146,26 +124,20 @@ $heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap']: 0;
 
 /** Date and days */
 $dateStamp = isset($_GET['date']) ? strtotime($_GET['date']) : time();
-$date2Stamp = isset($_GET['date2']) ? strtotime($_GET['date2']) : time();
-$days = min(120, (int) floor(abs($dateStamp - $date2Stamp) / 86400) + 1); // Limit to 120 days
-$dateStamp = max($dateStamp, $date2Stamp);
+$range = isset($_GET['range']) && in_array($_GET['range'], array('d', 'w', 'm')) ? $_GET['range'] : 'd';
+$days = $range === 'd' ? 1 : ($range === 'w' ? 7 : date('t', $dateStamp));
 $date = date('Y-m-d', $dateStamp);
 
-/** Against rude people on my demo server */
-if ($date === date('Y-m-d') && $demoServer === true)
-{
-	errorGenerate(LANG_ERROR_TODAY);
-}
+$imagePath = $clickheatConf['logPath'].$page.'/%%'.$date.'-'.$range.'-'.$screen.'-'.$browser.'-'.$heatmap;
 
-$imagePath = CLICKHEAT_LOGPATH.$page.'/%%'.$date.'-'.$days.'-'.$screen.'-'.($width + 40).'-'.$browser.'-'.$heatmap;
-
-/** If images are already created and older than the current day, just stop script here */
-if (file_exists($imagePath.'.html%%') && filemtime($imagePath.'.html%%') > $dateStamp + 86400)
+/** If images are already created, just stop script here if these have less than 120 seconds */
+if (file_exists($imagePath.'.html%%') && filemtime($imagePath.'.html%%') > time() - 120)
 {
 	readfile($imagePath.'.html%%');
 	exit;
 }
 
+$startStep = floor(($clickheatConf['step'] - 1) / 2);
 $nbOfImages = 1; /** Will be modified after the first image is created */
 $maxClicks = 1; /** Must not be zero for divisions */
 $html = '';
@@ -179,9 +151,7 @@ for ($image = 0; $image < $nbOfImages; $image++)
 	{
 		$red = imagecolorallocate($img, 255, 0, 0);
 		$green = imagecolorallocate($img, 0, 220, 0);
-		$grey = imagecolorallocatealpha($img, CLICKHEAT_GREY_COLOR, CLICKHEAT_GREY_COLOR, CLICKHEAT_GREY_COLOR, CLICKHEAT_ALPHA);
-		imagealphablending($img, false);
-		imagesavealpha($img, true);
+		$grey = imagecolorallocate($img, CLICKHEAT_GREY_COLOR, CLICKHEAT_GREY_COLOR, CLICKHEAT_GREY_COLOR);
 		imagefill($img, 0, 0, $grey);
 	}
 	else
@@ -191,136 +161,148 @@ for ($image = 0; $image < $nbOfImages; $image++)
 	}
 
 	$maxY = 0;
-	for ($day = -$days + 1; $day <= 0; $day++)
+	for ($day = 0; $day < $days; $day++)
 	{
 		$currentDate = date('Y-m-d', mktime(0, 0, 0, date('m', $dateStamp), date('d', $dateStamp) + $day, date('Y', $dateStamp)));
-		if (!file_exists(CLICKHEAT_LOGPATH.$page.'/%%'.$currentDate.'.log%%'))
+		if (!file_exists($clickheatConf['logPath'].$page.'/%%'.$currentDate.'.log%%'))
 		{
 			continue;
 		}
 		/** Read clicks in the log file */
-		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%'.$currentDate.'.log%%', 'r');
+		$f = @fopen($clickheatConf['logPath'].$page.'/%%'.$currentDate.'.log%%', 'r');
 		if ($f === false)
 		{
-			errorGenerate(LANG_ERROR_FILE.': '.CLICKHEAT_LOGPATH.$page.'/'.$currentDate.'.log');
+			errorGenerate(LANG_ERROR_FILE.': '.$clickheatConf['logPath'].$page.'/%%'.$currentDate.'.log%%');
 		}
 
-		while (feof($f) === false)
+		$buffer = '';
+		$count = 0;
+		while (true)
 		{
-			$click = explode('|', trim(fgets($f, 1024)));
-			/** Old logs without right clicks */
-			if (count($click) === 4)
-			{
-				$click[4] = '1';
-			}
-			if (count($click) !== 5 || $click[2] <= $minScreen || $click[2] > $maxScreen || ($browser !== 'all' && $browser !== $click[3]) || $heatmap === 1 && $click[4] !== '1')
+			$buffer .= fgets($f, 1024);
+			/** Grouping by 1000 clicks */
+			if (feof($f) === false && $count++ !== 1000)
 			{
 				continue;
 			}
-			$click[0] = (int) $click[0]; // X
-			$click[1] = (int) $click[1]; // Y
-			$click[2] = (int) $click[2]; // display width
-			if ($click[0] > $click[2])
-			{
-				/** If X is greater than screen size, the website is too large for the window, so we don't know where the click is... ignore it */
-				continue;
-			}
-			/** Correction of X for liquid and/or fixed layouts */
-			if ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth === 0)
-			{
-				/** Left fixed menu */
-				if ($click[0] <= $leftWidth)
-				{
-					/** Click in the left menu : X is good */
-					$x = $click[0];
-				}
-				else
-				{
-					/** Apply a percentage on the rest of the screen */
-					$x = $leftWidth + ceil(($width - $leftWidth) * ($click[0] - $leftWidth) / ($click[2] - $leftWidth));
-				}
-			}
-			elseif ($leftWidth === 0 && $centerWidth === 0 && $rightWidth !== 0)
-			{
-				/** Right fixed menu */
-				if ($click[2] - $click[0] <= $rightWidth)
-				{
-					/** Click in the right menu : X is good, but relative to the right border */
-					$x = $width - ($click[2] - $click[0]);
-				}
-				else
-				{
-					/** Apply a percentage on the rest of the screen */
-					$x = ceil(($width - $rightWidth) * $click[0] / ($click[2] - $rightWidth));
-				}
-			}
-			elseif ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth !== 0)
-			{
-				/** Left and right fixed menus */
-				if ($click[2] - $click[0] <= $rightWidth)
-				{
-					/** Click in the right menu : X is good, but relative to the right border */
-					$x = $width - ($click[2] - $click[0]);
-				}
-				elseif ($click[0] <= $leftWidth)
-				{
-					/** Click in the left menu : X is good */
-					$x = $click[0];
-				}
-				else
-				{
-					/** Apply a percentage on the rest of the screen */
-					$x = $leftWidth + ceil(($width - $leftWidth - $rightWidth) * ($click[0] - $leftWidth) / ($click[2] - $leftWidth - $rightWidth));
-				}
-			}
-			elseif ($leftWidth === 0 && $centerWidth !== 0 && $rightWidth === 0)
-			{
-				/** Fixed centered content */
-				if (abs($click[0] - $click[2] / 2) <= $centerWidth / 2)
-				{
-					/** Click is in the centered content */
-					$x = ($width - $click[2]) / 2 + $click[0];
-				}
-				elseif ($click[0] < $click[2] / 2)
-				{
-					/** Click is at the left of the centered content */
-					$x = ($width - $centerWidth) / ($click[2] - $centerWidth) * $click[0];
-				}
-				else
-				{
-					/** Click is at the right of the centered content */
-					$x = ($width + $centerWidth) / 2 + ($width - $centerWidth) / ($click[2] - $centerWidth) * ($click[0] - ($click[2] + $centerWidth) / 2);
-				}
-			}
-			else
-			{
-				/** Layout 100% */
-				$x = $width / $click[2] * $click[0];
-			}
-			$y = $click[1];
-			if ($image === 0)
-			{
-				/** Looking for the maximum height of click */
-				$maxY = max($y, $maxY);
-			}
-			if ($y >= $minHeight && $y < $maxHeight && $x >= 0 && $x <= $width)
-			{
-				if ($heatmap === 1)
-				{
-					/** Add 1 to the current color of this pixel (color which represents the sum of clicks on this pixel) */
-					$color = imagecolorat($img, $x, $y - $height * $image) + 1;
-					imagesetpixel($img, $x, $y - $height * $image, $color);
-					$maxClicks = max($maxClicks, $color);
-				}
-				else
-				{
-					/** Put a red or green cross at the click location */
-					$color = $click[4] === '1' ? $red : $green;
-					imageline($img, $x - 2, $y - $height * $image - 2, $x + 2, $y - $height * $image + 2, $color);
-					imageline($img, $x + 2, $y - $height * $image - 2, $x - 2, $y - $height * $image + 2, $color);
-				}
-			}
+			/** Do a regular match (faster and easier for large volume of data) */
+			preg_match_all('~^(\d+)\|(\d+)\|(\d+)\|'.($browser === 'all' ? '[a-z]+' : $browser).'\|(\d)$~m', $buffer, $clicks);
+			$buffer = '';
 
+			for ($i = 0, $max = count($clicks[1]); $i < $max; $i++)
+			{
+				$x = (int) $clicks[1][$i]; // X
+				$y = (int) $clicks[2][$i]; // Y
+				$w = (int) $clicks[3][$i]; // display width
+				$c = ($clicks[4][$i] < 3); // left click
+				/** X is not in the range of sizes, or right click for heatmap, or X is greater than screen size, the website is too large for the window, so we don't know where the click is... ignore those clicks */
+				if ($x <= $minScreen || $x > $maxScreen || $heatmap === 1 && $c === false || $x > $w)
+				{
+					continue;
+				}
+				/** Correction of X for liquid and/or fixed layouts */
+				if ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth === 0)
+				{
+					/** Left fixed menu */
+					if ($x <= $leftWidth)
+					{
+						/** Click in the left menu : X is good */
+					}
+					else
+					{
+						/** Apply a percentage on the rest of the screen */
+						$x = $leftWidth + ceil(($width - $leftWidth) * ($x - $leftWidth) / ($w - $leftWidth));
+					}
+				}
+				elseif ($leftWidth === 0 && $centerWidth === 0 && $rightWidth !== 0)
+				{
+					/** Right fixed menu */
+					if ($w - $x <= $rightWidth)
+					{
+						/** Click in the right menu : X is good, but relative to the right border */
+						$x = $width - ($w - $x);
+					}
+					else
+					{
+						/** Apply a percentage on the rest of the screen */
+						$x = ceil(($width - $rightWidth) * $x / ($w - $rightWidth));
+					}
+				}
+				elseif ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth !== 0)
+				{
+					/** Left and right fixed menus */
+					if ($w - $x <= $rightWidth)
+					{
+						/** Click in the right menu : X is good, but relative to the right border */
+						$x = $width - ($w - $x);
+					}
+					elseif ($x <= $leftWidth)
+					{
+						/** Click in the left menu : X is good */
+					}
+					else
+					{
+						/** Apply a percentage on the rest of the screen */
+						$x = $leftWidth + ceil(($width - $leftWidth - $rightWidth) * ($x - $leftWidth) / ($w - $leftWidth - $rightWidth));
+					}
+				}
+				elseif ($leftWidth === 0 && $centerWidth !== 0 && $rightWidth === 0)
+				{
+					/** Fixed centered content */
+					if (abs($x - $w / 2) <= $centerWidth / 2)
+					{
+						/** Click is in the centered content */
+						$x = ($width - $w) / 2 + $x;
+					}
+					elseif ($x < $w / 2)
+					{
+						/** Click is at the left of the centered content */
+						$x = ($width - $centerWidth) / ($w - $centerWidth) * $x;
+					}
+					else
+					{
+						/** Click is at the right of the centered content */
+						$x = ($width + $centerWidth) / 2 + ($width - $centerWidth) / ($w - $centerWidth) * ($x - ($w + $centerWidth) / 2);
+					}
+				}
+				else
+				{
+					/** Layout 100% */
+					$x = $width / $w * $x;
+				}
+				if ($image === 0)
+				{
+					/** Looking for the maximum height of click */
+					$maxY = max($y, $maxY);
+				}
+				if ($y >= $minHeight && $y < $maxHeight && $x >= 0 && $x <= $width)
+				{
+					if ($heatmap === 1)
+					{
+						/** Apply a calculus for the step, with increases the speed of rendering : step = 3, then pixel is drawn at x = 2 (center of a 3x3 square) */
+						$x -= $x % $clickheatConf['step'] - $startStep;
+						$y -= $y % $clickheatConf['step'] - $startStep;
+						/** Add 1 to the current color of this pixel (color which represents the sum of clicks on this pixel) */
+						$color = imagecolorat($img, $x, $y - $height * $image) + 1;
+						imagesetpixel($img, $x, $y - $height * $image, $color);
+						$maxClicks = max($maxClicks, $color);
+					}
+					else
+					{
+						/** Put a red or green cross at the click location */
+						$color = $c === true ? $red : $green;
+						imageline($img, $x - 2, $y - $height * $image - 2, $x + 2, $y - $height * $image + 2, $color);
+						imageline($img, $x + 2, $y - $height * $image - 2, $x - 2, $y - $height * $image + 2, $color);
+					}
+				}
+			}
+			unset($clicks);
+
+			if ($count !== 1001)
+			{
+				break;
+			}
+			$count = 0;
 		}
 		fclose($f);
 	}
@@ -346,92 +328,91 @@ for ($image = 0; $image < $nbOfImages; $image++)
 			imageline($img, 0, $height - 1, $width, $height - 1, $black);
 			imagestring($img, 1, 1, $height - 9, LANG_NO_CLICK_BELOW, $black);
 		}
-
 		imagepng($img, $imagePath.'-'.$image.'.png%%');
 	}
 	imagedestroy($img);
 
 	/** Generate HTML code */
-	$html .= '<img src="./png.php?page='.$page.'&amp;date='.$date.'&amp;days='.$days.'&amp;image='.$image.'&amp;browser='.$browser.'&amp;screen='.$screen.'&amp;width='.($width + 40).'&amp;heatmap='.$heatmap.'&amp;rand='.(time() + microtime()).'" width="'.$width.'" height="'.$height.'" alt="" /><br />';
+	$html .= '<img id="heatmap-'.$image.'" src="'.CLICKHEAT_INDEX_PATH.'action=png&page='.$page.'&amp;date='.$date.'&amp;range='.$range.'&amp;image='.$image.'&amp;browser='.$browser.'&amp;screen='.$screen.'&amp;heatmap='.$heatmap.'&amp;rand='.(time() + microtime()).'" width="'.$width.'" height="'.$height.'" alt="" /><br />';
 }
 
-/** Now, our image is a direct representation of the clicks on each pixel, so create some fuzzy dots to put a nice blur effect if user asks for a heatmap */
+/** Now, our image is a direct representation of the clicks on each pixel, so create some fuzzy dots to put a nice blur effect if user asked for a heatmap */
 if ($heatmap === 1)
 {
-	for ($i = 0; $i < 100; $i++)
+	for ($i = 0; $i < 128; $i++)
 	{
-		$dots[$i] = imagecreatetruecolor(CLICKHEAT_DOT_WIDTH, CLICKHEAT_DOT_WIDTH);
+		$dots[$i] = imagecreatetruecolor($clickheatConf['dot'], $clickheatConf['dot']);
 		imagealphablending($dots[$i], false);
 	}
-	for ($x = 0; $x < CLICKHEAT_DOT_WIDTH; $x++)
+	for ($x = 0; $x < $clickheatConf['dot']; $x++)
 	{
-		for ($y = 0; $y < CLICKHEAT_DOT_WIDTH; $y++)
+		for ($y = 0; $y < $clickheatConf['dot']; $y++)
 		{
-			$sinX = sin($x * pi() / CLICKHEAT_DOT_WIDTH);
-			$sinY = sin($y * pi() / CLICKHEAT_DOT_WIDTH);
-			for ($i = 0; $i < 100; $i++)
+			$sinX = sin($x * pi() / $clickheatConf['dot']);
+			$sinY = sin($y * pi() / $clickheatConf['dot']);
+			for ($i = 0; $i < 128; $i++)
 			{
-				/** Alpha range is only 27 => 127 to limit the effect on nearby pixels */
 				$alpha = 127 - $i * $sinX * $sinY * $sinX * $sinY;
 				imagesetpixel($dots[$i], $x, $y, ((int) $alpha) * 16777216);
 			}
 		}
 	}
+
 	/**
 	 * Colors creation :
 	 * grey	=> deep blue (rgB)	=> light blue (rGB)	=> green (rGb)		=> yellow (RGb)		=> red (Rgb)
-	 * 0	   $colorLevels[0]	   $colorLevels[1]	   $colorLevels[2]	   $colorLevels[3]	   128
+	 * 0	   $__colorLevels[0]	   $__colorLevels[1]	   $__colorLevels[2]	   $__colorLevels[3]	   128
 	**/
-	sort($colorLevels);
+	sort($__colorLevels);
 	$colors = array();
 	for ($i = 0; $i < 128; $i++)
 	{
 		/** Red */
-		if ($i < $colorLevels[0])
+		if ($i < $__colorLevels[0])
 		{
-			$colors[$i][0] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
+			$colors[$i][0] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $__colorLevels[0];
 		}
-		elseif ($i < $colorLevels[2])
+		elseif ($i < $__colorLevels[2])
 		{
 			$colors[$i][0] = CLICKHEAT_LOW_COLOR;
 		}
-		elseif ($i < $colorLevels[3])
+		elseif ($i < $__colorLevels[3])
 		{
-			$colors[$i][0] = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[2]) / ($colorLevels[3] - $colorLevels[2]);
+			$colors[$i][0] = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $__colorLevels[2]) / ($__colorLevels[3] - $__colorLevels[2]);
 		}
 		else
 		{
 			$colors[$i][0] = CLICKHEAT_HIGH_COLOR;
 		}
 		/** Green */
-		if ($i < $colorLevels[0])
+		if ($i < $__colorLevels[0])
 		{
-			$colors[$i][1] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
+			$colors[$i][1] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_LOW_COLOR - CLICKHEAT_GREY_COLOR) * $i / $__colorLevels[0];
 		}
-		elseif ($i < $colorLevels[1])
+		elseif ($i < $__colorLevels[1])
 		{
-			$colors[$i][1] = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[0]) / ($colorLevels[1] - $colorLevels[0]);
+			$colors[$i][1] = CLICKHEAT_LOW_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $__colorLevels[0]) / ($__colorLevels[1] - $__colorLevels[0]);
 		}
-		elseif ($i < $colorLevels[3])
+		elseif ($i < $__colorLevels[3])
 		{
 			$colors[$i][1] = CLICKHEAT_HIGH_COLOR;
 		}
 		else
 		{
-			$colors[$i][1] = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[3]) / (127 - $colorLevels[3]);
+			$colors[$i][1] = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $__colorLevels[3]) / (127 - $__colorLevels[3]);
 		}
 		/** Blue */
-		if ($i < $colorLevels[0])
+		if ($i < $__colorLevels[0])
 		{
-			$colors[$i][2] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_GREY_COLOR) * $i / $colorLevels[0];
+			$colors[$i][2] = CLICKHEAT_GREY_COLOR + (CLICKHEAT_HIGH_COLOR - CLICKHEAT_GREY_COLOR) * $i / $__colorLevels[0];
 		}
-		elseif ($i < $colorLevels[1])
+		elseif ($i < $__colorLevels[1])
 		{
 			$colors[$i][2] = CLICKHEAT_HIGH_COLOR;
 		}
-		elseif ($i < $colorLevels[2])
+		elseif ($i < $__colorLevels[2])
 		{
-			$colors[$i][2] = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $colorLevels[1]) / ($colorLevels[2] - $colorLevels[1]);
+			$colors[$i][2] = CLICKHEAT_HIGH_COLOR - (CLICKHEAT_HIGH_COLOR - CLICKHEAT_LOW_COLOR) * ($i - $__colorLevels[1]) / ($__colorLevels[2] - $__colorLevels[1]);
 		}
 		else
 		{
@@ -441,53 +422,66 @@ if ($heatmap === 1)
 	for ($image = 0; $image < $nbOfImages; $image++)
 	{
 		$img = imagecreatetruecolor($width, $height);
-		imagesavealpha($img, true);
 		/** We don't use imagefill() because this function is buggy on the French host Free.fr */
 		imagealphablending($img, false);
 		imagefilledrectangle($img, 0, 0, $width - 1, $height - 1, 0x7FFFFFFF);
 		imagealphablending($img, true);
 
 		$imgSrc = imagecreatefrompng($imagePath.'-'.$image.'.pngs%%');
-		unlink($imagePath.'-'.$image.'.pngs%%');
-		for ($x = 0; $x < $width; $x++)
+		@unlink($imagePath.'-'.$image.'.pngs%%');
+		if ($imgSrc === false)
 		{
-			for ($y = 0; $y < $height; $y++)
+			errorGenerate('::MEMORY_OVERFLOW::');
+		}
+		for ($x = $startStep; $x < $width; $x += $clickheatConf['step'])
+		{
+			for ($y = $startStep; $y < $height; $y += $clickheatConf['step'])
 			{
-				$dot = (int) ceil(imagecolorat($imgSrc, $x, $y) / $maxClicks * 99);
+				$dot = (int) ceil(imagecolorat($imgSrc, $x, $y) / $maxClicks * 127);
 				if ($dot !== 0)
 				{
-					imagecopy($img, $dots[$dot], ceil($x - CLICKHEAT_DOT_WIDTH / 2), ceil($y - CLICKHEAT_DOT_WIDTH / 2), 0, 0, CLICKHEAT_DOT_WIDTH, CLICKHEAT_DOT_WIDTH);
+					imagecopy($img, $dots[$dot], ceil($x - $clickheatConf['dot'] / 2), ceil($y - $clickheatConf['dot'] / 2), 0, 0, $clickheatConf['dot'], $clickheatConf['dot']);
 				}
 			}
 		}
 		/** Destroy image source */
 		imagedestroy($imgSrc);
 
-		/** Change the palette, and create the 128 colors */
-		$allocatedColors = array();
-		for ($i = 0; $i < 128; $i++)
+		/** Rainbow */
+		if ($image === 0)
 		{
-			$allocatedColors[$i] = imagecolorallocatealpha($img, $colors[$i][0], $colors[$i][1], $colors[$i][2], CLICKHEAT_ALPHA);
-		}
-		imagealphablending($img, false);
-		for ($x = 0; $x < $width; $x++)
-		{
-			for ($y = 0; $y < $height; $y++)
+			for ($i = 1; $i < 128; $i += 2)
 			{
-				/** Set a pixel with the new color, while reading the current alpha level */
-				imagesetpixel($img, $x, $y, $allocatedColors[127 - ((imagecolorat($img, $x, $y) & 0x7F000000) >> 24)]);
+				imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, (127 - $i) * 16777216);
 			}
 		}
 
-		/** Rainbow and maxClicks */
+		/** Some version of imagetruecolortopalette() don't transform alpha value to non alpha */
+		if ($clickheatConf['palette'] === true)
+		{
+			for ($x = 0; $x < $width; $x++)
+			{
+				for ($y = 0; $y < $height; $y++)
+				{
+					/** Get Alpha value (0->127) and transform it to red (divide color by 16777216 and multiply by 65536 * 2 (red is 0->255), so divide it by 128) */
+					imagesetpixel($img, $x, $y, (imagecolorat($img, $x, $y) & 0x7F000000) / 128);
+				}
+			}
+		}
+
+		/** Transform true-color to palette, then change palette colors */
+		imagetruecolortopalette($img, false, 128);
+		for ($i = 0, $max = imagecolorstotal($img); $i < $max; $i++)
+		{
+			$color = imagecolorsforindex($img, $i);
+			imagecolorset($img, $i, $colors[floor(127 - $color['red'] / 2)][0], $colors[floor(127 - $color['red'] / 2)][1], $colors[floor(127 - $color['red'] / 2)][2]);
+		}
+
+		/** maxClicks */
 		if ($image === 0)
 		{
 			$white = imagecolorallocate($img, 255, 255, 255);
 			$black = imagecolorallocate($img, 0, 0, 0);
-			for ($i = 1; $i < 128; $i += 2)
-			{
-				imagefilledrectangle($img, $i/2 + 1, 0, $i/2 + 1, 10, $allocatedColors[$i]);
-			}
 			imagerectangle($img, 0, 0, 65, 11, $white);
 			imagestring($img, 1, 1, 2, '0', $black);
 			imagestring($img, 1, 65 - strlen($maxClicks) * 5, 2, $maxClicks, $black);
@@ -512,20 +506,19 @@ if ($heatmap === 1)
 }
 echo $html;
 
-/** Save the HTML code to speed up following queries */
+/** Save the HTML code to speed up following queries (only over two minutes) */
 $f = fopen($imagePath.'.html%%', 'w');
 fputs($f, $html);
 fclose($f);
-touch($imagePath.'.html%%');
 
 /**
- * Retourne une erreur Ajax / Returns an Ajax error
+ * Retourne une erreur / Returns an error
  *
  * @param string $error
 **/
 function errorGenerate($error)
 {
-	echo '&nbsp;<br style="line-height:20px" /><br /><br /><span class="error">'.$error.'</span>';
+	echo '&nbsp;<div style="line-height:20px;"><span class="error">'.$error.'</span></div>';
 	exit;
 }
 ?>

@@ -6,109 +6,66 @@
  * @since 04/12/2006
 **/
 
-include './config.php';
-
-/** Loading language according to browser's Accept-Language */
-$lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)) : '';
-if (!in_array($lang, $availableLanguages))
+/** Direct call forbidden */
+if (!defined('CLICKHEAT_LANGUAGE'))
 {
-	$lang = $availableLanguages[0];
+	exit;
 }
-include './lang.'.$lang.'.php';
 
-/** Login check */
-include './login.php';
-
-/** Protection of Labsmedia servers (hide critical info as the password is public) */
-$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false;
+$checks = true;
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
-<head>
-<title><?php echo LANG_TITLE ?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="./clickheat.css" />
-</head>
-<body>
+<div id="clickheat-box">
 <h1><?php echo LANG_CHECKS ?></h1>
+<br /><br />
 <table cellpadding="0" cellspacing="5" border="0">
-<tr><th><?php echo LANG_CHECK_SYSTEM ?></th><td>OS = <?php echo $demoServer === false ? PHP_OS : 'hidden' ?>, PHP = <?php echo $demoServer === false ? PHP_VERSION : 'hidden' ?></td></tr>
-<tr><th><?php echo LANG_CHECK_LOGPATH ?></th><td>
+<tr><th><?php echo LANG_CHECK_WRITABLE ?><br />(<?php echo dirname(__FILE__) ?>/config/)</th><td>
 <?php
-/** Test of log directory : */
-if (is_dir(CLICKHEAT_LOGPATH) === false)
+/** Test if current path is writable for config.php : */
+$f = fopen(CLICKHEAT_ROOT.'config/temp.tmp', 'w');
+if ($f === false)
 {
-	mkdir(CLICKHEAT_LOGPATH);
-	if (is_dir(CLICKHEAT_LOGPATH) === false)
-	{
-		echo LANG_CHECK_LOGPATH_DIR;
-	}
-}
-if (is_dir(CLICKHEAT_LOGPATH) === true)
-{
-	/** Check if creation of directories is allowed */
-	if (is_dir(CLICKHEAT_LOGPATH.'test_dir') === false && @mkdir(CLICKHEAT_LOGPATH.'test_dir') === false)
-	{
-		echo LANG_CHECK_LOGPATH_MKDIR;
-	}
-	else
-	{
-		/** Check if creation of a file is allowed */
-		if (@touch(CLICKHEAT_LOGPATH.'test_dir/test.txt') === false)
-		{
-			echo LANG_CHECK_LOGPATH_TOUCH;
-		}
-		else
-		{
-			@unlink(CLICKHEAT_LOGPATH.'test_dir/test.txt');
-			echo LANG_CHECK_OK;
-		}
-		@rmdir(CLICKHEAT_LOGPATH.'test_dir');
-	}
-}
-?></td></tr>
-<tr><th><?php echo LANG_CHECK_MEMORY ?></th><td>
-<?php
-$memory = (int) @ini_get('memory_limit');
-if ($memory === 0)
-{
-	if (CLICKHEAT_MEMORY === 0)
-	{
-		echo LANG_CHECK_MEMORY_BAD;
-	}
-	elseif (gettype(CLICKHEAT_MEMORY) !== 'integer')
-	{
-		echo LANG_CHECK_MEMORY_INT;
-	}
-	else
-	{
-		echo LANG_CHECK_OK;
-	}
+	echo '<img src="./images/warning.png" width="16" height="16" alt="Warning" /></td><td>', LANG_CHECK_NOT_WRITABLE;
 }
 else
 {
-	echo LANG_CHECK_OK;
+	fputs($f, 'delete this file');
+	fclose($f);
+	@unlink(CLICKHEAT_ROOT.'config/temp.tmp');
+	echo '<img src="./images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
 }
 ?></td></tr>
 <tr><th><?php echo LANG_CHECK_GD ?></th><td>
 <?php
 if (function_exists('imagecreatetruecolor') === false)
 {
-	echo LANG_CHECK_GD_IMG;
+	$checks = false;
+	echo '<img src="./images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CHECK_GD_IMG;
 }
 elseif (function_exists('imagecolorallocatealpha') === false)
 {
-	echo LANG_CHECK_GD_ALPHA;
+	$checks = false;
+	echo '<img src="./images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CHECK_GD_ALPHA;
 }
 elseif (function_exists('imagepng') === false)
 {
-	echo LANG_CHECK_GD_PNG;
+	$checks = false;
+	echo '<img src="./images/ko.png" width="16" height="16" alt="KO" /></td><td>', LANG_CHECK_GD_PNG;
 }
 else
 {
-	echo LANG_CHECK_OK;
+	echo '<img src="./images/ok.png" width="16" height="16" alt="OK" /></td><td>&nbsp;';
+}
+?></td></tr>
+<tr><td colspan="3" align="center">&nbsp;<br /><br />
+<?php
+if ($checks === false)
+{
+	echo LANG_CHECKS_KO;
+}
+else
+{
+	echo LANG_CHECKS_OK, ' <a href="index.php?action=config"><img src="./images/next.png" width="16" height="16" alt="Next" /></a>';
 }
 ?></td></tr>
 </table>
-</body>
-</html>
+</div>

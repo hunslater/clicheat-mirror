@@ -1,303 +1,245 @@
 <?php
 /**
- * ClickHeat : Fichier de résultats / Results file
+ * ClickHeat : Fichier principal / Main file
  * 
  * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
  * @since 27/10/2006
 **/
 
-include './config.php';
+$__action = isset($_GET['action']) && $_GET['action'] !== '' ? $_GET['action'] : 'view';
+
+/** First of all, check if we are inside PhpMyVisites */
+if (isset($_SERVER['REQUEST_URI']) && $_SERVER['SCRIPT_NAME'] !== '')
+{
+	$realPath = &$_SERVER['REQUEST_URI'];
+}
+elseif (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] !== '')
+{
+	$realPath = &$_SERVER['SCRIPT_NAME'];
+}
+else
+{
+	exit(LANG_UNKNOWN_DIR);
+}
+if (substr($realPath, -1, 1) === '/')
+{
+	header('Location: '.$realPath.'index.php');
+	exit;
+}
+
+if (!defined('INCLUDE_PATH'))
+{
+	define('CLICKHEAT_PATH', rtrim(dirname($realPath), '/').'/');
+	define('CLICKHEAT_INDEX_PATH', rtrim(dirname($realPath), '/').'/index.php?');
+	define('CLICKHEAT_ROOT', './');
+	define('IS_PHPMV_MODULE', false);
+}
+else
+{
+	define('CLICKHEAT_PATH', rtrim(dirname($realPath), '/').'/libs/clickheat/');
+	define('CLICKHEAT_INDEX_PATH', rtrim(dirname($realPath), '/').'/index.php?mod=view_clickheat&');
+	define('CLICKHEAT_ROOT', INCLUDE_PATH.'/libs/clickheat/');
+	define('IS_PHPMV_MODULE', true);
+}
+
+/** Improve buffer usage and compression */
+if (function_exists('ob_start') && IS_PHPMV_MODULE === false)
+{
+	if (function_exists('ob_gzhandler'))
+	{
+		ob_start('ob_gzhandler');
+	}
+	else
+	{
+		ob_start();
+	}
+}
 
 /** Loading language according to browser's Accept-Language */
 $lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2)) : '';
-if (!in_array($lang, $availableLanguages))
+if (!in_array($lang, array('fr', 'en', 'ru')))
 {
-	$lang = $availableLanguages[0];
+	$lang = 'en';
 }
-include './lang.'.$lang.'.php';
+define('CLICKHEAT_LANGUAGE', $lang);
+unset($lang);
+include CLICKHEAT_ROOT.'languages/'.CLICKHEAT_LANGUAGE.'.php';
 
-/** Login check */
-include './login.php';
+/** If there's no config file, run check script */
+if (!file_exists(CLICKHEAT_ROOT.'config/config.php'))
+{
+	if ($__action !== 'check' && $__action !== 'config')
+	{
+		$__action = 'check';
+	}
+}
+else
+{
+	include CLICKHEAT_ROOT.'config/config.php';
 
-/** Against people that just don't understand that a demo is not a tool to promote their url... */
-$demoServer = strpos($_SERVER['SERVER_NAME'], 'www.labsmedia.com') !== false;
-
-/** Input variables */
-$page = isset($_GET['page']) ? $_GET['page'] : '';
-$screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
-$width = isset($_GET['width']) ? (int) $_GET['width'] : 0;
-$browser = isset($_GET['browser']) ? $_GET['browser'] : '';
-$heatmap = isset($_GET['heatmap']);
-$savePage = isset($_GET['savePage']);
-
-/** List of available pages */
-$selectPages = '';
-$d = @dir(CLICKHEAT_LOGPATH);
-if ($d === false)
-{
-	echo LANG_ERROR_DIRECTORY;
-	die();
-}
-while (($file = $d->read()) !== false)
-{
-	if (strpos($file, '.') !== false) continue;
-	if ($page === '')
+	/** Login check */
+	if (IS_PHPMV_MODULE === true)
 	{
-		$page = $file;
+		/** Consider that we are already logged */
+		define('CLICKHEAT_ADMIN', true);
 	}
-	if ($page === $file)
+	elseif (isset($_COOKIE['clickheat']))
 	{
-		$selectPages .= '<option value="'.$file.'" selected="selected">'.$file.'</option>';
-	}
-	else
-	{
-		$selectPages .= '<option value="'.$file.'">'.$file.'</option>';
-	}
-}
-$d->close();
-$webPage = '';
-if ($page !== '')
-{
-	$webPage = isset($_GET['webpage']) && is_array($_GET['webpage']) && count($_GET['webpage']) === 4 && $_GET['webpage'][0] !== '' ? $_GET['webpage'][0].'>'.((int) $_GET['webpage'][1]).'>'.((int) $_GET['webpage'][2]).'>'.((int) $_GET['webpage'][3]) : '';
-	if ($demoServer === false && $webPage !== '' && $savePage === true)
-	{
-		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'w');
-		fputs($f, $webPage);
-		fclose($f);
-	}
-	if (file_exists(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%'))
-	{
-		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/%%url.txt%%', 'r');
-		$webPage = trim(fgets($f, 1024));
-		fclose($f);
-	}
-	else
-	{
-		$webPage = '';
-	}
-}
-$webPage = explode('>', $webPage);
-if (count($webPage) !== 4)
-{
-	$webPage = array('../', 0, 0, 0);
-}
-$webPage[1] = (int) $webPage[1];
-$webPage[2] = (int) $webPage[2];
-$webPage[3] = (int) $webPage[3];
-
-/** Date and days */
-$date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
-$date2 = isset($_GET['date2']) ? date('Y-m-d', strtotime($_GET['date2'])) : '1970-01-01';
-if ($date === '1970-01-01')
-{
-	if ($demoServer === true)
-	{
-		$date = date('Y-m-d', time() - 86400);
-	}
-	else
-	{
-		$date = date('Y-m-d');
-	}
-}
-if ($date2 === '1970-01-01')
-{
-	$date2 = $date;
-}
-
-asort($screenSizes);
-/** Width of display */
-$selectWidths = '';
-if (!in_array($width, $screenSizes))
-{
-	/** Looking for the closest width in the list */
-	$futureWidth = 0;
-	for ($i = 0; $i < count($screenSizes) - 1; $i++)
-	{
-		if ($width > $screenSizes[$i])
+		if ($_COOKIE['clickheat'] === $clickheatConf['adminLogin'].'||'.$clickheatConf['adminPass'])
 		{
-			$futureWidth = $screenSizes[$i + 1];
+			/** Everything is fine, admin logged */
+			define('CLICKHEAT_ADMIN', true);
 		}
-	}
-	$width = $futureWidth;
-	unset($futureWidth);
-}
-for ($i = 1; $i < count($screenSizes); $i++)
-{
-	$selectWidths .= '<option value="'.$screenSizes[$i].'"'.($screenSizes[$i] === $width ? ' selected="selected"' : '').'>'.$screenSizes[$i].'px</option>';
-}
-
-/** Screen sizes */
-$selectScreens = '';
-if (!in_array($screen, $screenSizes))
-{
-	$screen = $width;
-}
-for ($i = 0; $i < count($screenSizes); $i++)
-{
-	$selectScreens .= '<option value="'.$screenSizes[$i].'"'.($screenSizes[$i] === $screen ? ' selected="selected"' : '').'>'.($screenSizes[$i] === 0 ? LANG_ALL : $screenSizes[$i].'px').'</option>';
-}
-
-/** Browsers */
-$selectBrowsers = '';
-if (!isset($browsersList[$browser]))
-{
-	$browser = 'all';
-}
-foreach ($browsersList as $label => $name)
-{
-	$selectBrowsers .= '<option value="'.$label.'"'.($label === $browser ? ' selected="selected"' : '').'>'.($label === 'all' ? LANG_ALL : ($label === 'unknown' ? LANG_UNKNOWN : $name)).'</option>';
-}
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
-<head>
-<title><?php echo LANG_TITLE ?></title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<link rel="stylesheet" type="text/css" href="./clickheat.css" />
-</head>
-<body>
-<?php
-if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
-{
-	echo '<small class="error" style="float:right;">'.LANG_ERROR_PASSWORD.'</small>';
-}
-?>
-<span id="float-right"><a href="http://www.labsmedia.com/clickheat/"><img src="./logo.png" width="80" height="15" alt="ClickHeat" /></a></span>
-<h1><?php echo LANG_TITLE ?> : <?php echo LANG_INDEX ?> - <a href="tools.php"><?php echo LANG_TOOLS ?></a></h1>
-<form action="index.php" method="get" id="clickForm">
-<table cellpadding="0" cellspacing="1" border="0" width="100%">
-<tr>
-	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select></td><td>&nbsp;</td>
-	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /></td><td rowspan="2" valign="middle"><input type="checkbox" id="savePage" name="savePage" /> <input type="submit" onclick="document.getElementById('savePage').checked = true; return true;" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td><td rowspan="2"></td></tr><?php } ?>
-<tr>
-	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_TO ?> <input type="text" name="date2" id="formDate2" size="10" value="<?php echo $date2 ?>" /></td><td rowspan="3"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<?php if ($demoServer === false) { ?><th><?php echo LANG_LAYOUT_WIDTH ?> <acronym onmouseover="showHelp('layout');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="webpage[1]" value="<?php echo $webPage[1] ?>" size="3" /> <input type="text" name="webpage[2]" value="<?php echo $webPage[2] ?>" size="3" /> <input type="text" name="webpage[3]" value="<?php echo $webPage[3] ?>" size="3" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
-</tr>
-<tr>
-	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser"><?php echo $selectBrowsers ?></select></td>
-	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select></td><td rowspan="2" valign="middle"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-</tr>
-<tr>
-	<th><?php echo LANG_HEATMAP ?> <acronym onmouseover="showHelp('heatmap');" onmouseout="showHelp('');">?</acronym></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /></td>
-	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select></td>
-</tr>
-</table>
-</form>
-<div id="overflowDiv">
-	<div id="helpDiv"></div>
-	<div id="pngDiv"></div>
-	<p><iframe src="<?php echo $webPage[0] ?>" id="webPageFrame" onload="cleanIframe();" frameborder="0" scrolling="no" width="<?php echo $width - 40 ?>" height="100"></iframe></p>
-</div>
-<!--[if lt IE 7.]>
-<script defer type="text/javascript">var correctPng = true;</script>
-<![endif]-->
-<script type="text/javascript">
-var correctPng = (correctPng == undefined ? false : true);
-/** Resize the main div to the height of the current page */
-oD = document.documentElement != undefined && document.documentElement.clientHeight != 0 ? document.documentElement : document.body;
-iH = oD.innerHeight != undefined ? oD.innerHeight : oD.clientHeight;
-document.getElementById('overflowDiv').style.height = (iH < 300 ? 400 : iH) - 130 + 'px';
-/** Width of main display */
-iW = oD.innerWidth != undefined ? oD.innerWidth : oD.clientWidth;
-<?php
-/** Must reload if width is not defined */
-if ($width === 0 && !isset($_GET['width'])) {
-	echo 'window.location.href = \'index.php?width=\' + (iW < 300 ? 400 : iW); </script></body></html>';
-	exit;
-}
-?>
-
-/** Ajax requests to update PNGs */
-document.getElementById('pngDiv').innerHTML = '&nbsp;<br style="line-height:20px" /><span class="error"><?php echo addslashes(LANG_ERROR_LOADING); ?></span>';
-try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
-catch (e)
-{
-	try { xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");	}
-	catch (oc) { xmlhttp = null; }
-}
-if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
-xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&date2=' + document.getElementById('formDate2').value + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
-xmlhttp.onreadystatechange = function()
-{
-	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
-	{
-		document.getElementById('pngDiv').innerHTML = xmlhttp.responseText;
-		document.getElementById('webPageFrame').height = document.getElementById('pngDiv').offsetHeight < 100 ? 100 : document.getElementById('pngDiv').offsetHeight;
-		/**
-		* Correctly handle PNG transparency in Win IE 5.5 & 6. http://homepage.ntlworld.com/bobosola. Updated 18-Jan-2006.
-		* I've modified it a lot to meet my needs :-)
-		**/
-		if (correctPng == false) return true;
-
-		var arVersion = navigator.appVersion.split("MSIE");
-		var version = parseFloat(arVersion[1]);
-		if (version < 5.5 || document.body.filters == undefined) return true;
-
-		for (i = 0; i < document.images.length; i++)
+		elseif ($_COOKIE['clickheat'] === $clickheatConf['viewerLogin'].'||'.$clickheatConf['viewerPass'])
 		{
-			var img = document.images[i];
-			if (img.src.search(/png\.php/) != -1)
+			/** Viewer logged, force it to 'view' action if not view|generate|png */
+			if ($__action !== 'generate' && $__action !== 'png' && $__action !== 'iframe' && $__action !== 'cleaner' && $__action !== 'logout')
 			{
-				img.outerHTML = '<span style="display:inline-block; margin-bottom:-1px; width:' + img.width + 'px; height:' + img.height + 'px; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'' + img.src + '\', sizingMethod=\'scale\');"></span>';
-				i--;
+				$__action = 'view';
 			}
 		}
-	}
-}
-xmlhttp.send(null);
-
-/** Hide iframe's flashes and iframes */
-function cleanIframe()
-{
-	try
-	{
-		var currentIframe = document.getElementById('webPageFrame');
-		if (currentIframe.contentDocument)
+		else
 		{
-			currentIframeContent = currentIframe.contentDocument;
+			/** Not logged, send him to login form */
+			$__action = 'logout';
 		}
-		else if (currentIframe.Document)
-		{
-			currentIframeContent = currentIframe.Document;
-		}
-		/** Hide iframes and flashes content */
-		if (currentIframeContent != undefined)
-		{
-			aIframes = currentIframeContent.body.getElementsByTagName('iframe');
-			for (i = 0; i < aIframes.length; i++)
-			{
-				aIframes[i].src='';
-			}
-			aFlashes = currentIframeContent.body.getElementsByTagName('object');
-			for (i = 0; i < aFlashes.length; i++)
-			{
-				aFlashes[i].src='';
-			}
-		}
-	}
-	catch(e) {}
-}
-
-/** Show contextual help */
-var helpText = new Array();
-<?php
-foreach ($__jsHelp as $key => $text)
-{
-	echo 'helpText[\'', $key, '\'] = \'', addslashes($text), '\';';
-}
-?>
-function showHelp(id)
-{
-	if (id == '')
-	{
-		document.getElementById('helpDiv').style.display = 'none';
 	}
 	else
 	{
-		document.getElementById('helpDiv').innerHTML = helpText[id];
-		document.getElementById('helpDiv').style.display = 'block';
+		if (isset($_POST['login']) && isset($_POST['pass']))
+		{
+			if ($_POST['login'] === $clickheatConf['adminLogin'] && md5($_POST['pass']) === $clickheatConf['adminPass'])
+			{
+				/** Set a session cookie */
+				setcookie('clickheat', $clickheatConf['adminLogin'].'||'.$clickheatConf['adminPass'], 0, '/');
+				/** Redirect to index.php */
+				header('Content-Type: text/html');
+				header('Location: index.php?action=view');
+				exit;
+			}
+			elseif ($clickheatConf['viewerLogin'] !== '' && $_POST['login'] === $clickheatConf['viewerLogin'] && md5($_POST['pass']) === $clickheatConf['viewerPass'])
+			{
+				/** Set a session cookie */
+				setcookie('clickheat', $clickheatConf['viewerLogin'].'||'.$clickheatConf['viewerPass'], 0, '/');
+				/** Redirect to index.php */
+				header('Content-Type: text/html');
+				header('Location: index.php?action=view');
+				exit;
+			}
+		}
+		$__action = 'login';
 	}
 }
-</script>
-</body>
-</html>
+if (!defined('CLICKHEAT_ADMIN'))
+{
+	define('CLICKHEAT_ADMIN', false);
+}
+
+/** Specific definitions */
+$__screenSizes = array(0 /** Must start with 0 */, 640, 800, 1024, 1280, 1600, 1800);
+$__browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet Explorer', 'safari' => 'Safari', 'opera' => 'Opera', 'kmeleon' => 'K-meleon', 'unknown' => '');
+define('CLICKHEAT_LOW_COLOR', 0); /** Niveau minimal de couleur RVB / Lower RGB level of color */
+define('CLICKHEAT_HIGH_COLOR', 255); /** Niveau maximal de couleur RVB / Higher RGB level of color */
+define('CLICKHEAT_GREY_COLOR', 240); /** Niveau du gris (couleur du 0 clic) / Grey level (color of no-click) */
+$__colorLevels = array(50, 70, 90, 110, 120); /** Dégradé de couleurs, 5 valeurs entre 0 et 127 / Color gradient, 5 values between 0 and 127 */
+
+switch ($__action)
+{
+	case 'check':
+	case 'config':
+	case 'view':
+	case 'login':
+		{
+			header('Content-Type: text/html; charset=utf-8');
+			if (IS_PHPMV_MODULE === false) include CLICKHEAT_ROOT.'header.php';
+			include CLICKHEAT_ROOT.$__action.'.php';
+			if (IS_PHPMV_MODULE === false) include CLICKHEAT_ROOT.'footer.php';
+			break;
+		}
+	case 'generate':
+	case 'layout':
+	case 'javascript':
+	case 'latest':
+	case 'cleaner':
+		{
+			header('Content-Type: text/html; charset=utf-8');
+			include CLICKHEAT_ROOT.$__action.'.php';
+			break;
+		}
+	case 'iframe':
+		{
+			$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
+			if (is_dir($clickheatConf['logPath'].$page))
+			{
+				$webPage = array('/');
+				if (file_exists($clickheatConf['logPath'].$page.'/%%url.txt%%'))
+				{
+					$f = @fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'r');
+					if ($f !== false)
+					{
+						$webPage = explode('>', trim(fgets($f, 1024)));
+						fclose($f);
+					}
+				}
+				echo $webPage[0];
+			}
+			break;
+		}
+	case 'png':
+		{
+			$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
+			$date = isset($_GET['date']) ? str_replace(array('.', '/'), array('', ''), $_GET['date']) : '1970-01-01';
+			$range = isset($_GET['range']) && in_array($_GET['range'], array('d', 'w', 'm')) ? $_GET['range'] : 'd';
+			$browser = isset($_GET['browser']) && isset($browsersList[$_GET['browser']]) ? $_GET['browser'] : 'all';
+			$screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
+			$image = isset($_GET['image']) ? (int) $_GET['image'] : 0;
+			$heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap'] : 0;
+
+			$imagePath = $clickheatConf['logPath'].$page.'/%%'.$date.'-'.$range.'-'.$screen.'-'.$browser.'-'.$heatmap.'-'.$image.'.png%%';
+
+			header('Content-Type: image/png');
+			if (file_exists($imagePath))
+			{
+				readfile($imagePath);
+			}
+			else
+			{
+				readfile(CLICKHEAT_ROOT.'images/warning.png');
+			}
+			break;
+		}
+	case 'layoutupdate':
+		{
+			$page = isset($_GET['page']) ? str_replace(array('.', '/'), array('', ''), $_GET['page']) : '';
+			$url = isset($_GET['url']) ? $_GET['url'] : '';
+			$left = isset($_GET['left']) ? (int) $_GET['left'] : 0;
+			$center = isset($_GET['center']) ? (int) $_GET['center'] : 0;
+			$right = isset($_GET['right']) ? (int) $_GET['right'] : 0;
+
+			if (!is_dir($clickheatConf['logPath'].$page) || $url === '')
+			{
+				exit('Error');
+			}
+
+			$f = @fopen($clickheatConf['logPath'].$page.'/%%url.txt%%', 'w');
+			fputs($f, $url.'>'.$left.'>'.$center.'>'.$right);
+			fclose($f);
+
+			echo 'OK';
+			break;
+		}
+	case 'logout':
+		{
+			setcookie('clickheat', '', time() - 30 * 86400, '/');
+			header('Location: index.php');
+			exit;
+			break;
+		}
+	default:
+		{
+			header('HTTP/1.0 404 Not Found');
+			exit('Error, page not found');
+			break;
+		}
+}
+?>

@@ -1,0 +1,101 @@
+<?php
+/**
+ * ClickHeat : Fichier de langue : français
+ * 
+ * @author Yvan Taviaud - LabsMedia - www.labsmedia.com
+ * @since 27/10/2006
+**/
+
+define('LANG_USER', 'Utilisateur');
+define('LANG_PASSWORD', 'Mot de passe');
+define('LANG_LOGIN', 'Connexion');
+define('LANG_LOGIN_ERROR', 'Connexion impossible, mauvais utilisateur ou mot de passe');
+define('LANG_LOGOUT', 'Déconnexion');
+define('LANG_UNKNOWN_DIR', 'Impossible de déterminer le répertoire courant, merci de nous contacter');
+define('LANG_DAYS', 'L,M,M,J,V,S,D');
+define('LANG_RANGE', 'Jour,Semaine,Mois');
+define('LANG_MONTHS', '0,Janvier,Février,Mars,Avril,Mai,Juin,Juillet,Août,Septembre,Octobre,Novembre,Décembre');
+define('LANG_GROUP', 'Groupe');
+define('LANG_BROWSER', 'Navigateur');
+define('LANG_ALL', 'Tous');
+define('LANG_UNKNOWN', 'Autres/inconnus');
+define('LANG_EXAMPLE_URL', 'Adresse internet associée');
+define('LANG_LAYOUT', 'Mise en page du groupe');
+define('LANG_LAYOUT_FIXED', 'Contenu/menu fixe');
+define('LANG_LAYOUT_LIQUID', 'Contenu/menu, liquide (adaptation à la place disponible)');
+define('LANG_LAYOUT_NONE', 'Marge (pas de contenu), liquide');
+define('LANG_LAYOUT_0', 'Contenu et menu liquide');
+define('LANG_LAYOUT_1', 'Menu gauche fixe, contenu liquide');
+define('LANG_LAYOUT_2', 'Contenu centré fixe (marges droite et gauche automatiques)');
+define('LANG_LAYOUT_3', 'Contenu fixe collé à gauche (marge de droite automatique)');
+define('LANG_LAYOUT_4', 'Menu droit fixe, contenu liquide');
+define('LANG_LAYOUT_5', 'Menus gauche et droit fixes, contenu liquide');
+define('LANG_LAYOUT_6', 'Contenu fixe collé à droite (marge de gauche automatique)');
+define('LANG_LAYOUT_LEFT', 'Largeur fixe de gauche (pixels)');
+define('LANG_LAYOUT_CENTER', 'Largeur fixe centrale (pixels)');
+define('LANG_LAYOUT_RIGHT', 'Largeur fixe de droite (pixels)');
+define('LANG_SCREENSIZE', 'Taille d\'écran');
+define('LANG_HEATMAP', 'Carte de chaleur/Transparence');
+define('LANG_LATEST_CHECK', 'Mise à jour');
+define('LANG_LATEST_KO', 'Impossible de connaître la dernière version disponible. Vous pouvez consulter la dernière version sur notre site :');
+define('LANG_LATEST_OK', 'Vous avez la dernière version disponible (%s)');
+define('LANG_LATEST_NO', 'Votre version (%s) n\'est pas la toute dernière disponible (%s). Vous pouvez télécharger la nouvelle version en vous rendant sur notre site :');
+define('LANG_JAVASCRIPT', 'Code Javascript à coller sur les pages que vous voulez étudier');
+define('LANG_JAVASCRIPT_IMAGE', 'Afficher le logo ClickHeat sur la page étudiée : ');
+define('LANG_JAVASCRIPT_QUOTA', 'Limite maximum de clics par page et par visiteur, les clics suivants ne seront pas comptabilisés (0 = pas de limite, 3 est un bon compromis)');
+define('LANG_JAVASCRIPT_PAGE', 'Nom de groupe, pour regrouper les pages similaires pour une analyse simplifiée');
+define('LANG_JAVASCRIPT_PAGE1', 'utiliser un mot-clé (remplacez <span class="error">ABC</span> par votre mot-clé, caractères autorisés : A-Z, 0-9, souligné, tiret)');
+define('LANG_JAVASCRIPT_PAGE2', 'utiliser le titre de la page (<a href="http://www.labsmedia.fr/clickheat/performance.html" target="_blank">vivement déconseillé</a>)');
+define('LANG_JAVASCRIPT_PAGE3', 'utiliser l\'adresse de la page (<a href="http://www.labsmedia.fr/clickheat/performance.html" target="_blank">vivement déconseillé</a>)');
+define('LANG_JAVASCRIPT_PASTE', 'Copiez et collez le code ci-dessous sur vos pages, juste avant la fin de la page (avant le tag &lt;/body&gt;) :');
+define('LANG_JAVASCRIPT_DEBUG', 'Une fois le code copié sur vos pages, n\'oubliez pas de tester si le code marche bien, en appelant votre page avec le paramètre <span class="error">debugclickheat</span>. Par exemple pour http://www.site.com/index.html appelez http://www.site.com/index.html<span class="error">?debugclickheat</span>. Vous devrez alors voir une alerte javascript vous indiquant l\'état de Clickheat (en anglais). En cas de problème, n\'hésitez pas à nous contacter');
+define('LANG_NO_CLICK_BELOW', utf8_decode('Pas de clics enregistrés en-dessous de cette ligne'));
+define('LANG_ERROR_GROUP', 'Ce groupe est inconnu. _JAVASCRIPT_');
+define('LANG_ERROR_DATA', 'Pas d\'enregistrements pour la période choisie. _JAVASCRIPT_');
+define('LANG_ERROR_JAVASCRIPT', 'Avez-vous correctement installé le code javascript sur vos pages ?');
+define('LANG_ERROR_FILE', 'Impossible d\'ouvrir le fichier de suivi');
+define('LANG_ERROR_MEMORY', 'Limite mémoire non disponible, merci de jeter un oeil à config.php');
+define('LANG_ERROR_SCREEN', 'Taille d\'écran non conforme');
+define('LANG_ERROR_LOADING', 'Création de l\'image en cours, patience...');
+define('LANG_ERROR_FIXED', 'Toutes les largeurs sont fixes, ce qui est impossible. Merci de changer une des largeurs de votre mise en page ci-dessus.');
+define('LANG_DEFAULT', 'par défaut ');
+define('LANG_CHECKS', 'Vérifications préliminaires');
+define('LANG_CHECK_WRITABLE', 'Droits d\'écriture dans le répertoire de configuration');
+define('LANG_CHECK_NOT_WRITABLE', 'PHP n\'a pas les droits d\'écriture dans le répertoire de configuration. Cela n\'empêchera pas l\'application de fonctionner, mais il est plus simple de mettre à jour la configuration si le répertoire est accessible en écriture.');
+define('LANG_CHECK_GD', 'Librairie graphique GD');
+define('LANG_CHECK_GD_IMG', 'imagecreatetruecolor() non disponible, impossible de créer des images (de bonne qualité), vérifiez que GD est installé');
+define('LANG_CHECK_GD_ALPHA', 'imagecolorallocatealpha() non disponible, impossible de créer des images transparentes (nécessaire pour faire les cartes de température)');
+define('LANG_CHECK_GD_PNG', 'imagepng() non disponible, impossible de créer des images au format PNG, désolé');
+define('LANG_CHECKS_OK', 'Étape suivante : configuration');
+define('LANG_CHECKS_KO', 'Un ou plusieurs tests ont échoué. Corrigez les problèmes et rafraîchissez la page.');
+define('LANG_CONFIG', 'Configuration');
+define('LANG_CONFIG_LOGPATH', 'Répertoire des fichiers de suivi');
+define('LANG_CONFIG_LOGPATH_MKDIR', 'Impossible de créer le répertoire des fichiers de suivi, merci de le créer vous-même et de lui donner les droits d\'écriture pour l\'utilisateur PHP');
+define('LANG_CONFIG_CHECK', 'Vérifier la configuration');
+define('LANG_CONFIG_MEMORY', 'Limite mémoire (en Mo)');
+define('LANG_CONFIG_MEMORY_KO', 'vous devez préciser une limite mémoire non nulle, dans le doute mettez 8. Le php.ini donne :');
+define('LANG_CONFIG_STEP', 'Groupement des clics par zone de X*X pixels (accélère l\'affichage des cartes de température)');
+define('LANG_CONFIG_STEP_KO', 'les zones ne peuvent pas être en deçà de 1x1 pixels');
+define('LANG_CONFIG_DOT', 'Taille en pixels des points sur les cartes de température');
+define('LANG_CONFIG_DOT_KO', 'la taille du point ne peut être nulle');
+define('LANG_CONFIG_PALETTE', 'Si vous voyez des carrés rouges sur les cartes de température cochez cette case');
+define('LANG_CONFIG_HEATMAP', 'Afficher la carte de température par défaut (plutôt que la carte des clics)');
+define('LANG_CONFIG_YESTERDAY', 'Afficher les statistiques d\'hier au démarrage (plutôt que celle d\'aujourd\'hui)');
+define('LANG_CONFIG_ALPHA', 'Niveau de transparence (0 => 100)');
+define('LANG_CONFIG_FLUSH', 'Effacement automatique des statistiques datant de plus de X jours (mettre 0 conserve tous les fichiers, ce qui est vivement déconseillé)');
+define('LANG_CONFIG_START', 'Premier jour de la semaine');
+define('LANG_CONFIG_START_M', 'Lundi');
+define('LANG_CONFIG_START_S', 'Dimanche');
+define('LANG_CONFIG_ADMIN_LOGIN', 'Identifiant administrateur');
+define('LANG_CONFIG_ADMIN_PASS', 'Mot de passe administrateur (tapez-le 2 fois)');
+define('LANG_CONFIG_VIEWER_LOGIN', 'Identifiant visiteur (si vide, compte visiteur inactif)');
+define('LANG_CONFIG_VIEWER_PASS', 'Mot de passe visiteur (tapez-le 2 fois)');
+define('LANG_CONFIG_LOGIN', 'l\'identifiant doit contenir au moins 4 caractères');
+define('LANG_CONFIG_PASS', 'le mot de passe est vide');
+define('LANG_CONFIG_MATCH', 'les mots de passe sont différents');
+define('LANG_CONFIG_DL', 'Le répertoire de configuration n\'étant pas accessible en écriture, veuillez sauvez le fichier de configuration dans le répertoire "/config/"');
+define('LANG_CONFIG_DOWNLOAD', 'Télécharger le fichier de configuration');
+define('LANG_CONFIG_SAVE', 'Sauvegarder la configuration');
+define('LANG_CLEANER_RUNNING', 'Nettoyage en cours...');
+define('LANG_CLEANER_RUN', 'Nettoyage terminé : %d fichiers et %d répertoires ont été effacés');
+?>
