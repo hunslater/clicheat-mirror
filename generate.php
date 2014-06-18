@@ -12,6 +12,13 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 	exit;
 }
 
+if (IS_PIWIK_MODULE === true)
+{
+	$clickheatConf = &Piwik_ClickHeat_Controller::$conf;
+	$__screenSizes = &Piwik_ClickHeat_Controller::$conf['__screenSizes'];
+	$__browsersList = &Piwik_ClickHeat_Controller::$conf['__browsersList'];
+}
+
 /** Main class */
 include CLICKHEAT_ROOT.'classes/Heatmap.class.php';
 include CLICKHEAT_ROOT.'classes/HeatmapFromClicks.class.php';

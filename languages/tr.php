@@ -7,6 +7,12 @@
  * @since 01/04/2008
 **/
 
+/** Fix for Piwik bad behaviour */
+if (defined('LANG_USER'))
+{
+	return true;
+}
+
 define('LANG_USER', 'Kullanıcı Adı');
 define('LANG_PASSWORD', 'Şifre');
 define('LANG_LOGIN', 'Oturum aç');

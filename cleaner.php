@@ -12,10 +12,18 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 	exit;
 }
 
+$debug = isset($_GET['debug']);
+
 if (CLICKHEAT_ADMIN === false)
 {
 	return false;
 }
+
+if (IS_PIWIK_MODULE === true)
+{
+	$clickheatConf = &Piwik_ClickHeat_Controller::$conf;
+}
+
 $deletedFiles = 0;
 $deletedDirs = 0;
 /**
@@ -26,7 +34,7 @@ if ($clickheatConf['flush'] !== 0 && is_dir($clickheatConf['logPath']) === true)
 	$logDir = dir($clickheatConf['logPath'].'/');
 	while (($dir = $logDir->read()) !== false)
 	{
-		if ($dir === '.' || $dir === '..' || !is_dir($logDir->path.$dir))
+		if ($dir[0] === '.' || !is_dir($logDir->path.$dir))
 		{
 			continue;
 		}
@@ -34,9 +42,13 @@ if ($clickheatConf['flush'] !== 0 && is_dir($clickheatConf['logPath']) === true)
 		$d = dir($logDir->path.$dir.'/');
 		$deletedAll = true;
 		$oldestDate = mktime(0, 0, 0, date('m'), date('d') - $clickheatConf['flush'], date('Y'));
+		if ($debug === true)
+		{
+			echo 'directory: "', $dir, '"<br/>';
+		}
 		while (($file = $d->read()) !== false)
 		{
-			if ($file === '.' || $file === '..' || $file === 'url.txt')
+			if ($file[0] === '.' || $file === 'url.txt')
 			{
 				continue;
 			}
@@ -47,6 +59,10 @@ if ($clickheatConf['flush'] !== 0 && is_dir($clickheatConf['logPath']) === true)
 				continue;
 			}
 			$filemtime = filemtime($d->path.$file);
+			if ($debug === true)
+			{
+				echo '&nbsp;&nbsp;file: "', $file, '" ', ($filemtime - $oldestDate), ' seconds left (about ', ceil(($filemtime - $oldestDate) / 86400), ' days left)<br/>';
+			}
 			if ($ext[1] === 'log' && $filemtime <= $oldestDate)
 			{
 				@unlink($d->path.$file);
@@ -69,14 +85,20 @@ if ($clickheatConf['flush'] !== 0 && is_dir($clickheatConf['logPath']) === true)
 }
 
 /**
- * Clean the cache directory for every file older than 2 minutes
+ * Clean the cache directory for every file older than 1 day
 **/
 if (is_dir($clickheatConf['cachePath']) === true)
 {
+	if ($debug === true)
+	{
+		echo '<br/>cache directory:<br/>';
+	}
+	$time = isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+	$time -= 86400;
 	$d = dir($clickheatConf['cachePath'].'/');
 	while (($file = $d->read()) !== false)
 	{
-		if ($file === '.' || $file === '..')
+		if ($file[0] === '.')
 		{
 			continue;
 		}
@@ -86,6 +108,10 @@ if (is_dir($clickheatConf['cachePath']) === true)
 			continue;
 		}
 		$filemtime = filemtime($d->path.$file);
+		if ($debug === true)
+		{
+			echo '&nbsp;&nbsp;file: "', $file, '" ', ($filemtime - $time), ' seconds left<br/>';
+		}
 		switch ($ext[1])
 		{
 			case 'html':
@@ -93,7 +119,7 @@ if (is_dir($clickheatConf['cachePath']) === true)
 			case 'png_temp':
 			case 'png_log':
 				{
-					if ($filemtime + 86400 < time())
+					if ($filemtime < $time)
 					{
 						@unlink($d->path.$file);
 						$deletedFiles++;

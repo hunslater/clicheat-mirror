@@ -14,6 +14,10 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 
 $group = isset($_GET['group']) ? str_replace('/', '', $_GET['group']) : '';
 
+if (IS_PIWIK_MODULE === true)
+{
+	$clickheatConf = &Piwik_ClickHeat_Controller::$conf;
+}
 if (file_exists($clickheatConf['logPath'].$group.'/url.txt'))
 {
 	$f = @fopen($clickheatConf['logPath'].$group.'/url.txt', 'r');

@@ -24,7 +24,7 @@ if ($f === false || is_null($f))
 }
 else
 {
-	fputs($f, "GET /clickheat/VERSION HTTP/1.1\r\nHost: www.labsmedia.com\r\n");
+	fputs($f, "GET /admin/clickheat/VERSION HTTP/1.1\r\nHost: www.labsmedia.com\r\n");
 	fputs($f, "Connection: close\r\n\r\n");
 	while (!feof($f) && trim(fgets($f)) !== '') {}
 	$latest = trim(fgets($f));

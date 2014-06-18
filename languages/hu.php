@@ -6,6 +6,12 @@
  * @since 08/11/2009
 **/
 
+/** Fix for Piwik bad behaviour */
+if (defined('LANG_USER'))
+{
+	return true;
+}
+
 define('LANG_USER', 'Felhasználónév');
 define('LANG_PASSWORD', 'Jelszó');
 define('LANG_LOGIN', 'Bejelentkezés');

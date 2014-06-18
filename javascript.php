@@ -21,7 +21,7 @@ if (!defined('CLICKHEAT_LANGUAGE'))
 <tr><td><?php echo LANG_JAVASCRIPT_SITE ?></td><td><input type="text" name="js-site" id="jsSite" value="" size="15" maxlength="50" onchange="updateJs();" onkeyup="updateJs();" /></td></tr>
 <?php endif; ?>
 <tr><td><?php echo LANG_JAVASCRIPT_GROUP ?></td><td>
-	<input type="radio" name="jsRadioGroup" id="jsGroup1" value="0" checked="checked" onclick="updateJs();" /> <?php echo LANG_JAVASCRIPT_GROUP0 ?> <input type="text" name="js-group" id="jsGroup" size="15" maxlength="50" value="index" onchange="updateJs();" onkeyup="updateJs();" /> (<?php echo LANG_JAVASCRIPT_GROUP1 ?>) <br />
+	<input type="radio" name="jsRadioGroup" id="jsGroup1" value="0" checked="checked" onclick="updateJs();" /> <?php echo LANG_JAVASCRIPT_GROUP0 ?> <input type="text" name="js-group" id="jsGroup" size="15" maxlength="50" value="group1" onchange="updateJs();" onkeyup="updateJs();" /> (<?php echo LANG_JAVASCRIPT_GROUP1 ?>) <br />
 	<input type="radio" name="jsRadioGroup" id="jsGroup2" value="1" onclick="updateJs();" /> <?php echo LANG_JAVASCRIPT_GROUP2 ?><br />
 	<input type="radio" name="jsRadioGroup" id="jsGroup3" value="2" onclick="updateJs();" /> <?php echo LANG_JAVASCRIPT_GROUP3 ?></td></tr>
 <tr><td><?php echo LANG_JAVASCRIPT_QUOTA ?></td><td><input type="text" name="js-quota" id="jsQuota" value="0" size="3" onchange="updateJs();" onkeyup="updateJs();" /></td></tr>

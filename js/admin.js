@@ -231,11 +231,11 @@ function updateJs()
 	str += scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;' + addReturn;
 	if (language == 'fr')
 	{
-		linkList = ['&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportementale des internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportement internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Outils d\'analyse d\'audience&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Carte température page web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse des clics&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation de l\'ergonomie&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation ergonimique&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils marketing&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils référencement&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Monétisation de contenu&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de site&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Marketing web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils seo&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils open source&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster gratuits&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils gratuits webmaster&lt;/a&gt;'];
+		linkList = ['&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportementale des internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportement internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Outils d\'analyse d\'audience&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Carte température page web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse des clics&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation de l\'ergonomie&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation ergonimique&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils marketing&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils référencement&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Monétisation de contenu&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de site&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Marketing web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils seo&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils open source&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster gratuits&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils gratuits webmaster&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Cloud Computing Center&lt;/a&gt;'];
 	}
 	else
 	{
-		linkList = ['&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Traffic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Click analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Surfer navigation analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Navigational analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Landing page optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Ergonomy optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Web design optimisation&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Heat map generator&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source heat map&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source traffic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Webmaster tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Free marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Seo tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Traffic optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Traffic monetization&lt;/a&gt;'];
+		linkList = ['&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Traffic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Click analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Surfer navigation analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Navigational analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Landing page optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Ergonomy optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Web design optimisation&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Heat map generator&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source heat map&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source traffic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Webmaster tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Free marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Seo tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Traffic optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Traffic monetization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Cloud Computing Center&lt;/a&gt;'];
 	}
 	if (document.getElementById('jsShowImage').checked)
 	{
@@ -251,7 +251,7 @@ function updateJs()
 	/** Piwik form */
 	if (isPiwikModule == true)
 	{
-		str += document.getElementById('siteSelection').idSite.value;
+		str += piwik.idSite;
 	}
 	else
 	{
@@ -405,7 +405,7 @@ function cleanIframe()
 			if (width == null) width = [0, 300];
 			height = found.match(/height=[^0-9]*(\d+)/);
 			if (height == null) height = [0, 150];
-			newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #f00; background-color:#faa; font-size:0;">&nbsp;</span>&nbsp;' + newContent.substring(pos2, newContent.length);
+			newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #00f; background-color:#aaf; font-size:0;">Flash/Iframe</span>&nbsp;' + newContent.substring(pos2, newContent.length);
 			oldPos = pos;
 		}
 		currentIframeContent.body.innerHTML = newContent;
@@ -470,7 +470,7 @@ function runCleaner()
 			else
 			{
 				document.getElementById('cleaner').innerHTML = xmlhttp.responseText;
-				setTimeout("document.getElementById('cleaner').innerHTML = '';", 10000);
+				setTimeout("document.getElementById('cleaner').innerHTML = '';", 3000);
 			}
 		}
 	}
@@ -497,14 +497,15 @@ function showLatestVersion()
 /** Shows main panel */
 function showPanel()
 {
-	var div = isPiwikModule ? 'contenu' : 'adminPanel';
+	var div = (isPiwikModule == true ? 'contenu' : 'adminPanel');
 	if (document.getElementById(div).style.display != 'none')
 	{
 		return true;
 	}
-	if (isPiwikModule)
+	if (isPiwikModule == true)
 	{
-		document.getElementById('loggued').style.display = 'block';
+		document.getElementById('topBars').style.display = 'block';
+		document.getElementById('header').style.display = 'block';
 	}
 	document.getElementById(div).style.display = 'block';
 	document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-up.png" width="11" height="6" alt="" />';
@@ -513,10 +514,11 @@ function showPanel()
 /** Hides main panel */
 function hidePanel()
 {
-	var div = isPiwikModule ? 'contenu' : 'adminPanel';
-	if (isPiwikModule)
+	var div = (isPiwikModule == true ? 'contenu' : 'adminPanel');
+	if (isPiwikModule == true)
 	{
-		document.getElementById('loggued').style.display = 'none';
+		document.getElementById('topBars').style.display = 'none';
+		document.getElementById('header').style.display = 'none';
 	}
 	document.getElementById(div).style.display = 'none';
 	document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-down.png" width="11" height="6" alt="" />';
