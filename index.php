@@ -17,9 +17,8 @@ if (!in_array($lang, $availableLanguages))
 include './lang.'.$lang.'.php';
 
 /** Login check */
-if (CLICKHEAT_USER !== 'allow everyone' && CLICKHEAT_PASSWORD !== 'allow everyone' &&
-(!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_USER']) ||
-$_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD))
+if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
+$_SERVER['PHP_AUTH_USER'] !== CLICKHEAT_USER || $_SERVER['PHP_AUTH_PW'] !== CLICKHEAT_PASSWORD)
 {
 	header('WWW-Authenticate: Basic realm="Click Tracker"');
 	header('HTTP/1.0 401 Unauthorized');
@@ -33,7 +32,7 @@ $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
 $width = isset($_GET['width']) ? (int) $_GET['width'] : 0;
 $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
 
-/** Ask for page logs deletion */
+/** Ask for page logs deletion (and png images too) */
 if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15)) && $page !== '')
 {
 	$page = str_replace(array('.', '/'), array('', ''), $page);
@@ -44,7 +43,7 @@ if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15
 		while (($file = $d->read()) !== false)
 		{
 			if ($file === '.' || $file === '..' || $file === 'url.txt') continue;
-			$date = strtotime(str_replace('.log', '', $file));
+			$date = strtotime(substr($file, 0, 10));
 			/** The date is not valid (no reason for that, but hey, must check) */
 			if ($date === false)
 			{
@@ -73,7 +72,12 @@ if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15
 $selectPages = '';
 $firstPage = '';
 $pageExists = false;
-$d = dir(CLICKHEAT_LOGPATH);
+$d = @dir(CLICKHEAT_LOGPATH);
+if ($d === false)
+{
+	echo LANG_ERROR_DIRECTORY;
+	die();
+}
 while (($file = $d->read()) !== false)
 {
 	if (strpos($file, '.') !== false) continue;
@@ -106,7 +110,8 @@ if ($page !== '')
 	{
 		$webPage = '';
 	}
-	if (isset($_GET['webpage']) && $webPage !== $_GET['webpage'] && $_GET['webpage'] !== '')
+	/** Against people that just don't understand that a demo is not a tool to promote their url... */
+	if (isset($_GET['webpage']) && $webPage !== $_GET['webpage'] && $_GET['webpage'] !== '' && strpos($_SERVER['HOST_NAME'], '.labsmedia.com') === false && strpos($_SERVER['HOST_NAME'], '.lacoccinelle.net') === false)
 	{
 		$webPage = $_GET['webpage'];
 		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'w');
@@ -114,28 +119,45 @@ if ($page !== '')
 		fclose($f);
 	}
 }
-/** Against people that just don't understand that a demo is not a tool to promote their url... */
-if (strpos($_SERVER['HTTP_HOST'], 'www.labsmedia.com') === 0)
+if ($webPage === '')
 {
-	$webPage = 'http://www.labsmedia.com/clickheat/';
-}
-elseif ($webPage === '')
-{
-	$webPage = 'http://'.substr($_SERVER['HTTP_HOST'], 0, strpos($_SERVER['HTTP_HOST'], ':')).'/';
+	$webPage = '../';
 }
 
 /** Date */
-$date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : date('Y-m-d');
+$date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
 if ($date === '1970-01-01')
 {
-	$date = date('Y-m-d');
+	$date = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
+}
+
+asort($screenSizes);
+/** Width of display */
+$selectWidths = '';
+if (!in_array($width, $screenSizes))
+{
+	/** Looking for the closest width in the list */
+	$futureWidth = 0;
+	for ($i = 0; $i < count($screenSizes) - 1; $i++)
+	{
+		if ($width > $screenSizes[$i])
+		{
+			$futureWidth = $screenSizes[$i + 1];
+		}
+	}
+	$width = $futureWidth;
+	unset($futureWidth);
+}
+for ($i = 1; $i < count($screenSizes); $i++)
+{
+	$selectWidths .= '<option value="'.$screenSizes[$i].'"'.($screenSizes[$i] === $width ? ' selected="selected"' : '').'>'.$screenSizes[$i].'px</option>';
 }
 
 /** Screen sizes */
 $selectScreens = '';
 if (!in_array($screen, $screenSizes))
 {
-	$screen = 0;
+	$screen = $width;
 }
 for ($i = 0; $i < count($screenSizes); $i++)
 {
@@ -164,70 +186,106 @@ foreach ($browsersList as $label => $name)
 <span id="url"><a href="http://www.labsmedia.com/clickheat/"><img src="./logo.png" width="80" height="15" alt="ClickHeat" /></a></span>
 <h1><?php echo LANG_H1 ?></h1>
 <?php
-if (CLICKHEAT_USER === 'allow everyone' || CLICKHEAT_PASSWORD === 'allow everyone')
+if (CLICKHEAT_USER === 'demo' && CLICKHEAT_PASSWORD === 'demo')
 {
-	echo '<small style="background-color:red; color:white">'.LANG_ERROR_PASSWORD.'</small>';
+	echo '<small class="error">'.LANG_ERROR_PASSWORD.'</small>';
 }
 ?>
 <form action="index.php" method="get" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
-	<th><?php echo LANG_PAGE ?></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small></td>
-	<?php if (strpos($_SERVER['HTTP_HOST'], 'www.labsmedia.com') !== 0) { ?><th><?php echo LANG_EXAMPLE_URL ?></th><td><input type="text" id="webpage" name="webpage" value="<?php echo htmlentities($webPage)?>" size="30" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
+	<th><?php echo LANG_PAGE ?></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small></td>
+	<?php if (strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') === false && strpos($_SERVER['SERVER_NAME'], '.lacoccinelle.net') === false) { ?><th><?php echo LANG_EXAMPLE_URL ?></th><td><input type="text" id="webpage" name="webpage" value="<?php echo htmlentities($webPage)?>" size="30" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 <tr>
 	<th><?php echo LANG_DATE ?></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><input type="text" name="width" id="formWidth" size="4" value="<?php echo $width ?>" /> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 <tr>
-	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser" onchange="showPng();"><?php echo $selectBrowsers ?></select></td>
-	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen" onchange="showPng();"><?php echo $selectScreens ?></select></td>
+	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser"><?php echo $selectBrowsers ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 </table>
 </form>
-<div style="position:absolute; left:0; top:130px; text-align:center; width:100%; overflow:auto;" id="overflowDiv">
-	<img id="pngTag" src="./png.php?load=0" alt="" style="position:absolute;" />
-	<iframe src="<?php echo $webPage?>" onload="showPng();" id="webPageFrame" frameborder="0" scrolling="no" style="z-index:1; border-top:1px solid #888; <?php if ($width !== 0) echo 'width:'.($width - 25).'px;' ?>"></iframe>
+<br />
+<div id="overflowDiv">
+	<div id="pngDiv"></div>
+	<p><iframe src="<?php echo $webPage ?>" id="webPageFrame" onload="cleanIframe();" frameborder="0" scrolling="no" width="<?php echo $width - 40 ?>" height="100"></iframe></p>
 </div>
+<!--[if lt IE 7.]>
+<script defer type="text/javascript">var correctPng = true;</script>
+<![endif]-->
 <script type="text/javascript">
+var correctPng = (correctPng == undefined ? false : true);
 /** Resize the main div to the height of the current page */
 oD = document.documentElement != undefined && document.documentElement.clientHeight != 0 ? document.documentElement : document.body;
 iH = oD.innerHeight != undefined ? oD.innerHeight : oD.clientHeight;
-document.getElementById('overflowDiv').style.height = ((iH < 300 ? 400 : iH) - 135) + 'px';
+document.getElementById('overflowDiv').style.height = (iH < 300 ? 400 : iH) - 130 + 'px';
 /** Width of main display */
-if (document.getElementById('formWidth').value == 0)
+iW = oD.innerWidth != undefined ? oD.innerWidth : oD.clientWidth;
+/** Must reload if width is not defined */
+<?php if ($width === 0 && !isset($_GET['width'])): ?>
+window.location.href = 'index.php?width=' + (iW < 300 ? 400 : iW);
+<?php endif; ?>
+
+/** Ajax requests to update PNGs */
+function getNewPngs()
 {
-	iW = oD.innerWidth != undefined ? oD.innerWidth : oD.clientWidth;
-	document.getElementById('formWidth').value = (iW < 300 ? 400 : iW);
-	document.getElementById('webPageFrame').style.width = (iW < 300 ? 400 : iW) - 25 + 'px';
-}
-/** Update the PNG file */
-function showPng()
-{
-	document.getElementById('pngTag').onload = null;
-	if (document.getElementById('pngTag').src.search(/load=1/) == -1)
+	document.getElementById('pngDiv').innerHTML = '<span class="error"><?php echo addslashes(LANG_ERROR_LOADING); ?></span>';
+	try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
+	catch (e)
 	{
-		/** Displays a temporary PNG */
-		document.getElementById('pngTag').onload = showPng;
-		document.getElementById('pngTag').src = './png.php?load=1';
-		return true;
+		try { xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");	}
+		catch (oc) { xmlhttp = null; }
 	}
-	/** Set the iframe to the height of its content */
+	if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
+	xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&rand=' + Date(), true);
+	xmlhttp.onreadystatechange = function()
+	{
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+		{
+			document.getElementById('pngDiv').innerHTML = xmlhttp.responseText;
+			document.getElementById('webPageFrame').height = document.getElementById('pngDiv').offsetHeight < 100 ? 100 : document.getElementById('pngDiv').offsetHeight;
+			/**
+			* Correctly handle PNG transparency in Win IE 5.5 & 6. http://homepage.ntlworld.com/bobosola. Updated 18-Jan-2006.
+			* I've modified it a lot to meet my needs :-)
+			**/
+			if (correctPng == false) return true;
+
+			var arVersion = navigator.appVersion.split("MSIE");
+			var version = parseFloat(arVersion[1]);
+			if (version < 5.5 || document.body.filters == undefined) return true;
+
+			for (i = 0; i < document.images.length; i++)
+			{
+				var img = document.images[i];
+				if (img.src.search(/png\.php/) != -1)
+				{
+					img.outerHTML = '<span style="display:inline-block; margin-bottom:-1px; width:' + img.width + 'px; height:' + img.height + 'px; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\'' + img.src + '\', sizingMethod=\'scale\');"></span>';
+					i--;
+				}
+			}
+		}
+	}
+	xmlhttp.send(null);
+}
+var xmlhttp;
+
+getNewPngs();
+
+/** Hide iframe's flashes and iframes */
+function cleanIframe()
+{
 	try
 	{
 		var currentIframe = document.getElementById('webPageFrame');
-		currentIframe.style.display = 'block';
-		if (currentIframe.contentDocument && currentIframe.contentDocument.body.offsetHeight)
+		if (currentIframe.contentDocument)
 		{
 			currentIframeContent = currentIframe.contentDocument;
-			currentIframe.height = currentIframeContent.body.offsetHeight + 20;
 		}
-		else if (currentIframe.Document && currentIframe.Document.body.scrollHeight)
+		else if (currentIframe.Document)
 		{
 			currentIframeContent = currentIframe.Document;
-			currentIframe.height = currentIframeContent.body.scrollHeight + 20;
 		}
-		newHeight = currentIframe.height;
-		currentIframe.style.display = 'inline';
 		/** Hide iframes and flashes content */
 		if (currentIframeContent != undefined)
 		{
@@ -243,14 +301,7 @@ function showPng()
 			}
 		}
 	}
-	catch(e)
-	{
-		newHeight = 450;
-		document.getElementById('webPageFrame').height = 450;
-		document.getElementById('webPageFrame').style.display = 'inline';
-	}
-	/** Update the PNG */
-	document.getElementById('pngTag').src = './png.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&height=' + newHeight + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&rand=' + Date();
+	catch(e) {}
 }
 </script>
 </body>

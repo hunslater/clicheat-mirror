@@ -13,6 +13,43 @@ th {
 	text-align:left;
 	vertical-align:top;
 }
-input { border:1px solid #333;}
-img { border:0;}
-#url { float:right;}
+input {
+	border:1px solid #333;
+}
+img {
+	border:0;
+	padding:0;
+	margin:0;
+}
+#url {
+	float:right;
+	margin:5px;
+}
+#pngDiv {
+	position:absolute;
+	text-align:center;
+	width:100%;
+	line-height:1em;
+	margin:0;
+	padding:0;
+}
+#overflowDiv {
+	position:absolute;
+	left:0;
+	top:130px;
+	width:100%;
+	overflow-y:auto;
+}
+#overflowDiv p {
+	text-align:center;
+	padding:0;
+	margin:0;
+}
+#webPageFrame {
+	z-index:1;
+	border-top:1px solid #888;
+}
+.error {
+	color:#fff;
+	background-color:#f00;
+}	
