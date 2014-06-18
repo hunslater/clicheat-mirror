@@ -32,7 +32,7 @@ img {
 	position:absolute;
 	text-align:center;
 	width:100%;
-	line-height:1em;
+	line-height:0em;
 	margin:0;
 	padding:0;
 }

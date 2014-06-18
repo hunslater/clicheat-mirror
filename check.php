@@ -92,17 +92,17 @@ else
 ?></td></tr>
 <tr><th><?php echo LANG_CHECK_GD ?></th><td>
 <?php
-if (function_exists('imagecreate') === false)
-{
-	echo LANG_CHECK_GD_NA;
-}
-elseif (function_exists('imagecreatetruecolor') === false)
+if (function_exists('imagecreatetruecolor') === false)
 {
 	echo LANG_CHECK_GD_IMG;
 }
 elseif (function_exists('imagecolorallocatealpha') === false)
 {
 	echo LANG_CHECK_GD_ALPHA;
+}
+elseif (function_exists('imagepng') === false)
+{
+	echo LANG_CHECK_GD_PNG;
 }
 else
 {

@@ -41,7 +41,7 @@ $browsersList = array('all' => '', 'firefox' => 'Firefox', 'msie' => 'Internet E
 /**
  * Langues / Languages
 **/
-$availableLanguages = array('en', 'fr');
+$availableLanguages = array('en', 'fr', 'de');
 
 /**
  * Paramètres du PNG : antialias, limite mémoire...

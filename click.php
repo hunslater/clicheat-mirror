@@ -10,7 +10,7 @@
 include './config.php';
 
 /** Check parameters */
-if (!isset($_GET['x']) || !isset($_GET['y']) || !isset($_GET['w']) || !isset($_GET['p']) || !isset($_GET['b']))
+if (!isset($_GET['x']) || !isset($_GET['y']) || !isset($_GET['w']) || !isset($_GET['p']) || !isset($_GET['b']) || !isset($_GET['c']))
 {
 	exit;
 }
@@ -49,7 +49,7 @@ if ($f === false)
 }
 if ($f !== false)
 {
-	fputs($f, ((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser."\n");
+	fputs($f, ((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser.'|'.((int) $_GET['c'])."\n");
 	fclose($f);
 }
 ?>

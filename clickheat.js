@@ -13,7 +13,6 @@ Linux - Firefox 2.0.0.1, Konqueror 3.5.5, IE 7
 /** Main function */
 function catchClickHeat(e)
 {
-
 	/** Use a try{} to avoid showing errors to users */
 	try
 	{
@@ -21,12 +20,12 @@ function catchClickHeat(e)
 		if (e == undefined)
 		{
 			e = window.event;
-			b = e.button;
+			c = e.button;
 			element = e.srcElement;
 		}
 		else
 		{
-			b = e.which;
+			c = e.which;
 			element = null;
 		}
 		/** Filter for same iframe (focus on iframe => popup ad => close ad => new focus on same iframe) */
@@ -37,11 +36,6 @@ function catchClickHeat(e)
 				return true;
 			}
 			clickHeatLastIframe = element.sourceIndex;
-		}
-		else
-		{
-			/** Is it a left-click (not on iframe)? */
-			if (b != 1 && iFrameNumber == -1) return true;
 		}
 		x = e.clientX;
 		y = e.clientY;
@@ -56,7 +50,7 @@ function catchClickHeat(e)
 		b = navigator.userAgent != undefined ? navigator.userAgent.toLowerCase().replace(/-/g, '') : '';
 		b0 = b.replace(/^.*(firefox|kmeleon|safari|msie|opera).*$/, '$1');
 		if (b == b0 || b0 == '') b0 = 'unknown';
-		params = 'p=' + clickHeatPage + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&random=' + Date();
+		params = 'p=' + clickHeatPage + '&x=' + (x + scrollx) + '&y=' + (y + scrolly) + '&w=' + w + '&b=' + b0 + '&c=' + c + '&random=' + Date();
 		/** Local request? Try an ajax call */
 		if (clickHeatServer == '' || clickHeatServer.substring(0, 4) != 'http')
 		{

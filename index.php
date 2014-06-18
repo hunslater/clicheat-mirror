@@ -20,7 +20,7 @@ include './lang.'.$lang.'.php';
 include './login.php';
 
 /** Against people that just don't understand that a demo is not a tool to promote their url... */
-$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false;
+$demoServer = strpos($_SERVER['SERVER_NAME'], 'www.labsmedia.com') !== false;
 
 /** Input variables */
 $page = isset($_GET['page']) ? $_GET['page'] : '';
@@ -87,6 +87,7 @@ $webPage[3] = (int) $webPage[3];
 
 /** Date and days */
 $date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
+$date2 = isset($_GET['date2']) ? date('Y-m-d', strtotime($_GET['date2'])) : '1970-01-01';
 if ($date === '1970-01-01')
 {
 	if ($demoServer === true)
@@ -98,7 +99,10 @@ if ($date === '1970-01-01')
 		$date = date('Y-m-d');
 	}
 }
-$days = isset($_GET['days']) ? (int) $_GET['days'] : 1;
+if ($date2 === '1970-01-01')
+{
+	$date2 = $date;
+}
 
 asort($screenSizes);
 /** Width of display */
@@ -164,9 +168,9 @@ if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
 	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select></td><td>&nbsp;</td>
-	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /></td><td rowspan="2" valign="middle"><input type="checkbox" name="savePage" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td><td rowspan="2"></td></tr><?php } ?>
+	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /></td><td rowspan="2" valign="middle"><input type="checkbox" id="savePage" name="savePage" /> <input type="submit" onclick="document.getElementById('savePage').checked = true; return true;" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td><td rowspan="2"></td></tr><?php } ?>
 <tr>
-	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?></td><td rowspan="3"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_TO ?> <input type="text" name="date2" id="formDate2" size="10" value="<?php echo $date2 ?>" /></td><td rowspan="3"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 	<?php if ($demoServer === false) { ?><th><?php echo LANG_LAYOUT_WIDTH ?> <acronym onmouseover="showHelp('layout');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="webpage[1]" value="<?php echo $webPage[1] ?>" size="3" /> <input type="text" name="webpage[2]" value="<?php echo $webPage[2] ?>" size="3" /> <input type="text" name="webpage[3]" value="<?php echo $webPage[3] ?>" size="3" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 </tr>
 <tr>
@@ -174,7 +178,7 @@ if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select></td><td rowspan="2" valign="middle"><input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 <tr>
-	<th><?php echo LANG_HEATMAP ?></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /></td>
+	<th><?php echo LANG_HEATMAP ?> <acronym onmouseover="showHelp('heatmap');" onmouseout="showHelp('');">?</acronym></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /></td>
 	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select></td>
 </tr>
 </table>
@@ -204,7 +208,7 @@ if ($width === 0 && !isset($_GET['width'])) {
 ?>
 
 /** Ajax requests to update PNGs */
-document.getElementById('pngDiv').innerHTML = '<span class="error"><?php echo addslashes(LANG_ERROR_LOADING); ?></span>';
+document.getElementById('pngDiv').innerHTML = '&nbsp;<br style="line-height:20px" /><span class="error"><?php echo addslashes(LANG_ERROR_LOADING); ?></span>';
 try { xmlhttp = new ActiveXObject("Msxml2.XMLHTTP"); }
 catch (e)
 {
@@ -212,7 +216,7 @@ catch (e)
 	catch (oc) { xmlhttp = null; }
 }
 if (!xmlhttp && typeof XMLHttpRequest != undefined) xmlhttp = new XMLHttpRequest();
-xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&days=' + document.getElementById('formDays').value + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
+xmlhttp.open('GET', './generate.php?page=' + document.getElementById('formPage').value + '&screen=' + document.getElementById('formScreen').value + '&width=' + document.getElementById('formWidth').value + '&browser=' + document.getElementById('formBrowser').value + '&date=' + document.getElementById('formDate').value + '&date2=' + document.getElementById('formDate2').value + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
 xmlhttp.onreadystatechange = function()
 {
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)

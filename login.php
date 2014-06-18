@@ -13,9 +13,14 @@ if (CLICKHEAT_PASSWORD !== '' && (!isset($_COOKIE['clickheat']) || $_COOKIE['cli
 	if (isset($_POST['pass']) && $_POST['pass'] === CLICKHEAT_PASSWORD)
 	{
 		setcookie('clickheat', md5(CLICKHEAT_PASSWORD), 0, '/');
+		/** Content-Type for IIS only, else a CGI error appears */
+		header('Content-Type: text/html');
 		header('Location: '.$_SERVER['PHP_SELF']);
+		echo 'Location: '.$_SERVER['PHP_SELF'];
 		exit;
 	}
+	/** Content-Type for IIS only, else a CGI error appears */
+	header('Content-Type: text/html');
 	echo '<html><body><form method="post">', LANG_AUTHORIZATION, ' : <input type="password" name="pass"/><input type="submit" value="', LANG_CHECK_OK, '" /></form></body></html>';
 	exit;
 }
