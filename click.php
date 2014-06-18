@@ -26,9 +26,10 @@ if ($browser === '')
 	$browser = 'unknown';
 }
 /** Logging the click */
-if (@error_log(((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser."\n", 3, CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log') === false)
+$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log', 'a');
+if ($f === false)
 {
-	/** Can't write the log, let's try to create the directory */
+	/** Can't open the log, let's try to create the directory */
 	if (!is_dir(CLICKHEAT_LOGPATH))
 	{
 		@mkdir(CLICKHEAT_LOGPATH);
@@ -37,6 +38,11 @@ if (@error_log(((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).
 	{
 		@mkdir(CLICKHEAT_LOGPATH.$page.'/');
 	}
-	@error_log(((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser."\n", 3, CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log');
+	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/'.date('Y-m-d').'.log', 'a');
+}
+if ($f !== false)
+{
+	fputs($f, ((int) $_GET['x']).'|'.((int) $_GET['y']).'|'.((int) $_GET['w']).'|'.$browser."\n");
+	fclose($f);
 }
 ?>

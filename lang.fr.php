@@ -27,7 +27,7 @@ define('LANG_HEATMAP', 'Afficher les "températures"');
 define('LANG_ERROR_PASSWORD', 'Attention ! Vous n\'avez pas spécifié de mot de passe ou laissé celui par défaut, donc n\'importe qui a accès à cette page');
 define('LANG_ERROR_PAGE', 'Cette page est inconnue');
 define('LANG_ERROR_DATA', 'Pas d\'enregistrements pour la période choisie');
-define('LANG_ERROR_FILE', 'Impossible d\'ouvrir le fichier de suivi\'');
+define('LANG_ERROR_FILE', 'Impossible d\'ouvrir le fichier de suivi');
 define('LANG_ERROR_MEMORY', 'Limite mémoire non disponible, merci de jeter un oeil à config.php');
 define('LANG_ERROR_PNG', 'Ce fichier PNG n\'a pas été créé');
 define('LANG_ERROR_LOADING', 'Création de l\'image en cours, patience...');

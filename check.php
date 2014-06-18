@@ -47,7 +47,7 @@ if (is_dir(CLICKHEAT_LOGPATH) === false)
 if (is_dir(CLICKHEAT_LOGPATH) === true)
 {
 	/** Check if creation of directories is allowed */
-	if (@mkdir(CLICKHEAT_LOGPATH.'test_dir') === false)
+	if (is_dir(CLICKHEAT_LOGPATH.'test_dir') === false && @mkdir(CLICKHEAT_LOGPATH.'test_dir') === false)
 	{
 		echo LANG_CHECK_LOGPATH_MKDIR;
 	}
