@@ -213,7 +213,25 @@ function updateJs()
 {
 	var str = '';
 	var language = (navigator.language !== undefined && navigator.language == 'fr' ? 'fr' : 'com');
-	str += '&lt;script type="text/javascript" src="' + scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;\n';
+	str += '&lt;script type="text/javascript" src="';
+	str += scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;\n';
+	if (language == 'fr')
+	{
+		linkList = ['&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportementale des internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse comportement internautes&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Outils d\'analyse d\'audience&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Carte température page web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Analyse des clics&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation de l\'ergonomie&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/clickheat/index.html"&gt;Optimisation ergonimique&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils marketing&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils référencement&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Monétisation de contenu&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de site&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Optimisation de trafic&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Marketing web&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils seo&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils open source&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils webmaster gratuits&lt;/a&gt;', '&lt;a href="http://www.labsmedia.fr/index.html"&gt;Outils gratuits webmaster&lt;/a&gt;'];
+	}
+	else
+	{
+		linkList = ['&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Trafic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Click analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Surfer navigation analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Navigational analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Landing page optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Ergonomy optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Web design optimisation&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Heat map generator&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source heat map&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/clickheat/index.html"&gt;Open source trafic analysis&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Webmaster tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Free marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Open source marketing tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Seo tools&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Trafic optimization&lt;/a&gt;', '&lt;a href="http://www.labsmedia.com/index.html"&gt;Trafic monetization&lt;/a&gt;'];
+	}
+	if (document.getElementById('jsShowImage').checked)
+	{
+		str += '&lt;a href="http://www.labsmedia.' + language + '/clickheat/index.html" title="ClickHeat: clicks heatmap"&gt;&lt;img src="' + scriptPath + 'images/logo.png" width="80" height="15" border="0" alt="ClickHeat : track clicks" /&gt;&lt;/a&gt;\n';
+	}
+	else
+	{
+		rand = Math.floor(Math.random() * linkList.length);
+		str += '&lt;noscript&gt;' + linkList[rand] + '&lt;/noscript&gt;\n';
+	}
 	str += '&lt;script type="text/javascript"&gt;&lt;!--\n';
 	str += 'clickHeatSite = ';
 	/** PMV form */
@@ -243,20 +261,9 @@ function updateJs()
 	{
 		str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;\n';
 	}
-	if (scriptPath != '/clickheat/')
-	{
-		str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';\n';
-	}
-	str += 'initClickHeat();\n//--&gt;\n';
+	str += 'clickHeatServer = \'' + scriptPath + 'click' + (isPmvModule == true ? 'pmv' : '') + '.php\';\n';
+	str += 'initClickHeat(); //--&gt;\n';
 	str += '&lt;/script&gt;\n';
-	if (document.getElementById('jsShowImage').checked)
-	{
-		str += '&lt;a href="http://www.labsmedia.' + language + '/clickheat/index.html" title="ClickHeat: clicks heatmap"&gt;&lt;img src="' + scriptPath + 'images/logo.png" width="80" height="15" border="0" alt="ClickHeat : track clicks" /&gt;&lt;/a&gt;';
-	}
-	else
-	{
-		str += '&lt;noscript&gt;&lt;a href="http://www.labsmedia.' + language + '/clickheat/index.html" title="ClickHeat: clicks heatmap"&gt;clickheat&lt;/a&gt;&lt;/noscript&gt;'
-	}
 	document.getElementById('clickheat-js').innerHTML = str;
 }
 

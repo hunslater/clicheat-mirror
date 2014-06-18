@@ -51,7 +51,7 @@ define('LANG_JAVASCRIPT_GROUP1', 'допустимі символи: A-Z, a-z, 0
 define('LANG_JAVASCRIPT_GROUP2', 'використовувати заголовок сторінки (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">не рекомендується</a>)');
 define('LANG_JAVASCRIPT_GROUP3', 'використовувати адресу сторінки (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">не рекомендується</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Скопіюйте і вставте наступний код в кінець ваших сторінок (перед тегом &lt;/body&gt;):');
-define('LANG_JAVASCRIPT_DEBUG', 'Після того як код вставлено на Ваші сторінки не забудьте перевірити їх, відкриваючи сторінки з параметром <span class="error">debugclickheat</span>. Наприклад, для сайту http://www.site.com/index.html попробуйте http://www.site.com/index.html<span class="error">#debugclickheat</span>. Ви повинні побачити Javascript повідомлення, що показує стан Clickheat. Якщо у Вас виникають якісь труднощі, зверніться до нас за допомогою');
+define('LANG_JAVASCRIPT_DEBUG', 'Після того як код вставлено на Ваші сторінки не забудьте перевірити їх, відкриваючи сторінки з параметром <span class="error">debugclickheat</span>. Наприклад, для сайту http://www.site.com/index.html попробуйте http://www.site.com/index.html<span class="error">?debugclickheat</span>. Ви повинні побачити Javascript повідомлення, що показує стан Clickheat. Якщо у Вас виникають якісь труднощі, зверніться до нас за допомогою');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
 define('LANG_ERROR_GROUP', 'Невідома група. _JAVASCRIPT_');
 define('LANG_ERROR_DATA', 'Нема даних за вибраний період (перевірте спочатку фільтри: бравзер і розмір екрану). _JAVASCRIPT_');

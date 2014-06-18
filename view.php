@@ -186,7 +186,7 @@ cleanerRunning = '<?php echo addslashes(LANG_CLEANER_RUNNING); ?>';
 isJsOkay = '<?php echo CLICKHEAT_ADMIN === true ? '<a href="#" onclick="showJsCode(); return false;">'.addslashes(LANG_ERROR_JAVASCRIPT).'</a>' : '' ?>';
 hideIframes = <?php echo $clickheatConf['hideIframes'] === true ? 'true' : 'false' ?>;
 hideFlashes = <?php echo $clickheatConf['hideFlashes'] === true ? 'true' : 'false' ?>;
-scriptPath = '<?php echo CLICKHEAT_PATH ?>';
+scriptPath = 'http://<?php echo $_SERVER['HTTP_HOST'].CLICKHEAT_PATH ?>';
 scriptIndexPath = '<?php echo CLICKHEAT_INDEX_PATH ?>';
 lastDayOfMonth = <?php echo $__lastDayOfMonth ?>;
 currentDate = [<?php echo $__day, ',', $__month, ',', $__year, ',', $__month, ',', $__year ?>];

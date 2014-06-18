@@ -13,6 +13,7 @@
 ##
 ## @author Vincent Audino pour WAT - www.wat.tv
 ## @since 03/28/2007
+## @update 31/07/2007 - Yvan Taviaud : correction du paramètre «p=» qui devient «g=»
 ###
 
 
@@ -51,7 +52,7 @@ while(<LOGFILE>)
     if (/.*clickheat.*/ 
 	&& ($ignored eq "" || !/.*http:\/\/.*$ignored.*/) )
     {
-	if (s/.*\[(.*)\].*p=(.*)&x=([0-9]*)&y=([0-9]*)&w=([0-9]*)&b=(.*)&c=([0-9])&random=(.*) HTTP.* \"(http:\/\/.*)\" \".*\" .*/$1, $2, $3, $4, $5, $6, $7, $8, $9/)
+	if (s/.*\[(.*)\].*g=(.*)&x=([0-9]*)&y=([0-9]*)&w=([0-9]*)&b=(.*)&c=([0-9])&random=(.*) HTTP.* \"(http:\/\/.*)\" \".*\" .*/$1, $2, $3, $4, $5, $6, $7, $8, $9/)
 	{
 	    $date = ParseDate($1); $page = $2; $x = $3; $y = $4; $w = $5; $browser = $6; $c = $7; $random  = $8; $referer = $9;
 	    $page = 'none' if ($page eq '');

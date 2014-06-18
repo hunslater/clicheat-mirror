@@ -20,7 +20,7 @@ else
 {
 	exit(LANG_UNKNOWN_DIR);
 }
-if (substr($realPath, -1, 1) === '/')
+if (substr($realPath, -1) === '/')
 {
 	header('Location: '.$realPath.'index.php');
 	exit;
@@ -30,7 +30,7 @@ if (substr($realPath, -1, 1) === '/')
 if (defined('INCLUDE_PATH'))
 {
 	define('CLICKHEAT_PATH', dirname($realPath).'/plugins/clickheat/libs/');
-	define('CLICKHEAT_INDEX_PATH', dirname($realPath).'/index.php?mod=clickheat.view_clickheat&');
+	define('CLICKHEAT_INDEX_PATH', 'index.php?mod=clickheat.view_clickheat&');
 	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
 	define('CLICKHEAT_CONFIG', INCLUDE_PATH.'/config/clickheat.php');
 	define('IS_PHPMV_MODULE', true);
@@ -38,7 +38,7 @@ if (defined('INCLUDE_PATH'))
 else
 {
 	define('CLICKHEAT_PATH', dirname($realPath).'/');
-	define('CLICKHEAT_INDEX_PATH', dirname($realPath).'/index.php?');
+	define('CLICKHEAT_INDEX_PATH', 'index.php?');
 	define('CLICKHEAT_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
 	define('CLICKHEAT_CONFIG', CLICKHEAT_ROOT.'config/config.php');
 	define('IS_PHPMV_MODULE', false);

@@ -51,7 +51,7 @@ define('LANG_JAVASCRIPT_GROUP1', 'allowed characters: A-Z, a-z, 0-9, underscore,
 define('LANG_JAVASCRIPT_GROUP2', 'use a page\'s title (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
 define('LANG_JAVASCRIPT_GROUP3', 'use webpage\'s address (<a href="http://www.labsmedia.com/clickheat/performance.html" target="_blank">not recommended</a>)');
 define('LANG_JAVASCRIPT_PASTE', 'Copy and paste the code below on your pages, just before the end of the page (before &lt;/body&gt; tag):');
-define('LANG_JAVASCRIPT_DEBUG', 'Once the code pasted on your pages, don\'t forget to test if the code works correctly, by calling your page with the parameter <span class="error">debugclickheat</span>. For example for http://www.site.com/index.html call http://www.site.com/index.html<span class="error">#debugclickheat</span>. You should see a Javascript alert showing the state of Clickheat. If you encounter any problem, feel free to contact us');
+define('LANG_JAVASCRIPT_DEBUG', 'Once the code pasted on your pages, don\'t forget to test if the code works correctly, by calling your page with the parameter <span class="error">debugclickheat</span>. For example for http://www.site.com/index.html call http://www.site.com/index.html<span class="error">?debugclickheat</span>. You should see a Javascript alert showing the state of Clickheat. If you encounter any problem, feel free to contact us');
 define('LANG_NO_CLICK_BELOW', 'No clicks recorded beneath this line'); // Leave this line in English please
 define('LANG_ERROR_GROUP', 'Unknown group. _JAVASCRIPT_');
 define('LANG_ERROR_DATA', 'No logs for the selected period (first think removing filters: browser, screensize). _JAVASCRIPT_');

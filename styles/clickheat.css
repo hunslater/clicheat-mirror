@@ -55,19 +55,17 @@ img {
 #pngDiv {
 	position:absolute;
 	text-align:center;
-	width:100%;
 	line-height:0;
 	margin:0;
 	padding:0;
 }
 #overflowDiv {
 	position:absolute;
-	margin:2px auto 0;
-	width:100%;
+	margin:0;
+	padding:0;
 	overflow-y:auto;
 }
 #overflowDiv p {
-	text-align:center;
 	padding:0;
 	margin:0;
 }

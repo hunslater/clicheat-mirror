@@ -64,18 +64,39 @@ if (!is_dir($clickheatConf['logPath'].$group))
 $heatmap = isset($_GET['heatmap']) && $_GET['heatmap'] === '1';
 
 /** Date and days */
-$dateStamp = isset($_GET['date']) ? strtotime($_GET['date']) : time();
+$time = isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+$dateStamp = isset($_GET['date']) ? strtotime($_GET['date']) : $time;
 $range = isset($_GET['range']) && in_array($_GET['range'], array('d', 'w', 'm')) ? $_GET['range'] : 'd';
-$days = $range === 'd' ? 1 : ($range === 'w' ? 7 : date('t', $dateStamp));
 $date = date('Y-m-d', $dateStamp);
+switch ($range)
+{
+	case 'd':
+		{
+			$days = 1;
+			$delay = date('dmy', $dateStamp) !== date('dmy') ? 86400 : 120;
+			break;
+		}
+	case 'w':
+		{
+			$days = 7;
+			$delay = date('Wy', $dateStamp) !== date('Wy') ? 86400 : 120;
+			break;
+		}
+	case 'm':
+		{
+			$days = date('t', $dateStamp);
+			$delay = date('my', $dateStamp) !== date('my') ? 86400 : 120;
+			break;
+		}
+}
 
 $imagePath = $group.'-'.$date.'-'.$range.'-'.$screen.'-'.$browser.'-'.($heatmap === true ? 'heat' : 'click');
+$htmlPath = $clickheatConf['cachePath'].$imagePath.'.html';
 
 /** If images are already created, just stop script here if these have less than 120 seconds (today's log) or 86400 seconds (old logs) */
-$delay = $days === 1 && date('d', $dateStamp) !== date('d') ? 86400 : 120;
-if (file_exists($clickheatConf['cachePath'].$imagePath.'.html') && filemtime($clickheatConf['cachePath'].$imagePath.'.html') > time() - $delay)
+if (file_exists($htmlPath) && filemtime($htmlPath) > $time - $delay)
 {
-	readfile($clickheatConf['cachePath'].$imagePath.'.html');
+	readfile($htmlPath);
 	exit;
 }
 
@@ -123,7 +144,6 @@ if ($result === false)
 	errorGenerate($clicksHeatmap->error);
 }
 $html = '';
-$time = isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
 for ($i = 0; $i < $result['count']; $i++)
 {
 	$html .= '<img src="'.CLICKHEAT_INDEX_PATH.'action=png&amp;file='.$result['filenames'][$i].'&amp;rand='.$time.'" width="'.$result['width'].'" height="'.$result['height'].'" alt="" id="heatmap-'.$i.'" /><br />';
@@ -131,7 +151,7 @@ for ($i = 0; $i < $result['count']; $i++)
 echo $html;
 
 /** Save the HTML code to speed up following queries (only over two minutes) */
-$f = fopen($clickheatConf['cachePath'].$imagePath.'.html', 'w');
+$f = fopen($htmlPath, 'w');
 fputs($f, $html);
 fclose($f);
 

@@ -223,6 +223,7 @@ if ($memorySet === 0)
 	/** PHP doesn't give us the real limit */
 	if ($memoryLimit === 0)
 	{
+		$memoryLimit = 8;
 		$memoryRange = array(8, 8);
 	}
 	else

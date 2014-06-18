@@ -168,21 +168,15 @@ function catchClickHeat(e)
 	return true;
 }
 
-var clickHeatPage = ''; /** Backward compatibility */
 var clickHeatGroup = '';
 var clickHeatSite = '';
-var clickHeatServer = '/clickheat/click.php';
+var clickHeatServer = '';
 var clickHeatLastIframe = -1;
 var clickHeatTime = 0;
 var clickHeatQuota = -1;
 var clickHeatDebug = (window.location.href.search(/debugclickheat/) != -1);
 function initClickHeat()
 {
-	/** Backward compatibility */
-	if (clickHeatGroup == '' && clickHeatPage != '')
-	{
-		clickHeatGroup = clickHeatPage;
-	}
 	if (clickHeatGroup == '' || clickHeatServer == '')
 	{
 		if (clickHeatDebug == true)
@@ -190,6 +184,12 @@ function initClickHeat()
 			alert('ClickHeat NOT initialised: either clickHeatGroup or clickHeatServer is empty');
 		}
 		return false;
+	}
+	/** If current website has the same domain as the script, we remove the domain so that the call is made using Ajax */
+	domain = window.location.href.match(/http:\/\/[^/]+\//);
+	if (domain != null && clickHeatServer.substring(0, domain[0].length) == domain[0])
+	{
+		clickHeatServer = clickHeatServer.substring(domain[0].length - 1, clickHeatServer.length)
 	}
 	/** Add onmousedown event */
 	if (typeof document.onmousedown == 'function')
