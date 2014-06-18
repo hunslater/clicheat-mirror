@@ -95,6 +95,48 @@ if ($file !== $page)
 {
 	errorGenerate(LANG_ERROR_PAGE);
 }
+/** Get some data for the current page (centered and/or fixed layout) */
+if (file_exists(CLICKHEAT_LOGPATH.$page.'/url.txt'))
+{
+	$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'r');
+	$webPage = trim(fgets($f, 1024));
+	fclose($f);
+}
+else
+{
+	$webPage = '';
+}
+$webPage = explode('>', $webPage);
+if (count($webPage) !== 4)
+{
+	$leftWidth = 0;
+	$centerWidth = 0;
+	$rightWidth = 0;
+}
+else
+{
+	$leftWidth = (int) $webPage[1];
+	$centerWidth = (int) $webPage[2];
+	$rightWidth = (int) $webPage[3];
+}
+if ($leftWidth !== 0 && $centerWidth !== 0 && $rightWidth === 0)
+{
+	/** Fixed left menu and fixed center ? Fall back to a fixed left menu only */
+	$leftWidth += $centerWidth;
+	$centerWidth = 0;
+}
+elseif ($leftWidth === 0 && $centerWidth !== 0 && $rightWidth !== 0)
+{
+	/** Fixed right menu and fixed center ? Fall back to a fixed right menu only */
+	$rightWidth += $centerWidth;
+	$centerWidth = 0;
+}
+elseif ($leftWidth !== 0 && $centerWidth !== 0 && $rightWidth !== 0)
+{
+	/** Everything is fixed ?? */
+	errorGenerate(LANG_ERROR_FIXED);
+}
+unset($webPage);
 
 /** Show clicks or heatmap */
 $heatmap = isset($_GET['heatmap']) ? (int) $_GET['heatmap']: 0;
@@ -157,29 +199,93 @@ for ($image = 0; $image < $nbOfImages; $image++)
 			$click = explode('|', trim(fgets($f, 1024)));
 			if (count($click) === 4 && $click[2] > $minScreen && $click[2] <= $maxScreen && ($browser === 'all' || $browser === $click[3]))
 			{
-				/** If X-position is greater than screen size, the website is too large for the window, so we don't know where the click is... so treat is as absolute */
-				$click[0] = (int) $click[0];
-				$click[1] = (int) $click[1];
-				$click[2] = (int) $click[2];
-				if ($click[0] < $click[2])
+				$click[0] = (int) $click[0]; // X
+				$click[1] = (int) $click[1]; // Y
+				$click[2] = (int) $click[2]; // display width
+				if ($click[0] > $click[2])
 				{
-					$x = ceil($width / $click[2] * $click[0]);
+					/** If X is greater than screen size, the website is too large for the window, so we don't know where the click is... ignore it */
+					continue;
 				}
-				elseif ($click[0] <= $width)
+				/** Correction of X for liquid and/or fixed layouts */
+				if ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth === 0)
 				{
-					$x = $click[0];
+					/** Left fixed menu */
+					if ($click[0] <= $leftWidth)
+					{
+						/** Click in the left menu : X is good */
+						$x = $click[0];
+					}
+					else
+					{
+						/** Apply a percentage on the rest of the screen */
+						$x = $leftWidth + ceil(($width - $leftWidth) * ($click[0] - $leftWidth) / ($click[2] - $leftWidth));
+					}
+				}
+				elseif ($leftWidth === 0 && $centerWidth === 0 && $rightWidth !== 0)
+				{
+					/** Right fixed menu */
+					if ($click[2] - $click[0] <= $rightWidth)
+					{
+						/** Click in the right menu : X is good, but relative to the right border */
+						$x = $width - ($click[2] - $click[0]);
+					}
+					else
+					{
+						/** Apply a percentage on the rest of the screen */
+						$x = ceil(($width - $rightWidth) * $click[0] / ($click[2] - $rightWidth));
+					}
+				}
+				elseif ($leftWidth !== 0 && $centerWidth === 0 && $rightWidth !== 0)
+				{
+					/** Left and right fixed menus */
+					if ($click[2] - $click[0] <= $rightWidth)
+					{
+						/** Click in the right menu : X is good, but relative to the right border */
+						$x = $width - ($click[2] - $click[0]);
+					}
+					elseif ($click[0] <= $leftWidth)
+					{
+						/** Click in the left menu : X is good */
+						$x = $click[0];
+					}
+					else
+					{
+						/** Apply a percentage on the rest of the screen */
+						$x = $leftWidth + ceil(($width - $leftWidth - $rightWidth) * ($click[0] - $leftWidth) / ($click[2] - $leftWidth - $rightWidth));
+					}
+				}
+				elseif ($leftWidth === 0 && $centerWidth !== 0 && $rightWidth === 0)
+				{
+					/** Fixed centered content */
+					if (abs($click[0] - $click[2] / 2) <= $centerWidth / 2)
+					{
+						/** Click is in the centered content */
+						$x = ($width - $click[2]) / 2 + $click[0];
+					}
+					elseif ($click[0] < $click[2] / 2)
+					{
+						/** Click is at the left of the centered content */
+						$x = ($width - $centerWidth) / ($click[2] - $centerWidth) * $click[0];
+					}
+					else
+					{
+						/** Click is at the right of the centered content */
+						$x = ($width + $centerWidth) / 2 + ($width - $centerWidth) / ($click[2] - $centerWidth) * ($click[0] - ($click[2] + $centerWidth) / 2);
+					}
 				}
 				else
 				{
-					$x = -1;
+					/** Layout 100% */
+					$x = $width / $click[2] * $click[0];
 				}
 				$y = $click[1];
 				if ($image === 0)
 				{
-					/** Look for the maximum height of click */
+					/** Looking for the maximum height of click */
 					$maxY = max($y, $maxY);
 				}
-				if ($y >= $minHeight && $y < $maxHeight && $x >= 0)
+				if ($y >= $minHeight && $y < $maxHeight && $x >= 0 && $x <= $width)
 				{
 					if ($heatmap === 1)
 					{

@@ -19,6 +19,9 @@ include './lang.'.$lang.'.php';
 /** Login check */
 include './login.php';
 
+/** Against people that just don't understand that a demo is not a tool to promote their url... */
+$demoServer = strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') !== false || strpos($_SERVER['SERVER_NAME'], '.lacoccinelle.net') !== false;
+
 /** Input variables */
 $page = isset($_GET['page']) ? $_GET['page'] : '';
 $screen = isset($_GET['screen']) ? (int) $_GET['screen'] : 0;
@@ -27,7 +30,7 @@ $browser = isset($_GET['browser']) ? $_GET['browser'] : '';
 $heatmap = isset($_GET['heatmap']);
 
 /** Ask for page logs deletion (and png images too) */
-if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15)) && $page !== '')
+if (isset($_GET['delete_logs']) && in_array($_GET['delete_logs'], array(1, 7, 15)) && $page !== '' && $demoServer === false)
 {
 	$page = str_replace(array('.', '/'), array('', ''), $page);
 	if (is_dir(CLICKHEAT_LOGPATH.$page))
@@ -104,19 +107,26 @@ if ($page !== '')
 	{
 		$webPage = '';
 	}
-	/** Against people that just don't understand that a demo is not a tool to promote their url... */
-	if (isset($_GET['webpage']) && $webPage !== $_GET['webpage'] && $_GET['webpage'] !== '' && strpos($_SERVER['HTTP_HOST'], '.labsmedia.') === false && strpos($_SERVER['HTTP_HOST'], '.lacoccinelle.net') === false)
+	$webPageGet = isset($_GET['webpage']) && is_array($_GET['webpage']) && count($_GET['webpage']) === 4 ? $_GET['webpage'][0].'>'.((int) $_GET['webpage'][1]).'>'.((int) $_GET['webpage'][2]).'>'.((int) $_GET['webpage'][3]) : '';
+	if ($demoServer === false)
 	{
-		$webPage = $_GET['webpage'];
-		$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'w');
-		fputs($f, $_GET['webpage']);
-		fclose($f);
+		if ($webPage !== $webPageGet && $webPageGet !== '')
+		{
+			$webPage = $webPageGet;
+			$f = @fopen(CLICKHEAT_LOGPATH.$page.'/url.txt', 'w');
+			fputs($f, $webPage);
+			fclose($f);
+		}
 	}
 }
-if ($webPage === '')
+$webPage = explode('>', $webPage);
+if (count($webPage) !== 4)
 {
-	$webPage = '../';
+	$webPage = array('../', 0, 0, 0);
 }
+$webPage[1] = (int) $webPage[1];
+$webPage[2] = (int) $webPage[2];
+$webPage[3] = (int) $webPage[3];
 
 /** Date and days */
 $date = isset($_GET['date']) ? date('Y-m-d', strtotime($_GET['date'])) : '1970-01-01';
@@ -189,26 +199,26 @@ if (CLICKHEAT_PASSWORD === '' || CLICKHEAT_PASSWORD === 'demo')
 <form action="index.php" method="get" id="clickForm">
 <table cellpadding="0" cellspacing="1" border="0" width="100%">
 <tr>
-	<th><?php echo LANG_PAGE ?></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small></td>
-	<?php if (strpos($_SERVER['SERVER_NAME'], '.labsmedia.com') === false && strpos($_SERVER['SERVER_NAME'], '.lacoccinelle.net') === false) { ?><th><?php echo LANG_EXAMPLE_URL ?></th><td><input type="text" id="webpage" name="webpage" value="<?php echo htmlentities($webPage)?>" size="30" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
+	<th><?php echo LANG_PAGE ?> <acronym onmouseover="showHelp('page');" onmouseout="showHelp('');">?</acronym></th><td><select name="page" id="formPage" onchange="document.getElementById('webpage').value = ''; document.getElementById('clickForm').submit();"><?php echo $selectPages ?></select> <?php if ($demoServer === false) { ?><small><?php echo LANG_DELETE_LOGS ?> <a href="?delete_logs=1&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">1</a> <a href="?delete_logs=7&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">7</a> <a href="?delete_logs=15&amp;page=<?php echo $page ?>&amp;width=<?php echo $width ?>" onclick="if(!confirm('<?php echo LANG_SURE ?> ?')) return false;">15</a> <?php echo LANG_DAYS ?></small><?php } ?></td>
+	<?php if ($demoServer === false) { ?><th><?php echo LANG_EXAMPLE_URL ?> <acronym onmouseover="showHelp('web');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" id="webpage0" name="webpage[0]" value="<?php echo htmlentities($webPage[0])?>" size="15" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 <tr>
-	<th><?php echo LANG_DATE ?></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_DATE ?> <acronym onmouseover="showHelp('date');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="date" id="formDate" size="10" value="<?php echo $date ?>" /> <?php echo LANG_FOR ?> <input type="text" name="days" id="formDays" size="2" value="<?php echo $days ?>" /> <?php echo LANG_DAYS ?> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<?php if ($demoServer === false) { ?><th><?php echo LANG_LAYOUT_WIDTH ?> <acronym onmouseover="showHelp('layout');" onmouseout="showHelp('');">?</acronym></th><td><input type="text" name="webpage[1]" value="<?php echo $webPage[1] ?>" size="3" /> <input type="text" name="webpage[2]" value="<?php echo $webPage[2] ?>" size="3" /> <input type="text" name="webpage[3]" value="<?php echo $webPage[3] ?>" size="3" /> <input type="submit" value="<?php echo LANG_SAVE ?>" /></td></tr><?php } else { ?><th></th><td></td></tr><?php } ?>
 </tr>
 <tr>
 	<th><?php echo LANG_BROWSER ?></th><td><select name="browser" id="formBrowser"><?php echo $selectBrowsers ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
+	<th><?php echo LANG_DISPLAY_WIDTH ?></th><td><select name="width" id="formWidth"><?php echo $selectWidths ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 <tr>
 	<th><?php echo LANG_HEATMAP ?></th><td><input type="checkbox" id="formHeatmap" name="heatmap"<?php if ($heatmap === true) echo ' checked="checked"'; ?> /> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
-	<th></th><td>&nbsp;</td>
+	<th><?php echo LANG_SCREENSIZE ?></th><td><select name="screen" id="formScreen"><?php echo $selectScreens ?></select> <input type="submit" value="<?php echo LANG_UPDATE ?>" /></td>
 </tr>
 </table>
 </form>
-<br />
 <div id="overflowDiv">
+	<div id="helpDiv"></div>
 	<div id="pngDiv"></div>
-	<p><iframe src="<?php echo $webPage ?>" id="webPageFrame" onload="cleanIframe();" frameborder="0" scrolling="no" width="<?php echo $width - 40 ?>" height="100"></iframe></p>
+	<p><iframe src="<?php echo $webPage[0] ?>" id="webPageFrame" onload="cleanIframe();" frameborder="0" scrolling="no" width="<?php echo $width - 40 ?>" height="100"></iframe></p>
 </div>
 <!--[if lt IE 7.]>
 <script defer type="text/javascript">var correctPng = true;</script>
@@ -301,6 +311,27 @@ function cleanIframe()
 		}
 	}
 	catch(e) {}
+}
+
+/** Show contextual help */
+var helpText = new Array();
+<?php
+foreach ($__jsHelp as $key => $text)
+{
+	echo 'helpText[\'', $key, '\'] = \'', addslashes($text), '\';';
+}
+?>
+function showHelp(id)
+{
+	if (id == '')
+	{
+		document.getElementById('helpDiv').style.display = 'none';
+	}
+	else
+	{
+		document.getElementById('helpDiv').innerHTML = helpText[id];
+		document.getElementById('helpDiv').style.display = 'block';
+	}
 }
 </script>
 </body>

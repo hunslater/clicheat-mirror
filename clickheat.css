@@ -15,6 +15,10 @@ th {
 }
 input {
 	border:1px solid #333;
+	font-size:12px;
+}
+form {
+	margin:0px;
 }
 img {
 	border:0;
@@ -52,4 +56,18 @@ img {
 .error {
 	color:#fff;
 	background-color:#f00;
-}	
+}
+#helpDiv {
+	padding:2px;
+	margin:0 5px;
+	border:1px dashed #446;
+	background-color:#ddf;
+	display:none;
+}
+acronym {
+	font-weight:bold;
+	border:1px solid #446;
+	background-color:#ddf;
+	color:#446;
+	padding:1px;
+}

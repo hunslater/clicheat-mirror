@@ -9,7 +9,7 @@
 define('LANG_TITLE', 'ClickHeat : visualisation et analyse des clics');
 define('LANG_H1', 'ClickHeat : analyse des clics');
 define('LANG_AUTHORIZATION', 'Désolé, mais cette page est protégée, vous devez entrer le bon mot de passe');
-define('LANG_DELETE_LOGS', 'Supprimer les enregistrements de plus de');
+define('LANG_DELETE_LOGS', 'Supprimer les clics de plus de');
 define('LANG_DAYS', 'jour(s)');
 define('LANG_SURE', 'Sûr');
 define('LANG_UPDATE', 'Actualiser');
@@ -19,8 +19,9 @@ define('LANG_BROWSER', 'Navigateur');
 define('LANG_ALL', 'Tous');
 define('LANG_UNKNOWN', 'Autres/inconnus');
 define('LANG_DATE', 'Date de début');
-define('LANG_FOR', 'pour');
-define('LANG_EXAMPLE_URL', 'Page internet <small>(affichée sous l\'image des clics, absolue ou relative)</small>');
+define('LANG_FOR', 'sur');
+define('LANG_EXAMPLE_URL', 'Page internet');
+define('LANG_LAYOUT_WIDTH', 'Mise en page : gauche, centre, droite');
 define('LANG_DISPLAY_WIDTH', 'Taille de l\'affichage ci-dessous');
 define('LANG_SCREENSIZE', 'Taille d\'écran');
 define('LANG_HEATMAP', 'Afficher les "températures"');
@@ -32,6 +33,7 @@ define('LANG_ERROR_MEMORY', 'Limite mémoire non disponible, merci de jeter un o
 define('LANG_ERROR_PNG', 'Ce fichier PNG n\'a pas été créé');
 define('LANG_ERROR_LOADING', 'Création de l\'image en cours, patience...');
 define('LANG_ERROR_DIRECTORY', 'Le répertoire des fichiers de suivi n\'existe pas => merci de lancer le <a href="check.php">script check.php</a> dans un premier temps');
+define('LANG_ERROR_FIXED', 'Toutes les largeurs sont fixes, ce qui est impossible. Merci de changer une des largeurs de votre mise en page ci-dessus.');
 define('LANG_CHECKS', 'Vérifications principales pour ClickHeat');
 define('LANG_CHECKS_TO_BE', 'Tous les champs doivent afficher OK pour que le programme fonctionne bien (sauf "Votre système")');
 define('LANG_CHECK_SYSTEM', 'Votre système (pour information)');
@@ -48,4 +50,10 @@ define('LANG_CHECK_GD_IMG', 'imagecreatetruecolor() non disponible, impossible d
 define('LANG_CHECK_GD_ALPHA', 'imagecolorallocatealpha() non disponible, impossible de créer des images transparentes (vous pouvez vous en passer, mais c\'est fortement recommandé)');
 define('LANG_CHECK_GD_ANTIALIAS', 'imagefilter() non disponible (nécessite PHP 5+), impossible d\'appliquer un effet d\'antialias/fondu (vous pouvez vous en passer sans souci)');
 define('LANG_CHECK_OK', 'OK');
+$__jsHelp = array(
+	'layout' => 'Mise en page du site : 0 = taille automatique, sinon c\'est la valeur en pixels de la colonne.<br />Exemples : menu gauche fixe de 100px, le contenu prend la place restante : 100 0 0<br />Contenu 750px, le tout centré (avec un menu éventuel dans les 750px) : 0 750 0<br />Menu gauche fixe 100px, contenu collé à gauche de 650px : 100 650 0 ou 750 0 0 (car tout est à gauche)<br />Menus à gauche et à droite, fixes de 100px, le contenu central prend toute la place : 100 0 100<br />Contenu à 100% : 0 0 0<br /><br />Si votre contenu principal n\'est pas fixe, vous feriez bien de sélectionner la même "Taille d\'écran" que la "Taille de l\'affichage ci-dessous" pour que les clics soient biens placés.',
+	'page' => 'Il s\'agit du tag choisi lors de l\'installation du code Javascript : initClickheat(\'page\');',
+	'date' => 'Choisissez ici la date à étudier, au format AAAA-MM-JJ. Si vous avez peu de données, il peut être intéressant d\'étendre l\'étude sur plusieurs jours : remplissez le 2e champ pour cela. Exemple : 2007-02-01, sur 7 jours, affichera la somme des clics enregistrés entre le 1er février et le 6 février 2007.',
+	'web' => 'Indiquez ici une adresse internet qui a le marqueur correspondant à la page en cours (paramètre "Page" ci-contre), cette page sera ainsi affichée sous la carte de température. Par défaut, l\'adresse est "../" qui est normalement la racine de votre site. Vous pouvez indiquer une adresse absolue (http://www.mon-site.com/page.html ou plus simplement /page.html) ou relative (../page.html)'
+);
 ?>

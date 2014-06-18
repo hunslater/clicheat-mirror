@@ -20,9 +20,10 @@ define('LANG_ALL', 'All');
 define('LANG_UNKNOWN', 'Other/unknown');
 define('LANG_DATE', 'Start date');
 define('LANG_FOR', 'for');
-define('LANG_EXAMPLE_URL', 'Webpage <small>(shown under heatmap, absolute or relative)</small>');
+define('LANG_EXAMPLE_URL', 'Webpage');
+define('LANG_LAYOUT_WIDTH', 'Layout widths : left, center, right');
 define('LANG_DISPLAY_WIDTH', 'Results display size');
-define('LANG_SCREENSIZE', 'Screen sizes');
+define('LANG_SCREENSIZE', 'Screen size');
 define('LANG_HEATMAP', 'Show as heatmap');
 define('LANG_ERROR_PASSWORD', 'Beware ! You didn\'t speficied any password or didn\'t change the default one, so anyone has access to this page');
 define('LANG_ERROR_PAGE', 'Unknown page');
@@ -32,6 +33,7 @@ define('LANG_ERROR_MEMORY', 'Memory limit not available in ini_get(), please loo
 define('LANG_ERROR_PNG', 'This PNG file has not been created');
 define('LANG_ERROR_LOADING', 'Generating image, please wait...');
 define('LANG_ERROR_DIRECTORY', 'Logging directory doesn\'t exist => please run the <a href="check.php">check.php script</a> first');
+define('LANG_ERROR_FIXED', 'All widths are fixed, that is not possible. Please change one of your layout width above.');
 define('LANG_CHECKS', 'Main checks for ClickHeat');
 define('LANG_CHECKS_TO_BE', 'All rows must display OK so the script works well (except "Your system")');
 define('LANG_CHECK_SYSTEM', 'Your system (just for information)');
@@ -48,4 +50,10 @@ define('LANG_CHECK_GD_IMG', 'imagecreatetruecolor() unavailable, can\'t create i
 define('LANG_CHECK_GD_ALPHA', 'imagecolorallocatealpha() unavailable, can\'t create transparent images (you can ignore this, but transparency is really recommended)');
 define('LANG_CHECK_GD_ANTIALIAS', 'imagefilter() unavailable (PHP 5+ required), can\'t use antialias/gaussian filters (you can ignore this)');
 define('LANG_CHECK_OK', 'OK');
+$__jsHelp = array(
+	'layout' => 'Site layout : 0 = automatic width, else it\'s column\'s width in pixels.<br />Examples : fixed 100px left menu, content uses the available space left : 100 0 0<br />Content 750px, centered (with an optional menu within 750px) : 0 750 0<br />Left fixed 100px menu, content 650px align to the left : 100 650 0 or 750 0 0 (because everything is on the left)<br />Left and right menus, fixed 100px, central content uses the available space left : 100 0 100<br />100% content : 0 0 0<br /><br />If your main content is not fixed, you should select the same "Screen size" as "Results display size" so that the clicks are at the good position.',
+	'page' => 'This is the tag used while installing Javascript code : initClickheat(\'page\');',
+	'date' => 'Choose the report date, format is YYYY-MM-DD. If you have few data, it might be interesting to enlarge the report over many days : fill in the second field for this. Example : 2007-02-01, over 7 days, will show the sum of clicks logged between the 1st and 6th of February 2007.',
+	'web' => 'Provide an internet address here which has the tag relative to the current page (parameter "Page" on the left), this page will be shown under the heatmap. Default is address "../", which probably is the root of your website. You can use an absolute address (http://www.my-site.com/page.html or simply /page.html) or relative (../page.html)'
+);
 ?>
